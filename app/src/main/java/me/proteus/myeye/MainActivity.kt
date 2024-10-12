@@ -4,13 +4,17 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Button
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -53,19 +57,15 @@ fun SnellenChart(modifier: Modifier = Modifier) {
     Column(
         modifier = Modifier.fillMaxSize().padding(16.dp),
         verticalArrangement = Arrangement.SpaceBetween,
-        horizontalAlignment = Alignment.CenterHorizontally
+        horizontalAlignment = Alignment.CenterHorizontally,
     ) {
 
         Box (
             modifier = modifier
-                .fillMaxSize()
-                .clickable(onClick = {
-                    if (stage < 8) stage++;
-                    text = generateText(stage)
-                    println(stage)
-                })
+                .weight(1f)
+                .fillMaxWidth()
                 .padding(bottom = 16.dp),
-            contentAlignment = Alignment.Center
+            contentAlignment = Alignment.Center,
         ) {
             Text(
                 text = text,
@@ -76,7 +76,39 @@ fun SnellenChart(modifier: Modifier = Modifier) {
                 modifier = modifier
             )
         }
+
+        ButtonRow(
+            onRegenerate = { text = generateText(stage) },
+            onSizeIncrease = { if (stage > 1) { stage--; text = generateText(stage)} },
+            onSizeDecrease = { if (stage < 10) { stage++; text = generateText(stage) } }
+        )
     }
+}
+
+@Composable
+fun ButtonRow(
+    onRegenerate: () -> Unit,
+    onSizeIncrease: () -> Unit,
+    onSizeDecrease: () -> Unit,
+    modifier: Modifier = Modifier) {
+
+    Row(
+        modifier = modifier
+            .fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceEvenly,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Button(onClick = { onSizeIncrease() }) {
+            Text(text = "Wieksze litery")
+        }
+        Button(onClick = { onRegenerate() }) {
+            Text(text = "Losuj litery")
+        }
+        Button(onClick = { onSizeDecrease() }) {
+            Text(text = "Mniejsze litery")
+        }
+    }
+
 }
 
 fun generateText(stage: Int): String {
