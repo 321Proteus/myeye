@@ -11,6 +11,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.setValue
@@ -61,12 +62,9 @@ fun SnellenChart(modifier: Modifier = Modifier) {
                 .padding(bottom = 16.dp),
             contentAlignment = Alignment.Center,
         ) {
-            Text(
-                text = text,
-                color = Color.Black,
-                fontSize = (27*(9-stage)).sp,
-                letterSpacing = 16.sp,
-                fontFamily = FontFamily(Font(R.font.opticiansans)),
+            LetterRow(
+                stage = remember { mutableIntStateOf(stage) },
+                text = remember { mutableStateOf(text) },
                 modifier = modifier
             )
         }
@@ -77,6 +75,18 @@ fun SnellenChart(modifier: Modifier = Modifier) {
             onSizeDecrease = { if (stage < 10) { stage++; text = generateText(stage) } }
         )
     }
+}
+
+@Composable
+fun LetterRow(stage: MutableState<Int>, text: MutableState<String>, modifier: Modifier = Modifier) {
+    Text(
+        text = text.value,
+        color = Color.Black,
+        fontSize = (27*(9-stage.value)).sp,
+        letterSpacing = 16.sp,
+        fontFamily = FontFamily(Font(R.font.opticiansans)),
+        modifier = modifier
+    )
 }
 
 @Composable
@@ -110,7 +120,7 @@ fun generateText(stage: Int): String {
     var random = Random()
     var text: String = ""
 
-    for (i in 1..stage) {
+    for (i in 1..stage)  {
         text += ((abs(random.nextInt() % 25)) + 65).toChar()
     }
     println(text)
