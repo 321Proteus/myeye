@@ -4,14 +4,11 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.Button
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.setValue
@@ -20,11 +17,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.font.FontStyle
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.*
+import me.proteus.myeye.ScreenScalingUtils.getScreenInfo
 import me.proteus.myeye.ui.theme.MyEyeTheme
 import java.util.Random
 import kotlin.math.*
@@ -63,8 +60,8 @@ fun SnellenChart(modifier: Modifier = Modifier) {
             contentAlignment = Alignment.Center,
         ) {
             LetterRow(
-                stage = remember { mutableIntStateOf(stage) },
-                text = remember { mutableStateOf(text) },
+                stage = stage,
+                text = text,
                 modifier = modifier
             )
         }
@@ -77,13 +74,29 @@ fun SnellenChart(modifier: Modifier = Modifier) {
     }
 }
 
+fun stageToFontSize(stage: Int, distance: Float): Double {
+
+    var marBase = ((PI/180) / 60) * 5  // 5 minut katowych
+    var marCurrent = marBase * 10f.pow(-stage * 0.1f)
+
+    var height = 2 * distance * tan(marCurrent / 2)
+
+    return height
+
+}
 @Composable
-fun LetterRow(stage: MutableState<Int>, text: MutableState<String>, modifier: Modifier = Modifier) {
+fun LetterRow(stage: Int, text: String, modifier: Modifier = Modifier) {
+
+    var screenDensity = getScreenInfo(LocalContext.current).densityDpi / 2.54f
+    var calculatedSize = stageToFontSize(stage, 120.5f) * screenDensity
+
+    println(calculatedSize)
+
     Text(
-        text = text.value,
+        text = text,
         color = Color.Black,
-        fontSize = (27*(9-stage.value)).sp,
-        letterSpacing = 16.sp,
+        fontSize = calculatedSize.sp,
+        letterSpacing = (calculatedSize / 2).sp,
         fontFamily = FontFamily(Font(R.font.opticiansans)),
         modifier = modifier
     )

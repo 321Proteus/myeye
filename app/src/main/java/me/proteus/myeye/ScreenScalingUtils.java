@@ -17,9 +17,9 @@ public class ScreenScalingUtils {
     }
 
     public static class ScreenInfo {
-        private int width;
-        private int height;
-        private float densityDpi;
+        private final int width;
+        private final int height;
+        private final float densityDpi;
 
         public ScreenInfo(int width, int height, float density) {
             this.width = width;
@@ -38,5 +38,6 @@ public class ScreenScalingUtils {
         public float getDensityDpi() {
             return densityDpi;
         }
+
     }
 }
