@@ -1,10 +1,12 @@
 package me.proteus.myeye
 
+import android.content.res.Configuration
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.material3.Button
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -17,6 +19,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.Font
@@ -48,7 +51,9 @@ fun SnellenChart(modifier: Modifier = Modifier) {
     var text: String by remember { mutableStateOf(generateText()) }
 
     Column(
-        modifier = Modifier.fillMaxSize().padding(16.dp),
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp),
         verticalArrangement = Arrangement.SpaceBetween,
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
@@ -56,11 +61,10 @@ fun SnellenChart(modifier: Modifier = Modifier) {
         Box (
             modifier = modifier
                 .weight(1f)
-                .fillMaxWidth()
                 .padding(bottom = 16.dp),
             contentAlignment = Alignment.Center,
         ) {
-            LetterRow(
+            LetterContainer(
                 stage = stage,
                 text = text,
                 modifier = modifier
@@ -87,21 +91,51 @@ fun stageToCentimeters(stage: Int, distance: Float): Float {
 }
 
 @Composable
-fun LetterRow(stage: Int, text: String, modifier: Modifier = Modifier) {
+fun LetterContainer(stage: Int, text: String, modifier: Modifier = Modifier) {
+
+    val config = LocalConfiguration.current
+    val opticianSansFamily = FontFamily(Font(R.font.opticiansans))
 
     var screenDensity = getScreenInfo(LocalContext.current).densityDpi / 2.54f
     var calculatedSize = stageToCentimeters(stage, 100f)
     println(calculatedSize)
-    var pixelSize =  with(LocalDensity.current) { (screenDensity * calculatedSize).toSp() }
+    var pixelSize = with(LocalDensity.current) { (screenDensity * calculatedSize).toSp() }
 
-    Text(
-        text = text,
-        color = Color.Black,
-        fontSize = pixelSize * 2,
-        letterSpacing = pixelSize,
-        fontFamily = FontFamily(Font(R.font.opticiansans)),
-        modifier = modifier
-    )
+    if (config.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth(),
+            horizontalArrangement = Arrangement.Center
+        ) {
+            for (char in text) {
+                Text(
+                    text = char.toString(),
+                    color = Color.Black,
+                    fontSize = pixelSize * 2,
+                    fontFamily = opticianSansFamily,
+                    modifier = modifier.padding(8.dp)
+                )
+            }
+        }
+    } else {
+        Column(
+            modifier = Modifier
+                .fillMaxHeight(),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            for (char in text) {
+                Text(
+                    text = char.toString(),
+                    color = Color.Black,
+                    fontSize = pixelSize * 2,
+                    fontFamily = opticianSansFamily,
+                    modifier = modifier.padding(8.dp)
+                )
+            }
+        }
+    }
+
 }
 
 @Composable
@@ -134,7 +168,7 @@ fun generateText(): String {
 
     var random = Random()
     var text: String = ""
-    var i: Int = 1
+    var i: Int = 0
     while(i < 5)  {
         text += ((abs(random.nextInt() % 25)) + 65).toChar()
         i++
