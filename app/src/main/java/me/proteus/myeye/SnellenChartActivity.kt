@@ -18,6 +18,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.*
@@ -74,29 +75,30 @@ fun SnellenChart(modifier: Modifier = Modifier) {
     }
 }
 
-fun stageToFontSize(stage: Int, distance: Float): Double {
+fun stageToCentimeters(stage: Int, distance: Float): Float {
 
     var marBase = ((PI/180) / 60) * 5  // 5 minut katowych
     var marCurrent = marBase * 10f.pow(-stage * 0.1f)
 
     var height = 2 * distance * tan(marCurrent / 2)
 
-    return height
+    return height.toFloat()
 
 }
+
 @Composable
 fun LetterRow(stage: Int, text: String, modifier: Modifier = Modifier) {
 
     var screenDensity = getScreenInfo(LocalContext.current).densityDpi / 2.54f
-    var calculatedSize = stageToFontSize(stage, 120.5f) * screenDensity
-
+    var calculatedSize = stageToCentimeters(stage, 100f)
     println(calculatedSize)
+    var pixelSize =  with(LocalDensity.current) { (screenDensity * calculatedSize).toSp() }
 
     Text(
         text = text,
         color = Color.Black,
-        fontSize = calculatedSize.sp,
-        letterSpacing = (calculatedSize / 2).sp,
+        fontSize = pixelSize * 2,
+        letterSpacing = pixelSize,
         fontFamily = FontFamily(Font(R.font.opticiansans)),
         modifier = modifier
     )
@@ -136,7 +138,6 @@ fun generateText(stage: Int): String {
     for (i in 1..stage)  {
         text += ((abs(random.nextInt() % 25)) + 65).toChar()
     }
-    println(text)
 
     return text
 }
