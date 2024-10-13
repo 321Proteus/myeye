@@ -45,7 +45,7 @@ class SnellenChartActivity : ComponentActivity() {
 fun SnellenChart(modifier: Modifier = Modifier) {
 
     var stage: Int by remember { mutableIntStateOf(1) }
-    var text: String by remember { mutableStateOf(generateText(stage)) }
+    var text: String by remember { mutableStateOf(generateText()) }
 
     Column(
         modifier = Modifier.fillMaxSize().padding(16.dp),
@@ -68,9 +68,9 @@ fun SnellenChart(modifier: Modifier = Modifier) {
         }
 
         ButtonRow(
-            onRegenerate = { text = generateText(stage) },
-            onSizeIncrease = { if (stage > 1) { stage--; text = generateText(stage)} },
-            onSizeDecrease = { if (stage < 10) { stage++; text = generateText(stage) } }
+            onRegenerate = { text = generateText() },
+            onSizeIncrease = { if (stage > 1) { stage--; text = generateText()} },
+            onSizeDecrease = { if (stage < 10) { stage++; text = generateText() } }
         )
     }
 }
@@ -130,13 +130,14 @@ fun ButtonRow(
 
 }
 
-fun generateText(stage: Int): String {
+fun generateText(): String {
 
     var random = Random()
     var text: String = ""
-
-    for (i in 1..stage)  {
+    var i: Int = 1
+    while(i < 5)  {
         text += ((abs(random.nextInt() % 25)) + 65).toChar()
+        i++
     }
 
     return text
