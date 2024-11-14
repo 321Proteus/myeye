@@ -1,9 +1,11 @@
 package me.proteus.myeye
 
+import me.proteus.myeye.ui.VisionTestLayoutActivity
+
 interface VisionTest {
 
-    fun display()
-    fun generateQuestion()
+    fun beginDisplay(activity: VisionTestLayoutActivity)
+    fun generateQuestion(): Any
     fun checkAnswer()
 
 }

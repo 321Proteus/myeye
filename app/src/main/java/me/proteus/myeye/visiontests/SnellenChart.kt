@@ -1,15 +1,18 @@
 package me.proteus.myeye.visiontests
 
 import me.proteus.myeye.VisionTest
+import me.proteus.myeye.ui.VisionTestLayoutActivity
 
 class SnellenChart : VisionTest {
 
-    override fun display() {
+    override fun beginDisplay(activity: VisionTestLayoutActivity) {
         println("display")
     }
 
-    override fun generateQuestion() {
-        println("generateQuestion")
+    override fun generateQuestion(): Any {
+
+        return "Testowy tekst"
+
     }
 
     override fun checkAnswer() {
