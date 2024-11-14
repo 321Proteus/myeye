@@ -17,7 +17,7 @@ class BuildTest : VisionTest {
     }
 
     override fun checkAnswer(answer: String): Boolean {
-        return true;
+        return true
     }
 
     override fun getExampleAnswers(): Array<String> {

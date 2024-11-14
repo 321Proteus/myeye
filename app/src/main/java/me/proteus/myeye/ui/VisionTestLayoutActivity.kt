@@ -18,10 +18,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import me.proteus.myeye.ButtonRow
-import me.proteus.myeye.LetterContainer
 import me.proteus.myeye.VisionTest
-import me.proteus.myeye.generateText
 import me.proteus.myeye.ui.theme.MyEyeTheme
 import me.proteus.myeye.visiontests.*
 import java.lang.IllegalArgumentException
@@ -99,7 +96,7 @@ fun VisionTestScreen(test: VisionTest, modifier: Modifier) {
         ) {
             for (ans in answers) {
                 Button(onClick = {
-                    if (test.checkAnswer(ans)) score++;
+                    if (test.checkAnswer(ans)) score++
                     else println(ans)
                     question = test.generateQuestion()
                     answers = test.getExampleAnswers()

@@ -15,7 +15,6 @@ class SnellenChart : VisionTest {
 
     override fun generateQuestion(): Any {
 
-        var random = Random()
         var question = randomChar()
 
         correctAnswer = question.toString()

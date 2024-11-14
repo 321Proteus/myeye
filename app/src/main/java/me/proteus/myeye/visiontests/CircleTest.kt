@@ -17,7 +17,7 @@ class CircleTest : VisionTest {
     }
 
     override fun checkAnswer(answer: String): Boolean {
-        return false;
+        return false
     }
 
     override fun getExampleAnswers(): Array<String> {
