@@ -55,21 +55,33 @@ class MenuActivity : ComponentActivity() {
                         ModalDrawerSheet {
                             NavigationDrawerItem(
                                 icon = { Icon(Icons.Outlined.AccountCircle, contentDescription = null) },
-                                label = { Text("Osoba") },
+                                label = { Text("Test wzroku testowy 1") },
                                 selected = false,
-                                onClick = { println("Wcisnieto guzik 1") },
+                                onClick = {
+                                    val intent = Intent(this@MenuActivity, VisionTestLayoutActivity::class.java)
+                                    intent.putExtra("TEST_ID", "TEST_CIRCLE")
+                                    startActivity(intent)
+                                }
                             )
                             NavigationDrawerItem(
                                 icon = { Icon(Icons.Outlined.Build, contentDescription = null) },
-                                label = { Text("Budowanie") },
+                                label = { Text("Test wzroku testowy 2") },
                                 selected = false,
-                                onClick = { println("Wcisnieto guzik 2") },
+                                onClick = {
+                                    val intent = Intent(this@MenuActivity, VisionTestLayoutActivity::class.java)
+                                    intent.putExtra("TEST_ID", "TEST_BUILD")
+                                    startActivity(intent)
+                                }
                             )
                             NavigationDrawerItem(
                                 icon = { Icon(Icons.Outlined.Info, contentDescription = null) },
-                                label = { Text("Informacja") },
+                                label = { Text("Test wzroku Testowy 3") },
                                 selected = false,
-                                onClick = { println("Wcisnieto guzik 3") },
+                                onClick = {
+                                    val intent = Intent(this@MenuActivity, VisionTestLayoutActivity::class.java)
+                                    intent.putExtra("TEST_ID", "TEST_INFO")
+                                    startActivity(intent)
+                                }
                             )
                             NavigationDrawerItem(
                                 icon = { Icon(Icons.TwoTone.Face, contentDescription = null) },
@@ -77,6 +89,7 @@ class MenuActivity : ComponentActivity() {
                                 selected = false,
                                 onClick = {
                                     val intent = Intent(this@MenuActivity, VisionTestLayoutActivity::class.java)
+                                    intent.putExtra("TEST_ID", "SNELLEN_CHART")
                                     startActivity(intent)
                                 },
                             )
