@@ -6,12 +6,17 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.*
+import androidx.compose.material3.Button
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
+import me.proteus.myeye.ButtonRow
+import me.proteus.myeye.LetterContainer
 import me.proteus.myeye.VisionTest
+import me.proteus.myeye.generateText
 import me.proteus.myeye.ui.theme.MyEyeTheme
 import me.proteus.myeye.visiontests.*
 import java.lang.IllegalArgumentException
@@ -32,8 +37,7 @@ class VisionTestLayoutActivity : ComponentActivity() {
                             .fillMaxSize(),
                         contentAlignment = Alignment.Center
                     ) {
-
-                        VisionTestScreen(getTest(intent))
+                        VisionTestScreen(test = getTest(intent), modifier = Modifier)
                     }
 
                 }
@@ -56,9 +60,40 @@ fun getTest(intent: Intent): VisionTest {
 }
 
 @Composable
-fun VisionTestScreen(test: VisionTest) {
+fun VisionTestScreen(test: VisionTest, modifier: Modifier) {
 
     var question = test.generateQuestion()
-    Text(text = question.toString())
+    var answers = test.getExampleAnswers()
+
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp),
+        verticalArrangement = Arrangement.SpaceBetween,
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+
+        Box (
+            modifier = modifier
+                .weight(1f)
+                .padding(bottom = 32.dp),
+            contentAlignment = Alignment.Center,
+        ) {
+            Text(text = question.toString())
+        }
+
+        Row(
+            modifier = modifier
+                .fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceEvenly,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            for (ans in answers) {
+                Button(onClick = { test.checkAnswer(ans) }) {
+                    Text(ans)
+                }
+            }
+        }
+    }
 
 }
