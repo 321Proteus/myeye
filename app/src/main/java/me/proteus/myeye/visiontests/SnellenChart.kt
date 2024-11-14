@@ -38,7 +38,7 @@ class SnellenChart : VisionTest {
             while (arr[i] == correctAnswer) arr[i] = randomChar().toString()
             println(arr[i])
         }
-        arr[random.nextInt() % 4] = correctAnswer.toString()
+        arr[abs(random.nextInt()) % 4] = correctAnswer.toString()
 
         return arr
 
