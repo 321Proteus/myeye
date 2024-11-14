@@ -2,6 +2,7 @@ package me.proteus.myeye.visiontests
 
 import me.proteus.myeye.VisionTest
 import me.proteus.myeye.ui.VisionTestLayoutActivity
+import java.util.Random
 
 class CircleTest : VisionTest {
 
@@ -15,8 +16,15 @@ class CircleTest : VisionTest {
 
     }
 
-    override fun checkAnswer() {
+    override fun checkAnswer(answer: String) {
         println("checkAnswer")
+    }
+
+    override fun getExampleAnswers(): Array<String> {
+
+        var random = Random()
+        return Array<String>(4) { random.nextInt().toString() }
+
     }
 
 }
