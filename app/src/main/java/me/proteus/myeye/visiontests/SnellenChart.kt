@@ -1,4 +1,19 @@
 package me.proteus.myeye.visiontests
 
-class SnellenChart {
+import me.proteus.myeye.VisionTest
+
+class SnellenChart : VisionTest {
+
+    override fun display() {
+        println("display")
+    }
+
+    override fun generateQuestion() {
+        println("generateQuestion")
+    }
+
+    override fun checkAnswer() {
+        println("checkAnswer")
+    }
+
 }
