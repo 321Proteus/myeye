@@ -21,8 +21,6 @@ class MainActivity : ComponentActivity() {
             MyEyeTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
 
-                    var activityContext = this
-
                     Box(
                         modifier = Modifier
                             .fillMaxSize(),
@@ -31,7 +29,7 @@ class MainActivity : ComponentActivity() {
                         Button(
                             modifier = Modifier.padding(innerPadding),
                             onClick = {
-                                val intent = Intent(activityContext, MenuActivity::class.java)
+                                val intent = Intent(this@MainActivity, MenuActivity::class.java)
                                 startActivity(intent)
                             }
                         ) {
