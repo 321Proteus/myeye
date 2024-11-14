@@ -10,6 +10,11 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -62,8 +67,9 @@ fun getTest(intent: Intent): VisionTest {
 @Composable
 fun VisionTestScreen(test: VisionTest, modifier: Modifier) {
 
-    var question = test.generateQuestion()
-    var answers = test.getExampleAnswers()
+    var question by remember { mutableStateOf(test.generateQuestion()) }
+    var answers by remember { mutableStateOf(test.getExampleAnswers()) }
+    var score by remember { mutableIntStateOf(0) }
 
     Column(
         modifier = Modifier
@@ -73,6 +79,9 @@ fun VisionTestScreen(test: VisionTest, modifier: Modifier) {
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
 
+        Box (contentAlignment = Alignment.Center) {
+            Text(text = score.toString())
+        }
         Box (
             modifier = modifier
                 .weight(1f)
@@ -89,7 +98,12 @@ fun VisionTestScreen(test: VisionTest, modifier: Modifier) {
             verticalAlignment = Alignment.CenterVertically
         ) {
             for (ans in answers) {
-                Button(onClick = { test.checkAnswer(ans) }) {
+                Button(onClick = {
+                    if (test.checkAnswer(ans)) score++;
+                    else println(ans)
+                    question = test.generateQuestion()
+                    answers = test.getExampleAnswers()
+                }) {
                     Text(ans)
                 }
             }
