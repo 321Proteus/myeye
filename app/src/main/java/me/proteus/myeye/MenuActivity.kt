@@ -1,5 +1,6 @@
 package me.proteus.myeye
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -15,6 +16,7 @@ import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.outlined.AccountCircle
 import androidx.compose.material.icons.outlined.Build
 import androidx.compose.material.icons.outlined.Info
+import androidx.compose.material.icons.twotone.Face
 import androidx.compose.material3.DrawerState
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -67,6 +69,15 @@ class MenuActivity : ComponentActivity() {
                                 label = { Text("Informacja") },
                                 selected = false,
                                 onClick = { println("Wcisnieto guzik 3") },
+                            )
+                            NavigationDrawerItem(
+                                icon = { Icon(Icons.TwoTone.Face, contentDescription = null) },
+                                label = { Text("Test Wzroku LogMAR") },
+                                selected = false,
+                                onClick = {
+                                    val intent = Intent(this@MenuActivity, SnellenChartActivity::class.java)
+                                    startActivity(intent)
+                                },
                             )
                         }
                     }
