@@ -10,6 +10,6 @@ interface VisionTest {
 
     fun getExampleAnswers(): Array<String>
 
-    fun checkAnswer(answer: String)
+    fun checkAnswer(answer: String): Boolean
 
 }

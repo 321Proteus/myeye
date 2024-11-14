@@ -24,8 +24,8 @@ class SnellenChart : VisionTest {
 
     }
 
-    override fun checkAnswer(answer: String) {
-        println(answer == correctAnswer)
+    override fun checkAnswer(answer: String): Boolean {
+        return answer == correctAnswer
     }
 
     override fun getExampleAnswers(): Array<String> {
