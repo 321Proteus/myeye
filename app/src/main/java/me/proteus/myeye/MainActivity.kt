@@ -31,7 +31,7 @@ class MainActivity : ComponentActivity() {
                         Button(
                             modifier = Modifier.padding(innerPadding),
                             onClick = {
-                                val intent = Intent(activityContext, SnellenChartActivity::class.java)
+                                val intent = Intent(activityContext, MenuActivity::class.java)
                                 startActivity(intent)
                             }
                         ) {
