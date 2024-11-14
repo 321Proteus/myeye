@@ -37,6 +37,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import me.proteus.myeye.ui.VisionTestLayoutActivity
 import me.proteus.myeye.ui.theme.MyEyeTheme
 
 class MenuActivity : ComponentActivity() {
@@ -75,7 +76,7 @@ class MenuActivity : ComponentActivity() {
                                 label = { Text("Test Wzroku LogMAR") },
                                 selected = false,
                                 onClick = {
-                                    val intent = Intent(this@MenuActivity, SnellenChartActivity::class.java)
+                                    val intent = Intent(this@MenuActivity, VisionTestLayoutActivity::class.java)
                                     startActivity(intent)
                                 },
                             )
