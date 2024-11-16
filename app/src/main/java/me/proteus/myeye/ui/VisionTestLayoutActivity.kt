@@ -10,6 +10,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import me.proteus.myeye.VisionTest
+import me.proteus.myeye.io.FileSaver
 import me.proteus.myeye.ui.theme.MyEyeTheme
 import me.proteus.myeye.visiontests.*
 import java.lang.IllegalArgumentException
@@ -35,6 +36,10 @@ class VisionTestLayoutActivity : ComponentActivity() {
 
                 }
             }
+
+            var saver: FileSaver = FileSaver()
+            saver.getDataDirectory(applicationContext)
+
         }
     }
 }
