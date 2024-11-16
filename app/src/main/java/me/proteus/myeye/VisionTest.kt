@@ -1,13 +1,14 @@
 package me.proteus.myeye
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.State
 import androidx.compose.ui.Modifier
 import me.proteus.myeye.ui.VisionTestLayoutActivity
 
 interface VisionTest {
 
     val stageCount: Int
-    var currentStage: Int
+    val currentStage: Int
 
     /**
      * Display the test stage as Composable in the target activity context

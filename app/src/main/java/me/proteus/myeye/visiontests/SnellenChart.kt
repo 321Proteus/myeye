@@ -10,9 +10,16 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.State
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import me.proteus.myeye.VisionTest
 import me.proteus.myeye.ui.VisionTestLayoutActivity
 import java.util.Random
@@ -25,20 +32,17 @@ class SnellenChart : VisionTest {
 
     override val stageCount: Int = 10
 
-    override var currentStage: Int = 0
+    private var currentStageState = mutableIntStateOf(1)
 
+    override val currentStage: Int get() = currentStageState.intValue
 
     @Composable
     override fun DisplayStage(activity: VisionTestLayoutActivity, modifier: Modifier) {
 
-        println(this)
+        println("$score $currentStage")
 
-        var question: String = this.generateQuestion().toString()
-        var answers: Array<String> = this.getExampleAnswers()
-        println("---")
-
-        for (el in answers) println(el)
-
+        var question by remember { mutableStateOf(this.generateQuestion().toString()) }
+        var answers by remember { mutableStateOf(this.getExampleAnswers()) }
 
         Column(
             modifier = Modifier
@@ -57,7 +61,7 @@ class SnellenChart : VisionTest {
                     .padding(bottom = 32.dp),
                 contentAlignment = Alignment.Center,
             ) {
-                Text(text = question.toString())
+                Text(text = question.toString(), fontSize = 48.sp)
             }
 
             Row(
@@ -69,6 +73,14 @@ class SnellenChart : VisionTest {
                 for (ans in answers) {
                     Button(onClick = {
                         if (this@SnellenChart.checkAnswer(ans)) score++
+
+                        if (currentStageState.intValue < stageCount) {
+
+                            currentStageState.intValue++
+                            question = this@SnellenChart.generateQuestion().toString()
+                            answers = this@SnellenChart.getExampleAnswers()
+
+                        }
 
                     }) {
                         Text(ans)
@@ -101,7 +113,6 @@ class SnellenChart : VisionTest {
         for (i in 0..3) {
             arr[i] = correctAnswer
             while (arr[i] == correctAnswer) arr[i] = randomChar().toString()
-            println(arr[i])
         }
         arr[abs(random.nextInt()) % 4] = correctAnswer.toString()
 
