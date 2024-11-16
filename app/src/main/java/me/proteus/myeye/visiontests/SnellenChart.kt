@@ -23,12 +23,9 @@ class SnellenChart : VisionTest {
     private var correctAnswer: String = ""
     private var score: Int = 0
 
-    override val stageCount: Int
-        get() = 10
+    override val stageCount: Int = 10
 
-    override var currentStage: Int
-        get() = 0
-        set(value) {}
+    override var currentStage: Int = 0
 
 
     @Composable
