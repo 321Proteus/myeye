@@ -45,7 +45,7 @@ fun getTest(intent: Intent): VisionTest {
         "SNELLEN_CHART" -> SnellenChart()
         "TEST_CIRCLE" -> CircleTest()
         "TEST_BUILD" -> BuildTest()
-        "TEST_INFO" -> InfoTest()
+        "TEST_INFO" -> ExampleTest()
         else -> throw IllegalArgumentException("Nie znaleziono testu o podanym ID")
     }
 
