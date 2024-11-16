@@ -167,7 +167,7 @@ class SnellenChart : VisionTest {
 
     override fun generateQuestion(): Any {
 
-        var question: String = "";
+        var question: String = ""
         var i: Int = 0
 
         while(i++ < 5)  {

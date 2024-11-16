@@ -182,8 +182,8 @@ class CircleTest : VisionTest {
 
     fun generateDirections(): String {
 
-        var directions = "0123";
-        var text: String = "";
+        var directions = "0123"
+        var text: String = ""
         var i: Int = 0
 
         var random = Random()

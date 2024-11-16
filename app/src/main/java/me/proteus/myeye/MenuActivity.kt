@@ -55,7 +55,7 @@ class MenuActivity : ComponentActivity() {
                         ModalDrawerSheet {
                             NavigationDrawerItem(
                                 icon = { Icon(Icons.Outlined.AccountCircle, contentDescription = null) },
-                                label = { Text("Test wzroku testowy 1") },
+                                label = { Text("Test Landolt C") },
                                 selected = false,
                                 onClick = {
                                     val intent = Intent(this@MenuActivity, VisionTestLayoutActivity::class.java)
@@ -65,7 +65,7 @@ class MenuActivity : ComponentActivity() {
                             )
                             NavigationDrawerItem(
                                 icon = { Icon(Icons.Outlined.Build, contentDescription = null) },
-                                label = { Text("Test wzroku testowy 2") },
+                                label = { Text("Test wzroku TODO") },
                                 selected = false,
                                 onClick = {
                                     val intent = Intent(this@MenuActivity, VisionTestLayoutActivity::class.java)
@@ -75,7 +75,7 @@ class MenuActivity : ComponentActivity() {
                             )
                             NavigationDrawerItem(
                                 icon = { Icon(Icons.Outlined.Info, contentDescription = null) },
-                                label = { Text("Test wzroku Testowy 3") },
+                                label = { Text("Test wzroku Example") },
                                 selected = false,
                                 onClick = {
                                     val intent = Intent(this@MenuActivity, VisionTestLayoutActivity::class.java)
