@@ -1,5 +1,18 @@
 package me.proteus.myeye.visiontests
 
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Button
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import me.proteus.myeye.VisionTest
 import me.proteus.myeye.ui.VisionTestLayoutActivity
 import java.util.Random
@@ -8,9 +21,65 @@ import kotlin.math.abs
 class SnellenChart : VisionTest {
 
     private var correctAnswer: String = ""
+    private var score: Int = 0
 
-    override fun beginDisplay(activity: VisionTestLayoutActivity) {
-        println("display")
+    override val stageCount: Int
+        get() = 10
+
+    override var currentStage: Int
+        get() = 0
+        set(value) {}
+
+
+    @Composable
+    override fun DisplayStage(activity: VisionTestLayoutActivity, modifier: Modifier) {
+
+        println(this)
+
+        var question: String = this.generateQuestion().toString()
+        var answers: Array<String> = this.getExampleAnswers()
+        println("---")
+
+        for (el in answers) println(el)
+
+
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(16.dp),
+            verticalArrangement = Arrangement.SpaceBetween,
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+
+            Box (contentAlignment = Alignment.Center) {
+                Text(text = score.toString())
+            }
+            Box (
+                modifier = modifier
+                    .weight(1f)
+                    .padding(bottom = 32.dp),
+                contentAlignment = Alignment.Center,
+            ) {
+                Text(text = question.toString())
+            }
+
+            Row(
+                modifier = modifier
+                    .fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceEvenly,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                for (ans in answers) {
+                    Button(onClick = {
+                        if (this@SnellenChart.checkAnswer(ans)) score++
+
+                    }) {
+                        Text(ans)
+                    }
+                }
+            }
+        }
+
     }
 
     override fun generateQuestion(): Any {
