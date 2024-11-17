@@ -12,7 +12,7 @@ public class FileSaver {
 
     private String testType;
     private List<String> questions;
-    public File fileDirectory;
+    private File fileDirectory;
 
     public FileSaver(String testType, List<String> questions, Context context) {
         this.testType = testType;
@@ -47,6 +47,10 @@ public class FileSaver {
 
         }
 
+    }
+
+    public File getFileDirectory() {
+        return this.fileDirectory;
     }
 
     public void setTestType(String testType) {
