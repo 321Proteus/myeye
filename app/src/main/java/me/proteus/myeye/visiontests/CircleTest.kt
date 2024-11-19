@@ -30,6 +30,7 @@ import androidx.compose.ui.unit.dp
 import me.proteus.myeye.R
 import me.proteus.myeye.ScreenScalingUtils.getScreenInfo
 import me.proteus.myeye.VisionTest
+import me.proteus.myeye.io.ResultDataCollector
 import me.proteus.myeye.ui.VisionTestLayoutActivity
 import java.util.Random
 import kotlin.math.*
@@ -44,6 +45,8 @@ class CircleTest : VisionTest {
     private var currentStageState = mutableIntStateOf(1)
 
     override val currentStage: Int get() = currentStageState.intValue
+
+    override val resultCollector: ResultDataCollector = ResultDataCollector()
 
     fun stageToCentimeters(stage: Int, distance: Float): Float {
 
@@ -212,6 +215,12 @@ class CircleTest : VisionTest {
         arr[abs(random.nextInt()) % 4] = correctAnswer
 
         return arr
+
+    }
+
+    override fun storeResult(question: String, answer: String) {
+
+        resultCollector.addResult(question, answer);
 
     }
 

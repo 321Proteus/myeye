@@ -20,6 +20,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import me.proteus.myeye.VisionTest
+import me.proteus.myeye.io.ResultDataCollector
 import me.proteus.myeye.ui.VisionTestLayoutActivity
 import java.util.Random
 import kotlin.math.abs
@@ -34,6 +35,8 @@ class ExampleTest : VisionTest {
     private var currentStageState = mutableIntStateOf(1)
 
     override val currentStage: Int get() = currentStageState.intValue
+
+    override val resultCollector: ResultDataCollector = ResultDataCollector()
 
     @Composable
     override fun DisplayStage(activity: VisionTestLayoutActivity, modifier: Modifier) {
@@ -102,6 +105,12 @@ class ExampleTest : VisionTest {
 
     override fun checkAnswer(answer: String): Boolean {
         return answer == correctAnswer
+    }
+
+    override fun storeResult(question: String, answer: String) {
+
+        resultCollector.addResult(question, answer);
+
     }
 
     override fun getExampleAnswers(): Array<String> {
