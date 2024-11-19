@@ -164,6 +164,10 @@ class CircleTest : VisionTest {
                 },
 
                 onSizeDecrease = {
+
+                    TODO("Zaimplementowac polecenia glosowe do zbierania odpowiedzi")
+                    storeResult(question, generateDirections())
+
                     if (currentStage < stageCount) {
                         currentStageState.intValue++
                         question = this@CircleTest.generateQuestion().toString()
@@ -176,7 +180,7 @@ class CircleTest : VisionTest {
 
     override fun generateQuestion(): Any {
 
-        var question: String = this.generateDirections()
+        var question: String = generateDirections()
 
         correctAnswer = question
         return question
