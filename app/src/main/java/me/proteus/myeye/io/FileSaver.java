@@ -3,6 +3,7 @@ package me.proteus.myeye.io;
 import android.content.Context;
 
 import java.io.File;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -49,6 +50,55 @@ public class FileSaver {
 
         }
 
+    }
+
+    /* Znajduje ostatnie ID wyniku.
+    * Pliki z wynikami maja nazwy w formacie "myeye_RRRR-MM-DD_ID_.txt
+    * Funkcja przeszukuje folder wybiera najwieksze ID */
+    protected static int getLastID(String dir) {
+
+        List<String> fileNames = scanDirectory(new File(dir), true)
+                .stream().map(File::getName).collect(Collectors.toList());
+
+        int lastID = 0;
+
+        if (fileNames.isEmpty()) return lastID;
+
+        for (String name : fileNames) {
+            int fileID = getNumbers(name).get(3);
+            System.out.println(fileID);
+            if (lastID < fileID) lastID = fileID;
+        }
+
+        return lastID;
+    }
+
+    /* Wybiera wszystkie wartosci liczbowe z tekstu */
+    protected static List<Integer> getNumbers(String text) {
+
+        List<Integer> numbers = new ArrayList<>();
+
+        Pattern p = Pattern.compile("(\\d+)");
+        Matcher m = p.matcher(text);
+
+        while (m.find()) {
+            numbers.add(Integer.parseInt(m.group(1)));
+        }
+
+        return numbers;
+    }
+
+    protected static String generateFileName(int id) {
+
+        LocalDate date = LocalDate.now();
+
+        String format = "myeye-"
+            + String.valueOf(date.getYear()) + '-'
+            + String.valueOf(date.getMonthValue()) + '-'
+            + String.valueOf(date.getDayOfMonth()) + '-'
+            + String.valueOf(id);
+
+        return format;
     }
 
     public File getFileDirectory() {
