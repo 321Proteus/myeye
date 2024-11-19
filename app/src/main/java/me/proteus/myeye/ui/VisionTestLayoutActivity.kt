@@ -45,9 +45,7 @@ class VisionTestLayoutActivity : ComponentActivity() {
 fun getTest(intent: Intent, context: Context): VisionTest {
     val testID = intent.getStringExtra("TEST_ID")
 
-    var temp = List<String>(3) { "" }
-
-    var saver: FileSaver = FileSaver(testID, temp, context)
+    var saver: FileSaver = FileSaver(testID, context)
     saver.getDirectoryTree(saver.fileDirectory, 0)
 
     val test = when (testID) {
