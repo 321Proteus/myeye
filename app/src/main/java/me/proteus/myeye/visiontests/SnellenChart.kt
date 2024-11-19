@@ -160,7 +160,7 @@ class SnellenChart : VisionTest {
                 onRegenerate = { question = this@SnellenChart.generateQuestion().toString() },
                 onSizeDecrease = {
 
-                    TODO("Zaimplementowac polecenia glosowe do zbierania odpowiedzi")
+                    // TODO: Zaimplementowac polecenia glosowe do zbierania odpowiedzi
                     storeResult(question, randomText(5))
 
                     if (currentStage < stageCount) {

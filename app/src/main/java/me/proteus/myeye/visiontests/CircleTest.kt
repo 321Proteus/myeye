@@ -165,7 +165,7 @@ class CircleTest : VisionTest {
 
                 onSizeDecrease = {
 
-                    TODO("Zaimplementowac polecenia glosowe do zbierania odpowiedzi")
+                    // TODO: Zaimplementowac polecenia glosowe do zbierania odpowiedzi
                     storeResult(question, generateDirections())
 
                     if (currentStage < stageCount) {
