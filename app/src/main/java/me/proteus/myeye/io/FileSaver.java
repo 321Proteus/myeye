@@ -1,9 +1,13 @@
 package me.proteus.myeye.io;
 
 import android.content.Context;
+import android.util.Pair;
 
 import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -13,8 +17,8 @@ import java.util.regex.*;
 
 public class FileSaver {
 
-    private String testType;
-    private File fileDirectory;
+    private final String testType;
+    private final File fileDirectory;
 
     public FileSaver(String testType, Context context) {
 
@@ -22,18 +26,12 @@ public class FileSaver {
         this.fileDirectory = context.getFilesDir();
     }
 
-    public FileSaver() {
-
-    }
-
     private static List<File> scanDirectory(File path, boolean filesOnly) {
 
-        List<File> contents = Arrays.stream(Objects.requireNonNull(path
+        return Arrays.stream(Objects.requireNonNull(path
                 .listFiles(File::exists)))
                 .filter(f -> (!filesOnly || !f.isDirectory()))
                 .collect(Collectors.toList());
-
-        return contents;
 
     }
 
@@ -55,9 +53,9 @@ public class FileSaver {
     /* Znajduje ostatnie ID wyniku.
     * Pliki z wynikami maja nazwy w formacie "myeye_RRRR-MM-DD_ID_.txt
     * Funkcja przeszukuje folder wybiera najwieksze ID */
-    protected static int getLastID(String dir) {
+    protected static int getLastID(File dir) {
 
-        List<String> fileNames = scanDirectory(new File(dir), true)
+        List<String> fileNames = scanDirectory(dir, true)
                 .stream().map(File::getName).collect(Collectors.toList());
 
         int lastID = 0;
@@ -82,27 +80,74 @@ public class FileSaver {
         Matcher m = p.matcher(text);
 
         while (m.find()) {
-            numbers.add(Integer.parseInt(m.group(1)));
+            numbers.add(Integer.parseInt(Objects.requireNonNull(m.group(1))));
         }
 
         return numbers;
     }
 
-    protected static String generateFileName(int id) {
+    protected static String generateFileName(File dir) {
 
         LocalDate date = LocalDate.now();
 
-        String format = "myeye-"
-            + String.valueOf(date.getYear()) + '-'
-            + String.valueOf(date.getMonthValue()) + '-'
-            + String.valueOf(date.getDayOfMonth()) + '-'
-            + String.valueOf(id);
-
-        return format;
+        return "myeye-"
+            + date.getYear() + '-'
+            + date.getMonthValue() + '-'
+            + date.getDayOfMonth() + '-'
+            + (getLastID(dir) + 1) + ".txt";
     }
 
     public File getFileDirectory() {
         return this.fileDirectory;
+    }
+
+    public void save(ResultDataCollector data) throws IOException {
+
+        File resultsDir = new File(this.fileDirectory, "results");
+
+        if (!resultsDir.exists()) {
+            if (!resultsDir.mkdirs()) {
+                throw new IOException("Nie udalo sie utworzyc katalogu 'results/'");
+            }
+        }
+
+        File file = new File(resultsDir, generateFileName(resultsDir));
+        System.out.println(file.getName());
+
+        if (file.createNewFile()) {
+            System.out.println(file.getName());
+        } else {
+            throw new IOException("Plik o takiej nazwie juz istnieje lub plik nie mogl zostac utworzony");
+        }
+
+        FileWriter fw = new FileWriter(file);
+        LocalTime time = LocalTime.now();
+
+        List<Integer> nameIntegers = getNumbers(file.getName());
+
+        String timestamp = String.valueOf(nameIntegers.get(0)) + '-'
+            + nameIntegers.get(1) + '-'
+            + nameIntegers.get(2) + ' '
+            + time.getHour() + ':'
+            + time.getMinute() + ':'
+            + time.getSecond();
+
+        fw.write("MyEye v0.5 TIMESTAMP " + timestamp);
+        fw.write(System.lineSeparator());
+        fw.write("RESULT_ID " + nameIntegers.get(3));
+        fw.write(" TEST_ID " + this.testType);
+
+        for (int i=0;i<data.stages.size();i++) {
+
+            Pair<String, String> p = data.stages.get(i);
+
+            fw.write(System.lineSeparator());
+            fw.write(i + " " + p.first + " " + p.second);
+
+        }
+
+        fw.close();
+
     }
 
 }
