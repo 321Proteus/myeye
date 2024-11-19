@@ -16,6 +16,7 @@ import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.outlined.AccountCircle
 import androidx.compose.material.icons.outlined.Build
 import androidx.compose.material.icons.outlined.Info
+import androidx.compose.material.icons.twotone.Check
 import androidx.compose.material.icons.twotone.Face
 import androidx.compose.material3.DrawerState
 import androidx.compose.material3.DrawerValue
@@ -37,6 +38,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import me.proteus.myeye.ui.TestResultActivity
 import me.proteus.myeye.ui.VisionTestLayoutActivity
 import me.proteus.myeye.ui.theme.MyEyeTheme
 
@@ -90,6 +92,15 @@ class MenuActivity : ComponentActivity() {
                                 onClick = {
                                     val intent = Intent(this@MenuActivity, VisionTestLayoutActivity::class.java)
                                     intent.putExtra("TEST_ID", "SNELLEN_CHART")
+                                    startActivity(intent)
+                                },
+                            )
+                            NavigationDrawerItem(
+                                icon = { Icon(Icons.TwoTone.Check, contentDescription = null) },
+                                label = { Text("Przeglądaj wyniki") },
+                                selected = false,
+                                onClick = {
+                                    val intent = Intent(this@MenuActivity, TestResultActivity::class.java)
                                     startActivity(intent)
                                 },
                             )
