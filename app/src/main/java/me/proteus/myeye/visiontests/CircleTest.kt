@@ -30,6 +30,7 @@ import androidx.compose.ui.unit.dp
 import me.proteus.myeye.R
 import me.proteus.myeye.ScreenScalingUtils.getScreenInfo
 import me.proteus.myeye.VisionTest
+import me.proteus.myeye.io.FileSaver
 import me.proteus.myeye.io.ResultDataCollector
 import me.proteus.myeye.ui.VisionTestLayoutActivity
 import java.util.Random
@@ -132,8 +133,6 @@ class CircleTest : VisionTest {
     @Composable
     override fun DisplayStage(activity: VisionTestLayoutActivity, modifier: Modifier) {
 
-        println("$score $currentStage")
-
         var question: String by remember { mutableStateOf(this.generateQuestion().toString()) }
         var answers: Array<String> by remember { mutableStateOf(this.getExampleAnswers()) }
 
@@ -172,6 +171,12 @@ class CircleTest : VisionTest {
                         currentStageState.intValue++
                         question = this@CircleTest.generateQuestion().toString()
                         answers = this@CircleTest.getExampleAnswers()
+                    } else {
+
+                        val saver = FileSaver("TEST_CIRCLE", activity.applicationContext)
+                        println(saver.fileDirectory)
+                        saver.save(resultCollector)
+
                     }
                 }
             )

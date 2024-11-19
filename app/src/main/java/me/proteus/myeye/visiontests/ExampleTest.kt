@@ -20,6 +20,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import me.proteus.myeye.VisionTest
+import me.proteus.myeye.io.FileSaver
 import me.proteus.myeye.io.ResultDataCollector
 import me.proteus.myeye.ui.VisionTestLayoutActivity
 import java.util.Random
@@ -84,6 +85,12 @@ class ExampleTest : VisionTest {
                             currentStageState.intValue++
                             question = this@ExampleTest.generateQuestion().toString()
                             answers = this@ExampleTest.getExampleAnswers()
+
+                        } else {
+
+                            val saver = FileSaver("TEST_INFO", activity.applicationContext)
+                            println(saver.fileDirectory)
+                            saver.save(resultCollector)
 
                         }
 
