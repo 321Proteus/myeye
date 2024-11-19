@@ -3,7 +3,6 @@ package me.proteus.myeye.io;
 import android.util.Pair;
 
 import java.util.List;
-import java.util.Stack;
 
 public class ResultDataCollector {
     protected List<Pair<String, String>> stages;

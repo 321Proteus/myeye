@@ -13,7 +13,7 @@ class BuildTest : VisionTest {
         get() = TODO("Not yet implemented")
     override var currentStage: Int
         get() = TODO("Not yet implemented")
-        set(value) {}
+        set(value) { currentStage = value }
 
     override val resultCollector: ResultDataCollector = ResultDataCollector()
 
@@ -34,7 +34,7 @@ class BuildTest : VisionTest {
 
     override fun storeResult(question: String, answer: String) {
 
-        resultCollector.addResult(question, answer);
+        resultCollector.addResult(question, answer)
 
     }
 

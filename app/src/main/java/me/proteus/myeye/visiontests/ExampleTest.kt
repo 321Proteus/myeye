@@ -112,7 +112,7 @@ class ExampleTest : VisionTest {
 
     override fun storeResult(question: String, answer: String) {
 
-        resultCollector.addResult(question, answer);
+        resultCollector.addResult(question, answer)
 
     }
 
