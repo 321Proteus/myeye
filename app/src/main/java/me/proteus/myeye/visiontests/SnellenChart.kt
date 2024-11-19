@@ -176,14 +176,9 @@ class SnellenChart : VisionTest {
 
     override fun generateQuestion(): Any {
 
-        var question: String = ""
-        var i: Int = 0
+        var question: String = randomText(5)
 
-        while(i++ < 5)  {
-            question += randomChar()
-        }
-
-        correctAnswer = question.toString()
+        correctAnswer = question
         return question
 
     }
@@ -199,7 +194,7 @@ class SnellenChart : VisionTest {
         var arr = Array<String>(4) { "" }
         for (i in 0..3) {
             arr[i] = correctAnswer
-            while (arr[i] == correctAnswer) arr[i] = randomChar().toString()
+            while (arr[i] == correctAnswer) arr[i] = randomText(5)
         }
         arr[abs(random.nextInt()) % 4] = correctAnswer.toString()
 
@@ -211,6 +206,18 @@ class SnellenChart : VisionTest {
 
         var random = Random()
         return ((abs(random.nextInt() % 25)) + 65).toChar()
+    }
+
+    fun randomText(n: Int): String {
+
+        var text: String = ""
+        var i: Int = 0
+
+        while(i++ < n)  {
+            text += randomChar()
+        }
+
+        return text
     }
 
 }
