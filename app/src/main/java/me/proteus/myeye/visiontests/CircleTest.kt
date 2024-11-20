@@ -30,6 +30,8 @@ import androidx.compose.ui.unit.dp
 import me.proteus.myeye.R
 import me.proteus.myeye.ScreenScalingUtils.getScreenInfo
 import me.proteus.myeye.VisionTest
+import me.proteus.myeye.io.FileSaver
+import me.proteus.myeye.io.ResultDataCollector
 import me.proteus.myeye.ui.VisionTestLayoutActivity
 import java.util.Random
 import kotlin.math.*
@@ -44,6 +46,8 @@ class CircleTest : VisionTest {
     private var currentStageState = mutableIntStateOf(1)
 
     override val currentStage: Int get() = currentStageState.intValue
+
+    override val resultCollector: ResultDataCollector = ResultDataCollector()
 
     fun stageToCentimeters(stage: Int, distance: Float): Float {
 
@@ -129,8 +133,6 @@ class CircleTest : VisionTest {
     @Composable
     override fun DisplayStage(activity: VisionTestLayoutActivity, modifier: Modifier) {
 
-        println("$score $currentStage")
-
         var question: String by remember { mutableStateOf(this.generateQuestion().toString()) }
         var answers: Array<String> by remember { mutableStateOf(this.getExampleAnswers()) }
 
@@ -161,10 +163,20 @@ class CircleTest : VisionTest {
                 },
 
                 onSizeDecrease = {
+
+                    // TODO: Zaimplementowac polecenia glosowe do zbierania odpowiedzi
+                    storeResult(question, generateDirections())
+
                     if (currentStage < stageCount) {
                         currentStageState.intValue++
                         question = this@CircleTest.generateQuestion().toString()
                         answers = this@CircleTest.getExampleAnswers()
+                    } else {
+
+                        val saver = FileSaver("TEST_CIRCLE", activity.applicationContext)
+                        println(saver.fileDirectory)
+                        saver.save(resultCollector)
+
                     }
                 }
             )
@@ -173,7 +185,7 @@ class CircleTest : VisionTest {
 
     override fun generateQuestion(): Any {
 
-        var question: String = this.generateDirections()
+        var question: String = generateDirections()
 
         correctAnswer = question
         return question
@@ -212,6 +224,12 @@ class CircleTest : VisionTest {
         arr[abs(random.nextInt()) % 4] = correctAnswer
 
         return arr
+
+    }
+
+    override fun storeResult(question: String, answer: String) {
+
+        resultCollector.addResult(question, answer)
 
     }
 

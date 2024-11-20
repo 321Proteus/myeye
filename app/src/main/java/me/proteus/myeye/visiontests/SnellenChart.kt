@@ -29,6 +29,8 @@ import androidx.compose.ui.unit.dp
 import me.proteus.myeye.R
 import me.proteus.myeye.ScreenScalingUtils.getScreenInfo
 import me.proteus.myeye.VisionTest
+import me.proteus.myeye.io.FileSaver
+import me.proteus.myeye.io.ResultDataCollector
 import me.proteus.myeye.ui.VisionTestLayoutActivity
 import java.util.Random
 import kotlin.math.*
@@ -43,6 +45,8 @@ class SnellenChart : VisionTest {
     private var currentStageState = mutableIntStateOf(1)
 
     override val currentStage: Int get() = currentStageState.intValue
+
+    override val resultCollector: ResultDataCollector = ResultDataCollector()
 
     fun stageToCentimeters(stage: Int, distance: Float): Float {
 
@@ -156,25 +160,37 @@ class SnellenChart : VisionTest {
             ButtonRow(
                 onRegenerate = { question = this@SnellenChart.generateQuestion().toString() },
                 onSizeDecrease = {
+
+                    // TODO: Zaimplementowac polecenia glosowe do zbierania odpowiedzi
+                    storeResult(question, randomText(5))
+
                     if (currentStage < stageCount) {
                         currentStageState.intValue++
                         question = this@SnellenChart.generateQuestion().toString()
+                    } else {
+
+                        val saver = FileSaver("SNELLEN_CHART", activity.applicationContext)
+                        println(saver.fileDirectory)
+                        saver.save(resultCollector)
+
+
                     }
                 }
             )
         }
     }
 
+    override fun storeResult(question: String, answer: String) {
+
+        resultCollector.addResult(question, answer)
+
+    }
+
     override fun generateQuestion(): Any {
 
-        var question: String = ""
-        var i: Int = 0
+        var question: String = randomText(5)
 
-        while(i++ < 5)  {
-            question += randomChar()
-        }
-
-        correctAnswer = question.toString()
+        correctAnswer = question
         return question
 
     }
@@ -190,7 +206,7 @@ class SnellenChart : VisionTest {
         var arr = Array<String>(4) { "" }
         for (i in 0..3) {
             arr[i] = correctAnswer
-            while (arr[i] == correctAnswer) arr[i] = randomChar().toString()
+            while (arr[i] == correctAnswer) arr[i] = randomText(5)
         }
         arr[abs(random.nextInt()) % 4] = correctAnswer.toString()
 
@@ -202,6 +218,18 @@ class SnellenChart : VisionTest {
 
         var random = Random()
         return ((abs(random.nextInt() % 25)) + 65).toChar()
+    }
+
+    fun randomText(n: Int): String {
+
+        var text: String = ""
+        var i: Int = 0
+
+        while(i++ < n)  {
+            text += randomChar()
+        }
+
+        return text
     }
 
 }

@@ -1,5 +1,6 @@
 package me.proteus.myeye.ui
 
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -10,6 +11,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import me.proteus.myeye.VisionTest
+import me.proteus.myeye.io.FileSaver
 import me.proteus.myeye.ui.theme.MyEyeTheme
 import me.proteus.myeye.visiontests.*
 import java.lang.IllegalArgumentException
@@ -30,17 +32,22 @@ class VisionTestLayoutActivity : ComponentActivity() {
                             .fillMaxSize(),
                         contentAlignment = Alignment.Center
                     ) {
-                        getTest(intent).DisplayStage(activity = this@VisionTestLayoutActivity, modifier = Modifier)
+                        getTest(intent, applicationContext).DisplayStage(activity = this@VisionTestLayoutActivity, modifier = Modifier)
                     }
 
                 }
             }
+
         }
     }
 }
 
-fun getTest(intent: Intent): VisionTest {
+fun getTest(intent: Intent, context: Context): VisionTest {
     val testID = intent.getStringExtra("TEST_ID")
+
+    var saver: FileSaver = FileSaver(testID, context)
+    saver.getDirectoryTree(saver.fileDirectory, 0)
+
     val test = when (testID) {
         "SNELLEN_CHART" -> SnellenChart()
         "TEST_CIRCLE" -> CircleTest()
