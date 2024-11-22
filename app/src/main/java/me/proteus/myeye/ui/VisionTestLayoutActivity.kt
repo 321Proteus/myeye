@@ -45,7 +45,9 @@ class VisionTestLayoutActivity : ComponentActivity() {
 fun getTest(intent: Intent, context: Context): VisionTest {
     val testID = intent.getStringExtra("TEST_ID")
 
-    var saver: ResultDataSaver = ResultDataSaver(testID, context)
+    var saver: ResultDataSaver = ResultDataSaver(context)
+    saver.insert(testID);
+    saver.selectAll();
 
     val test = when (testID) {
         "SNELLEN_CHART" -> SnellenChart()

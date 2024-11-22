@@ -61,6 +61,47 @@ public class ResultDataSaver {
 
     }
 
+    public void selectAll() {
+        SupportSQLiteDatabase db = this.dbHelper.getWritableDatabase();
+        String ResultSelectionQuery = "SELECT * FROM RESULTS";
+
+        try (Cursor cursor = db.query(ResultSelectionQuery)) {
+
+            System.out.println(cursor.getCount());
+
+            while (cursor.moveToNext()) {
+
+                int idIndex = cursor.getColumnIndex("ID");
+                int testIndex = cursor.getColumnIndex("TEST");
+                int resultIndex = cursor.getColumnIndex("RESULT");
+
+                System.out.println();
+
+                if (resultIndex >= 0 && testIndex >= 0 && idIndex >= 0) {
+
+                    int id = cursor.getInt(idIndex);
+                    int test = cursor.getInt(testIndex);
+                    byte[] result = cursor.getBlob(resultIndex);
+                    System.out.println(id + " " + test + deserialize(result));
+
+                } else {
+                    System.out.println("Bledna kolumna w tabeli RESULTS");
+                }
+
+            }
+
+        }
+    }
+
+    public void insert(String result) {
+
+        SupportSQLiteDatabase db = this.dbHelper.getWritableDatabase();
+
+        String ResultInsertionQuery = "INSERT INTO RESULTS (TEST, RESULT) VALUES (?, ?)";
+        db.execSQL(ResultInsertionQuery, new Object[]{1, serialize(result)});
+
+    }
+
     public byte[] serialize(String text) {
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
