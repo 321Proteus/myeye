@@ -30,7 +30,6 @@ import androidx.compose.ui.unit.dp
 import me.proteus.myeye.R
 import me.proteus.myeye.ScreenScalingUtils.getScreenInfo
 import me.proteus.myeye.VisionTest
-import me.proteus.myeye.io.FileSaver
 import me.proteus.myeye.io.ResultDataCollector
 import me.proteus.myeye.ui.VisionTestLayoutActivity
 import java.util.Random
@@ -172,10 +171,6 @@ class CircleTest : VisionTest {
                         question = this@CircleTest.generateQuestion().toString()
                         answers = this@CircleTest.getExampleAnswers()
                     } else {
-
-                        val saver = FileSaver("TEST_CIRCLE", activity.applicationContext)
-                        println(saver.fileDirectory)
-                        saver.save(resultCollector)
 
                     }
                 }

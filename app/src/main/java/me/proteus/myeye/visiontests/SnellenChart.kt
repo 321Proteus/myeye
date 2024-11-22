@@ -29,7 +29,6 @@ import androidx.compose.ui.unit.dp
 import me.proteus.myeye.R
 import me.proteus.myeye.ScreenScalingUtils.getScreenInfo
 import me.proteus.myeye.VisionTest
-import me.proteus.myeye.io.FileSaver
 import me.proteus.myeye.io.ResultDataCollector
 import me.proteus.myeye.ui.VisionTestLayoutActivity
 import java.util.Random
@@ -168,10 +167,6 @@ class SnellenChart : VisionTest {
                         currentStageState.intValue++
                         question = this@SnellenChart.generateQuestion().toString()
                     } else {
-
-                        val saver = FileSaver("SNELLEN_CHART", activity.applicationContext)
-                        println(saver.fileDirectory)
-                        saver.save(resultCollector)
 
 
                     }
