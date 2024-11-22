@@ -1,22 +1,23 @@
 package me.proteus.myeye.io;
 
 import android.content.Context;
+import android.database.Cursor;
 
+import androidx.annotation.NonNull;
 import androidx.sqlite.db.*;
 import androidx.sqlite.db.framework.*;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
 public class ResultDataSaver {
 
-    private String testType = "";
     private final SupportSQLiteOpenHelper dbHelper;
 
-    public ResultDataSaver(String testType, Context context) {
-
-        this.testType = testType;
+    public ResultDataSaver(Context context) {
 
         SupportSQLiteOpenHelper.Configuration config = SupportSQLiteOpenHelper
                 .Configuration.builder(context)
@@ -53,7 +54,46 @@ public class ResultDataSaver {
         try {
             db.close();
         } catch (IOException ioe) {
-            ioe.printStackTrace();
+
+            throw new RuntimeException(ioe);
+
+        }
+
+    }
+
+    public byte[] serialize(String text) {
+
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        ObjectOutputStream oos;
+
+        try {
+
+            oos = new ObjectOutputStream(baos);
+            oos.writeObject(text);
+
+            return baos.toByteArray();
+
+        } catch (IOException e) {
+
+            throw new RuntimeException(e);
+
+        }
+
+    }
+
+    public String deserialize(byte[] object) {
+
+        ByteArrayInputStream bais = new ByteArrayInputStream(object);
+        try {
+            ObjectInputStream ois = new ObjectInputStream(bais);
+
+            String text = (String) ois.readObject();
+            return text;
+
+        } catch (IOException | ClassNotFoundException e) {
+
+            throw new RuntimeException(e);
+
         }
 
     }
