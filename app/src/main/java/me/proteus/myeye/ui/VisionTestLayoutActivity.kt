@@ -46,7 +46,7 @@ fun getTest(intent: Intent, context: Context): VisionTest {
     val testID = intent.getStringExtra("TEST_ID")
 
     var saver: ResultDataSaver = ResultDataSaver(context)
-    saver.insert(testID);
+    saver.insert(testID, "Hello from VTLA");
     saver.selectAll();
 
     val test = when (testID) {

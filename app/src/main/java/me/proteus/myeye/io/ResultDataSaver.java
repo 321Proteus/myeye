@@ -28,13 +28,8 @@ public class ResultDataSaver {
                     public void onCreate(SupportSQLiteDatabase db) {
                         String schema = "CREATE TABLE IF NOT EXISTS RESULTS (" +
                                 "ID INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                                "TEST INTEGER NOT NULL, " +
+                                "TEST TEXT NOT NULL, " +
                                 "RESULT BLOB NOT NULL)";
-                        db.execSQL(schema);
-
-                        schema = "CREATE TABLE IF NOT EXISTS TESTS (" +
-                                "TYPEID INTEGER PRIMARY KEY NOT NULL, " +
-                                "TYPENAME TEXT NOT NULL)";
                         db.execSQL(schema);
                     }
 
@@ -42,7 +37,6 @@ public class ResultDataSaver {
                     public void onUpgrade(@NonNull SupportSQLiteDatabase db, int i, int i1) {
                         // TODO: Obsluga migracji
                         db.execSQL("DROP TABLE IF EXISTS RESULTS");
-                        db.execSQL("DROP TABLE IF EXISTS TESTS");
                         onCreate(db);
                     }
 
@@ -80,9 +74,9 @@ public class ResultDataSaver {
                 if (resultIndex >= 0 && testIndex >= 0 && idIndex >= 0) {
 
                     int id = cursor.getInt(idIndex);
-                    int test = cursor.getInt(testIndex);
+                    String test = cursor.getString(testIndex);
                     byte[] result = cursor.getBlob(resultIndex);
-                    System.out.println(id + " " + test + deserialize(result));
+                    System.out.println(id + " " + test + " " + deserialize(result));
 
                 } else {
                     System.out.println("Bledna kolumna w tabeli RESULTS");
@@ -93,12 +87,12 @@ public class ResultDataSaver {
         }
     }
 
-    public void insert(String result) {
+    public void insert(String testName, String result) {
 
         SupportSQLiteDatabase db = this.dbHelper.getWritableDatabase();
 
         String ResultInsertionQuery = "INSERT INTO RESULTS (TEST, RESULT) VALUES (?, ?)";
-        db.execSQL(ResultInsertionQuery, new Object[]{1, serialize(result)});
+        db.execSQL(ResultInsertionQuery, new Object[]{testName, serialize(result)});
 
     }
 
