@@ -39,7 +39,7 @@ public class ResultDataSaver {
                     }
 
                     @Override
-                    public void onUpgrade(SupportSQLiteDatabase db, int i, int i1) {
+                    public void onUpgrade(@NonNull SupportSQLiteDatabase db, int i, int i1) {
                         // TODO: Obsluga migracji
                         db.execSQL("DROP TABLE IF EXISTS RESULTS");
                         db.execSQL("DROP TABLE IF EXISTS TESTS");
