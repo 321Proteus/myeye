@@ -13,7 +13,7 @@ import androidx.compose.ui.Modifier
 import me.proteus.myeye.VisionTest
 import me.proteus.myeye.io.ResultDataSaver
 import me.proteus.myeye.ui.theme.MyEyeTheme
-import me.proteus.myeye.visiontests.*
+import me.proteus.myeye.visiontests.VisionTestUtils
 import java.lang.IllegalArgumentException
 
 class VisionTestLayoutActivity : ComponentActivity() {
@@ -49,13 +49,7 @@ fun getTest(intent: Intent, context: Context): VisionTest {
     saver.insert(testID, "Hello from VTLA");
     saver.selectAll();
 
-    val test = when (testID) {
-        "SNELLEN_CHART" -> SnellenChart()
-        "TEST_CIRCLE" -> CircleTest()
-        "TEST_BUILD" -> BuildTest()
-        "TEST_INFO" -> ExampleTest()
-        else -> throw IllegalArgumentException("Nie znaleziono testu o podanym ID")
-    }
+    val test: VisionTest = VisionTestUtils().getTestByID(testID);
 
     return test
 }
