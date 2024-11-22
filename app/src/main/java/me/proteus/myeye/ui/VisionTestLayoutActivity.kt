@@ -11,7 +11,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import me.proteus.myeye.VisionTest
-import me.proteus.myeye.io.FileSaver
+import me.proteus.myeye.io.ResultDataSaver
 import me.proteus.myeye.ui.theme.MyEyeTheme
 import me.proteus.myeye.visiontests.*
 import java.lang.IllegalArgumentException
@@ -45,8 +45,7 @@ class VisionTestLayoutActivity : ComponentActivity() {
 fun getTest(intent: Intent, context: Context): VisionTest {
     val testID = intent.getStringExtra("TEST_ID")
 
-    var saver: FileSaver = FileSaver(testID, context)
-    saver.getDirectoryTree(saver.fileDirectory, 0)
+    var saver: ResultDataSaver = ResultDataSaver(testID, context)
 
     val test = when (testID) {
         "SNELLEN_CHART" -> SnellenChart()
