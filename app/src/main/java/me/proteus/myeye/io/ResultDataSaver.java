@@ -2,11 +2,12 @@ package me.proteus.myeye.io;
 
 import android.content.Context;
 
-import androidx.annotation.NonNull;
 import androidx.sqlite.db.*;
 import androidx.sqlite.db.framework.*;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.ObjectOutputStream;
 
 public class ResultDataSaver {
 
@@ -24,22 +25,23 @@ public class ResultDataSaver {
 
                     @Override
                     public void onCreate(SupportSQLiteDatabase db) {
-                        String schema = "CREATE IF NOT EXISTS RESULTS (" +
-                                "ID INT PRIMARY KEY AUTOINCREMENT, " +
-                                "TEST INT NOT NULL, " +
-                                "RESULT BLOB NOT NULL";
+                        String schema = "CREATE TABLE IF NOT EXISTS RESULTS (" +
+                                "ID INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                                "TEST INTEGER NOT NULL, " +
+                                "RESULT BLOB NOT NULL)";
                         db.execSQL(schema);
 
-                        schema = "CREATE IF NOT EXISTS TESTS (" +
-                                "TYPEID INT PRIMARY KEY NOT NULL, " +
-                                "TYPENAME TEXT NOT NULL";
+                        schema = "CREATE TABLE IF NOT EXISTS TESTS (" +
+                                "TYPEID INTEGER PRIMARY KEY NOT NULL, " +
+                                "TYPENAME TEXT NOT NULL)";
                         db.execSQL(schema);
                     }
 
                     @Override
                     public void onUpgrade(SupportSQLiteDatabase db, int i, int i1) {
                         // TODO: Obsluga migracji
-                        db.execSQL("DROP TABLE IF EXISTS RESULTS, TESTS");
+                        db.execSQL("DROP TABLE IF EXISTS RESULTS");
+                        db.execSQL("DROP TABLE IF EXISTS TESTS");
                         onCreate(db);
                     }
 
@@ -55,6 +57,5 @@ public class ResultDataSaver {
         }
 
     }
-
 
 }
