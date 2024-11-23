@@ -1,5 +1,7 @@
 package me.proteus.myeye.visiontests
 
+import android.content.Context
+import android.content.Intent
 import android.content.res.Configuration
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -26,11 +28,14 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
+import androidx.core.content.ContextCompat.startActivity
+import me.proteus.myeye.MenuActivity
 import me.proteus.myeye.R
 import me.proteus.myeye.ScreenScalingUtils.getScreenInfo
 import me.proteus.myeye.VisionTest
 import me.proteus.myeye.io.ResultDataCollector
 import me.proteus.myeye.io.ResultDataSaver
+import me.proteus.myeye.ui.TestResultActivity
 import me.proteus.myeye.ui.VisionTestLayoutActivity
 import java.util.Random
 import kotlin.math.*
@@ -171,10 +176,7 @@ class SnellenChart : VisionTest {
                     } else {
 
                         storeResult(question, randomText(5))
-
-                        var localSaver = ResultDataSaver(activity.applicationContext)
-                        localSaver.insert("SNELLEN_CHART", resultCollector.stages)
-                        localSaver.selectAll()
+                        endTest(activity)
 
                     }
                 }
@@ -232,6 +234,17 @@ class SnellenChart : VisionTest {
         }
 
         return text
+    }
+
+    override fun endTest(activity: VisionTestLayoutActivity) {
+
+        var localSaver = ResultDataSaver(activity.applicationContext)
+        localSaver.insert("SNELLEN_CHART", resultCollector.stages)
+        localSaver.selectAll()
+
+        val testLeavingIntent = Intent(activity, MenuActivity::class.java)
+        activity.startActivity(testLeavingIntent)
+
     }
 
 }

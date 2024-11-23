@@ -1,5 +1,7 @@
 package me.proteus.myeye.visiontests
 
+import android.content.Context
+import android.content.Intent
 import android.content.res.Configuration
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -27,6 +29,7 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
+import me.proteus.myeye.MenuActivity
 import me.proteus.myeye.R
 import me.proteus.myeye.ScreenScalingUtils.getScreenInfo
 import me.proteus.myeye.VisionTest
@@ -175,10 +178,7 @@ class CircleTest : VisionTest {
                     } else {
 
                         storeResult(question, generateDirections())
-
-                        var localSaver = ResultDataSaver(activity.applicationContext)
-                        localSaver.insert("TEST_CIRCLE", resultCollector.stages)
-                        localSaver.selectAll()
+                        endTest(activity)
 
                     }
                 }
@@ -233,6 +233,17 @@ class CircleTest : VisionTest {
     override fun storeResult(question: String, answer: String) {
 
         resultCollector.addResult(question, answer)
+
+    }
+
+    override fun endTest(activity: VisionTestLayoutActivity) {
+
+        var localSaver = ResultDataSaver(activity.applicationContext)
+        localSaver.insert("TEST_CIRCLE", resultCollector.stages)
+        localSaver.selectAll()
+
+        val testLeavingIntent = Intent(activity, MenuActivity::class.java)
+        activity.startActivity(testLeavingIntent)
 
     }
 

@@ -1,8 +1,10 @@
 package me.proteus.myeye
 
+import android.content.Context
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import me.proteus.myeye.io.ResultDataCollector
+import me.proteus.myeye.io.ResultDataSaver
 import me.proteus.myeye.ui.VisionTestLayoutActivity
 
 interface VisionTest {
@@ -26,5 +28,7 @@ interface VisionTest {
     fun checkAnswer(answer: String): Boolean
 
     fun storeResult(question: String, answer: String)
+
+    fun endTest(activity: VisionTestLayoutActivity)
 
 }
