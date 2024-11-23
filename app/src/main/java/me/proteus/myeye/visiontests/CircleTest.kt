@@ -239,7 +239,6 @@ class CircleTest : VisionTest {
 
         var localSaver = ResultDataSaver(activity.applicationContext)
         localSaver.insert("TEST_CIRCLE", resultCollector.stages)
-        localSaver.selectAll()
 
         val testLeavingIntent = Intent(activity, MenuActivity::class.java)
         activity.startActivity(testLeavingIntent)

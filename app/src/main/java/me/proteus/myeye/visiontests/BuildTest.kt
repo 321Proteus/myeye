@@ -52,7 +52,6 @@ class BuildTest : VisionTest {
 
         var localSaver = ResultDataSaver(activity.applicationContext)
         localSaver.insert("TEST_BUILD", resultCollector.stages)
-        localSaver.selectAll()
 
         val testLeavingIntent = Intent(activity, MenuActivity::class.java)
         activity.startActivity(testLeavingIntent)
