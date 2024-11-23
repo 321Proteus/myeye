@@ -160,14 +160,17 @@ class SnellenChart : VisionTest {
                 onRegenerate = { question = this@SnellenChart.generateQuestion().toString() },
                 onSizeDecrease = {
 
-                    // TODO: Zaimplementowac polecenia glosowe do zbierania odpowiedzi
-                    storeResult(question, randomText(5))
-
                     if (currentStage < stageCount) {
+
+                        // TODO: Zaimplementowac polecenia glosowe do zbierania odpowiedzi
+                        storeResult(question, randomText(5))
+
                         currentStageState.intValue++
                         question = this@SnellenChart.generateQuestion().toString()
 
                     } else {
+
+                        storeResult(question, randomText(5))
 
                         var localSaver = ResultDataSaver(activity.applicationContext)
                         localSaver.insert("SNELLEN_CHART", resultCollector.stages)

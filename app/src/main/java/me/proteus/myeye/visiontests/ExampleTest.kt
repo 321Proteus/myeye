@@ -82,11 +82,15 @@ class ExampleTest : VisionTest {
 
                         if (currentStageState.intValue < stageCount) {
 
+                            storeResult(question, ans)
+
                             currentStageState.intValue++
                             question = this@ExampleTest.generateQuestion().toString()
                             answers = this@ExampleTest.getExampleAnswers()
 
                         } else {
+
+                            storeResult(question, ans)
 
                             var localSaver = ResultDataSaver(activity.applicationContext)
                             localSaver.insert("TEST_INFO", resultCollector.stages)

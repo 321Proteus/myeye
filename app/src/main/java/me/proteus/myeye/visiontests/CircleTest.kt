@@ -164,16 +164,18 @@ class CircleTest : VisionTest {
 
                 onSizeDecrease = {
 
-                    // TODO: Zaimplementowac polecenia glosowe do zbierania odpowiedzi
-                    storeResult(question, generateDirections())
-
                     if (currentStage < stageCount) {
+
+                        // TODO: Zaimplementowac polecenia glosowe do zbierania odpowiedzi
+                        storeResult(question, generateDirections())
 
                         currentStageState.intValue++
                         question = this@CircleTest.generateQuestion().toString()
                         answers = this@CircleTest.getExampleAnswers()
 
                     } else {
+
+                        storeResult(question, generateDirections())
 
                         var localSaver = ResultDataSaver(activity.applicationContext)
                         localSaver.insert("TEST_CIRCLE", resultCollector.stages)
