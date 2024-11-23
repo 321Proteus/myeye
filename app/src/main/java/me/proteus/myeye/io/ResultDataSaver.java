@@ -8,6 +8,7 @@ import androidx.sqlite.db.*;
 import androidx.sqlite.db.framework.*;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import me.proteus.myeye.SerializablePair;
@@ -15,6 +16,11 @@ import me.proteus.myeye.SerializablePair;
 public class ResultDataSaver {
 
     private final SupportSQLiteOpenHelper dbHelper;
+
+
+    private final List<Integer> idList = new ArrayList<>();
+    private final List<String> testNames = new ArrayList<>();
+    private final List<byte[]> results = new ArrayList<>();
 
     public ResultDataSaver(Context context) {
 
@@ -54,9 +60,9 @@ public class ResultDataSaver {
 
     }
 
-    public void selectAll() {
+    public void select(String fields) {
         SupportSQLiteDatabase db = this.dbHelper.getWritableDatabase();
-        String ResultSelectionQuery = "SELECT * FROM RESULTS";
+        String ResultSelectionQuery = "SELECT " + fields + " FROM RESULTS";
 
         try (Cursor cursor = db.query(ResultSelectionQuery)) {
 
@@ -70,18 +76,9 @@ public class ResultDataSaver {
 
                 if (resultIndex >= 0 && testIndex >= 0 && idIndex >= 0) {
 
-                    int id = cursor.getInt(idIndex);
-                    String test = cursor.getString(testIndex);
-                    byte[] resultObject = cursor.getBlob(resultIndex);
-
-                    List<SerializablePair> result = ResultDataCollector.deserializeResult(resultObject);
-
-                    System.out.println(id + " " + test + "(" + result.size() + "):");
-
-                    for (int i = 0; i < result.size(); i++) {
-
-                        System.out.println(result.get(i).getFirst() + " " + result.get(i).getSecond());
-                    }
+                    this.idList.add(cursor.getInt(idIndex));
+                    this.testNames.add(cursor.getString(testIndex));
+                    this.results.add(cursor.getBlob(resultIndex));
 
                 } else {
                     System.out.println("Bledna kolumna w tabeli RESULTS");
@@ -99,6 +96,18 @@ public class ResultDataSaver {
         String ResultInsertionQuery = "INSERT INTO RESULTS (TEST, RESULT) VALUES (?, ?)";
         db.execSQL(ResultInsertionQuery, new Object[]{ testName, ResultDataCollector.serializeResult(result) });
 
+    }
+
+    public List<Integer> getIDList() {
+        return this.idList;
+    }
+
+    public List<String> getTestNames() {
+        return this.testNames;
+    }
+
+    public List<byte[]> getResults() {
+        return this.results;
     }
 
 }
