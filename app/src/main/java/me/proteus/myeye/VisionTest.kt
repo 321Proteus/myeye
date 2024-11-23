@@ -27,4 +27,6 @@ interface VisionTest {
 
     fun storeResult(question: String, answer: String)
 
+    fun endTest(activity: VisionTestLayoutActivity)
+
 }
