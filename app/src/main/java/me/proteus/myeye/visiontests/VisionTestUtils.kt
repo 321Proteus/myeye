@@ -21,4 +21,28 @@ class VisionTestUtils {
 
     }
 
+    fun getTestNameByID(testID: String?): String {
+
+        return when (testID) {
+            "SNELLEN_CHART" -> "LogMAR"
+            "TEST_CIRCLE" -> "Landolt C"
+            "TEST_BUILD" -> "TODO"
+            "TEST_INFO" -> "Przykładowy"
+            else -> throw IllegalArgumentException("Nie znaleziono testu o podanym ID")
+        }
+
+    }
+
+    fun getTestTypeByID(testID: String?): String {
+
+        return when (testID?.split('_')[0]) {
+            "TEST" -> "Test ostrości wzroku"
+            "COLOR" -> "Test rozróżniania kolorów"
+            else -> "Test wzroku"
+
+        }
+
+
+    }
+
 }
