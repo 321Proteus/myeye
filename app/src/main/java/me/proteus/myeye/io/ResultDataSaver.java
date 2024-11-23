@@ -12,6 +12,10 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.util.ArrayList;
+import java.util.List;
+
+import me.proteus.myeye.SerializablePair;
 
 public class ResultDataSaver {
 
@@ -76,7 +80,7 @@ public class ResultDataSaver {
                     int id = cursor.getInt(idIndex);
                     String test = cursor.getString(testIndex);
                     byte[] result = cursor.getBlob(resultIndex);
-                    System.out.println(id + " " + test + " " + deserialize(result));
+                    System.out.println(id + " " + test + " " + deserializeResult(result));
 
                 } else {
                     System.out.println("Bledna kolumna w tabeli RESULTS");
@@ -92,11 +96,11 @@ public class ResultDataSaver {
         SupportSQLiteDatabase db = this.dbHelper.getWritableDatabase();
 
         String ResultInsertionQuery = "INSERT INTO RESULTS (TEST, RESULT) VALUES (?, ?)";
-        db.execSQL(ResultInsertionQuery, new Object[]{testName, serialize(result)});
+        db.execSQL(ResultInsertionQuery, new Object[]{testName, serializeResult(new ArrayList<>())});
 
     }
 
-    public byte[] serialize(String text) {
+    public byte[] serializeResult(List<SerializablePair> input) {
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         ObjectOutputStream oos;
@@ -104,7 +108,8 @@ public class ResultDataSaver {
         try {
 
             oos = new ObjectOutputStream(baos);
-            oos.writeObject(text);
+            oos.writeObject(input);
+            oos.close();
 
             return baos.toByteArray();
 
@@ -116,14 +121,17 @@ public class ResultDataSaver {
 
     }
 
-    public String deserialize(byte[] object) {
+    public List<SerializablePair> deserializeResult(byte[] object) {
 
         ByteArrayInputStream bais = new ByteArrayInputStream(object);
-        try {
-            ObjectInputStream ois = new ObjectInputStream(bais);
 
-            String text = (String) ois.readObject();
-            return text;
+        try {
+
+            ObjectInputStream ois = new ObjectInputStream(bais);
+            List<SerializablePair> output = (List<SerializablePair>) ois.readObject();
+            ois.close();
+
+            return output;
 
         } catch (IOException | ClassNotFoundException e) {
 
