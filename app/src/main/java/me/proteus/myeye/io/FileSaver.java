@@ -15,6 +15,8 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.regex.*;
 
+import me.proteus.myeye.SerializablePair;
+
 public class FileSaver {
 
     private final String testType;
@@ -139,10 +141,10 @@ public class FileSaver {
 
         for (int i=0;i<data.stages.size();i++) {
 
-            Pair<String, String> p = data.stages.get(i);
+            SerializablePair p = data.stages.get(i);
 
             fw.write(System.lineSeparator());
-            fw.write(i + " " + p.first + " " + p.second);
+            fw.write(i + " " + p.getFirst() + " " + p.getSecond());
 
         }
 

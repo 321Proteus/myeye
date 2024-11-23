@@ -60,7 +60,7 @@ public class ResultDataSaver {
 
         try (Cursor cursor = db.query(ResultSelectionQuery)) {
 
-            System.out.println(cursor.getCount());
+            // System.out.println(cursor.getCount());
 
             while (cursor.moveToNext()) {
 
@@ -68,14 +68,20 @@ public class ResultDataSaver {
                 int testIndex = cursor.getColumnIndex("TEST");
                 int resultIndex = cursor.getColumnIndex("RESULT");
 
-                System.out.println();
-
                 if (resultIndex >= 0 && testIndex >= 0 && idIndex >= 0) {
 
                     int id = cursor.getInt(idIndex);
                     String test = cursor.getString(testIndex);
-                    byte[] result = cursor.getBlob(resultIndex);
-                    System.out.println(id + " " + test + " " + ResultDataCollector.deserializeResult(result));
+                    byte[] resultObject = cursor.getBlob(resultIndex);
+
+                    List<SerializablePair> result = ResultDataCollector.deserializeResult(resultObject);
+
+                    System.out.println(id + " " + test + "(" + result.size() + "):");
+
+                    for (int i = 0; i < result.size(); i++) {
+
+                        System.out.println(result.get(i).getFirst() + " " + result.get(i).getSecond());
+                    }
 
                 } else {
                     System.out.println("Bledna kolumna w tabeli RESULTS");

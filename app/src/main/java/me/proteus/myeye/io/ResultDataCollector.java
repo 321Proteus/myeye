@@ -13,7 +13,7 @@ import java.util.List;
 import me.proteus.myeye.SerializablePair;
 
 public class ResultDataCollector {
-    protected List<Pair<String, String>> stages = new ArrayList<>();
+    public List<SerializablePair> stages = new ArrayList<>();
 
 
     public ResultDataCollector() {
@@ -22,7 +22,7 @@ public class ResultDataCollector {
 
     public void addResult(String q, String a) {
 
-        Pair<String, String> p = new Pair<>(q, a);
+        SerializablePair p = new SerializablePair(q, a);
         stages.add(p);
 
     }

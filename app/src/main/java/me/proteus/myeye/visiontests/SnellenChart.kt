@@ -30,6 +30,7 @@ import me.proteus.myeye.R
 import me.proteus.myeye.ScreenScalingUtils.getScreenInfo
 import me.proteus.myeye.VisionTest
 import me.proteus.myeye.io.ResultDataCollector
+import me.proteus.myeye.io.ResultDataSaver
 import me.proteus.myeye.ui.VisionTestLayoutActivity
 import java.util.Random
 import kotlin.math.*
@@ -37,7 +38,6 @@ import kotlin.math.*
 class SnellenChart : VisionTest {
 
     private var correctAnswer: String = ""
-    private var score: Int = 0
 
     override val stageCount: Int = 10
 
@@ -131,7 +131,7 @@ class SnellenChart : VisionTest {
     @Composable
     override fun DisplayStage(activity: VisionTestLayoutActivity, modifier: Modifier) {
 
-        println("$score $currentStage")
+        println("Stage: $currentStage")
 
         var question: String by remember { mutableStateOf(this.generateQuestion().toString()) }
 
@@ -166,8 +166,12 @@ class SnellenChart : VisionTest {
                     if (currentStage < stageCount) {
                         currentStageState.intValue++
                         question = this@SnellenChart.generateQuestion().toString()
+
                     } else {
 
+                        var localSaver = ResultDataSaver(activity.applicationContext)
+                        localSaver.insert("SNELLEN_CHART", resultCollector.stages)
+                        localSaver.selectAll()
 
                     }
                 }

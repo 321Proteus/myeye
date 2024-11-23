@@ -21,6 +21,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import me.proteus.myeye.VisionTest
 import me.proteus.myeye.io.ResultDataCollector
+import me.proteus.myeye.io.ResultDataSaver
 import me.proteus.myeye.ui.VisionTestLayoutActivity
 import java.util.Random
 import kotlin.math.abs
@@ -86,6 +87,10 @@ class ExampleTest : VisionTest {
                             answers = this@ExampleTest.getExampleAnswers()
 
                         } else {
+
+                            var localSaver = ResultDataSaver(activity.applicationContext)
+                            localSaver.insert("TEST_INFO", resultCollector.stages)
+                            localSaver.selectAll()
 
                         }
 

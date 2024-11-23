@@ -31,6 +31,7 @@ import me.proteus.myeye.R
 import me.proteus.myeye.ScreenScalingUtils.getScreenInfo
 import me.proteus.myeye.VisionTest
 import me.proteus.myeye.io.ResultDataCollector
+import me.proteus.myeye.io.ResultDataSaver
 import me.proteus.myeye.ui.VisionTestLayoutActivity
 import java.util.Random
 import kotlin.math.*
@@ -167,10 +168,16 @@ class CircleTest : VisionTest {
                     storeResult(question, generateDirections())
 
                     if (currentStage < stageCount) {
+
                         currentStageState.intValue++
                         question = this@CircleTest.generateQuestion().toString()
                         answers = this@CircleTest.getExampleAnswers()
+
                     } else {
+
+                        var localSaver = ResultDataSaver(activity.applicationContext)
+                        localSaver.insert("TEST_CIRCLE", resultCollector.stages)
+                        localSaver.selectAll()
 
                     }
                 }
