@@ -1,7 +1,6 @@
 package me.proteus.myeye.io;
 
 import android.content.Context;
-import android.util.Pair;
 
 import java.io.File;
 import java.io.FileWriter;

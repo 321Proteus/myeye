@@ -1,7 +1,5 @@
 package me.proteus.myeye.io;
 
-import android.util.Pair;
-
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;

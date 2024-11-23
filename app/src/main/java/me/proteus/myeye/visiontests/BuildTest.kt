@@ -1,6 +1,5 @@
 package me.proteus.myeye.visiontests
 
-import android.content.Context
 import android.content.Intent
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier

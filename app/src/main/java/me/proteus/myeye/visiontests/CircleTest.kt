@@ -1,6 +1,5 @@
 package me.proteus.myeye.visiontests
 
-import android.content.Context
 import android.content.Intent
 import android.content.res.Configuration
 import androidx.compose.foundation.layout.Arrangement
