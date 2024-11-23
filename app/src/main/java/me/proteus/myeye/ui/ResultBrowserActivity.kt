@@ -37,7 +37,7 @@ class ResultBrowserActivity : ComponentActivity() {
                         println()
 
                         for (i in ids) {
-                            Text(text = dbConnector.testNames[i])
+                            Text(text = dbConnector.testNames[i-1])
                         }
                     }
 
