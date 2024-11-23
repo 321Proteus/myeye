@@ -56,6 +56,7 @@ public class ResultDataCollector {
         try {
 
             ObjectInputStream ois = new ObjectInputStream(bais);
+            @SuppressWarnings("unchecked")
             List<SerializablePair> output = (List<SerializablePair>) ois.readObject();
             ois.close();
 
