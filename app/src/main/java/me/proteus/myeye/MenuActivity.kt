@@ -108,7 +108,7 @@ class MenuActivity : ComponentActivity() {
                                 label = { Text("Przeglądaj wyniki") },
                                 selected = false,
                                 onClick = {
-                                    val intent = Intent(this@MenuActivity, TestResultActivity::class.java)
+                                    val intent = Intent(this@MenuActivity, ResultBrowserActivity::class.java)
                                     startActivity(intent)
                                 },
                             )
