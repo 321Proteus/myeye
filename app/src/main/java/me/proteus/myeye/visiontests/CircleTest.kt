@@ -39,7 +39,6 @@ import kotlin.math.*
 class CircleTest : VisionTest {
 
     private var correctAnswer: String = ""
-    private var score: Int = 0
 
     override val stageCount: Int = 10
 

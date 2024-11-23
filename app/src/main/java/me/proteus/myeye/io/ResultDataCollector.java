@@ -13,7 +13,7 @@ import java.util.List;
 import me.proteus.myeye.SerializablePair;
 
 public class ResultDataCollector {
-    public List<SerializablePair> stages = new ArrayList<>();
+    public final List<SerializablePair> stages = new ArrayList<>();
 
 
     public ResultDataCollector() {
