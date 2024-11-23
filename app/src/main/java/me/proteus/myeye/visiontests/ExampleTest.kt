@@ -148,7 +148,7 @@ class ExampleTest : VisionTest {
     override fun endTest(activity: VisionTestLayoutActivity) {
 
         var localSaver = ResultDataSaver(activity.applicationContext)
-        localSaver.insert("TEST_EXAMPLE", resultCollector.stages)
+        localSaver.insert("TEST_INFO", resultCollector.stages)
 
         val testLeavingIntent = Intent(activity, MenuActivity::class.java)
         activity.startActivity(testLeavingIntent)
