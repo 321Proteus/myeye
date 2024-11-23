@@ -76,11 +76,9 @@ class ExampleTest : VisionTest {
                 for (ans in answers) {
                     Button(onClick = {
 
-                        storeResult(question, ans)
-
                         if (this@ExampleTest.checkAnswer(ans)) score++
 
-                        if (currentStageState.intValue < stageCount) {
+                        if (currentStage < stageCount) {
 
                             storeResult(question, ans)
 
@@ -89,7 +87,6 @@ class ExampleTest : VisionTest {
                             answers = this@ExampleTest.getExampleAnswers()
 
                         } else {
-
                             storeResult(question, ans)
 
                             var localSaver = ResultDataSaver(activity.applicationContext)
