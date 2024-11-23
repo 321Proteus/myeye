@@ -7,12 +7,7 @@ import androidx.annotation.NonNull;
 import androidx.sqlite.db.*;
 import androidx.sqlite.db.framework.*;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.util.ArrayList;
 import java.util.List;
 
 import me.proteus.myeye.SerializablePair;
@@ -80,7 +75,7 @@ public class ResultDataSaver {
                     int id = cursor.getInt(idIndex);
                     String test = cursor.getString(testIndex);
                     byte[] result = cursor.getBlob(resultIndex);
-                    System.out.println(id + " " + test + " " + deserializeResult(result));
+                    System.out.println(id + " " + test + " " + ResultDataCollector.deserializeResult(result));
 
                 } else {
                     System.out.println("Bledna kolumna w tabeli RESULTS");
@@ -91,53 +86,12 @@ public class ResultDataSaver {
         }
     }
 
-    public void insert(String testName, String result) {
+    public void insert(String testName, List<SerializablePair> result) {
 
         SupportSQLiteDatabase db = this.dbHelper.getWritableDatabase();
 
         String ResultInsertionQuery = "INSERT INTO RESULTS (TEST, RESULT) VALUES (?, ?)";
-        db.execSQL(ResultInsertionQuery, new Object[]{testName, serializeResult(new ArrayList<>())});
-
-    }
-
-    public byte[] serializeResult(List<SerializablePair> input) {
-
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        ObjectOutputStream oos;
-
-        try {
-
-            oos = new ObjectOutputStream(baos);
-            oos.writeObject(input);
-            oos.close();
-
-            return baos.toByteArray();
-
-        } catch (IOException e) {
-
-            throw new RuntimeException(e);
-
-        }
-
-    }
-
-    public List<SerializablePair> deserializeResult(byte[] object) {
-
-        ByteArrayInputStream bais = new ByteArrayInputStream(object);
-
-        try {
-
-            ObjectInputStream ois = new ObjectInputStream(bais);
-            List<SerializablePair> output = (List<SerializablePair>) ois.readObject();
-            ois.close();
-
-            return output;
-
-        } catch (IOException | ClassNotFoundException e) {
-
-            throw new RuntimeException(e);
-
-        }
+        db.execSQL(ResultInsertionQuery, new Object[]{ testName, ResultDataCollector.serializeResult(result) });
 
     }
 
