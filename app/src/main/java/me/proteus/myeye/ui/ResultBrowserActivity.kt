@@ -1,11 +1,13 @@
 package me.proteus.myeye
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -19,6 +21,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import me.proteus.myeye.io.ResultDataSaver
+import me.proteus.myeye.ui.TestResultActivity
 import me.proteus.myeye.ui.theme.MyEyeTheme
 import me.proteus.myeye.visiontests.VisionTestUtils
 import java.lang.IllegalArgumentException
@@ -89,6 +92,11 @@ fun ResultColumn(activity: ResultBrowserActivity, paddingValues: PaddingValues) 
                     .height(60.dp)
                     .fillMaxWidth()
                     .background(Color.LightGray)
+                    .clickable {
+                        val intent: Intent = Intent(activity, TestResultActivity::class.java)
+                        intent.putExtra("ID", i)
+                        activity.startActivity(intent)
+                    }
             ) {
                 Row(
                     verticalAlignment = Alignment.CenterVertically

@@ -1,5 +1,6 @@
 package me.proteus.myeye.ui
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -26,14 +27,17 @@ class TestResultActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             MyEyeTheme {
-                TestResultScreen()
+                TestResultScreen(intent)
             }
         }
     }
 }
 
 @Composable
-fun TestResultScreen() {
+fun TestResultScreen(inputIntent: Intent) {
+
+    val testID = inputIntent.getIntExtra("ID", 1)
+
     Scaffold(
         content = { innerPadding ->
 
@@ -62,7 +66,7 @@ fun TestResultScreen() {
                     modifier = Modifier
                         .weight(0.35f)
                 ) {
-                    Text("Tu wstawic opis, date i przebieg testu")
+                    Text(testID.toString())
                 }
 
             }
