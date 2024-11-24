@@ -8,6 +8,8 @@ import androidx.sqlite.db.*;
 import androidx.sqlite.db.framework.*;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,6 +23,7 @@ public class ResultDataSaver {
     private final List<Integer> idList = new ArrayList<>();
     private final List<String> testNames = new ArrayList<>();
     private final List<byte[]> results = new ArrayList<>();
+    private final List<Long> timestamps = new ArrayList<>();
 
     public ResultDataSaver(Context context) {
 
@@ -33,6 +36,7 @@ public class ResultDataSaver {
                     public void onCreate(SupportSQLiteDatabase db) {
                         String schema = "CREATE TABLE IF NOT EXISTS RESULTS (" +
                                 "ID INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                                "TIMESTAMP INTEGER NOT NULL, " +
                                 "TEST TEXT NOT NULL, " +
                                 "RESULT BLOB NOT NULL)";
                         db.execSQL(schema);
@@ -71,12 +75,14 @@ public class ResultDataSaver {
             while (cursor.moveToNext()) {
 
                 int idIndex = cursor.getColumnIndex("ID");
+                int timestampIndex = cursor.getColumnIndex("TIMESTAMP");
                 int testIndex = cursor.getColumnIndex("TEST");
                 int resultIndex = cursor.getColumnIndex("RESULT");
 
                 if (resultIndex >= 0 && testIndex >= 0 && idIndex >= 0) {
 
                     this.idList.add(cursor.getInt(idIndex));
+                    this.timestamps.add(cursor.getLong(timestampIndex));
                     this.testNames.add(cursor.getString(testIndex));
                     this.results.add(cursor.getBlob(resultIndex));
 
@@ -93,8 +99,11 @@ public class ResultDataSaver {
 
         SupportSQLiteDatabase db = this.dbHelper.getWritableDatabase();
 
-        String ResultInsertionQuery = "INSERT INTO RESULTS (TEST, RESULT) VALUES (?, ?)";
-        db.execSQL(ResultInsertionQuery, new Object[]{ testName, ResultDataCollector.serializeResult(result) });
+        String ResultInsertionQuery = "INSERT INTO RESULTS (TIMESTAMP, TEST, RESULT) VALUES (?, ?, ?)";
+
+        long ts = LocalDateTime.now().toEpochSecond(ZoneOffset.UTC);
+
+        db.execSQL(ResultInsertionQuery, new Object[]{ ts, testName, ResultDataCollector.serializeResult(result) });
 
     }
 
@@ -108,6 +117,9 @@ public class ResultDataSaver {
 
     public List<byte[]> getResults() {
         return this.results;
+    }
+    public List<Long> getTimestamps() {
+        return this.timestamps;
     }
 
 }

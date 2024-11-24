@@ -22,6 +22,10 @@ import me.proteus.myeye.io.ResultDataSaver
 import me.proteus.myeye.ui.theme.MyEyeTheme
 import me.proteus.myeye.visiontests.VisionTestUtils
 import java.lang.IllegalArgumentException
+import java.time.LocalDateTime
+import java.time.ZoneOffset
+import java.time.format.DateTimeFormatter
+import java.util.Locale
 
 class ResultBrowserActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -63,6 +67,12 @@ fun ResultColumn(activity: ResultBrowserActivity, paddingValues: PaddingValues) 
             var testID = dbConnector.testNames[i-1]
             var boxTitle: String;
 
+            val timestamp: Long = dbConnector.timestamps[i-1]
+            var date = LocalDateTime.ofEpochSecond(timestamp, 0, ZoneOffset.UTC)
+
+            val fmt = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm", Locale.getDefault())
+            var formattedDate = date.format(fmt)
+
             try {
 
                 boxTitle = VisionTestUtils().getTestTypeByID(testID) + " " + VisionTestUtils().getTestNameByID(testID)
@@ -90,10 +100,19 @@ fun ResultColumn(activity: ResultBrowserActivity, paddingValues: PaddingValues) 
                             .clip(shape = RoundedCornerShape(15.dp))
                             .background(Color.Blue)
                     )
-                    Text(
-                        text = boxTitle,
-                        fontSize = 18.sp
-                    )
+                    Column(
+                        verticalArrangement = Arrangement.SpaceEvenly
+                    ) {
+                        Text(
+                            text = boxTitle,
+                            fontSize = 18.sp
+                        )
+                        Text(
+                            text = formattedDate,
+                            fontSize = 14.sp
+                        )
+                    }
+
                 }
             }
 
