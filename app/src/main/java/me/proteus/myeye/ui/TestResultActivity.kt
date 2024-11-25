@@ -103,6 +103,12 @@ fun TestResultScreen(inputIntent: Intent) {
                         Text("Data wykonania: " + resultData.formattedTimestamp)
                     }
 
+                    val stageData = ResultDataCollector.deserializeResult(resultData.result)
+
+                    for (i in 1..stageData.size) {
+                        Text("Etap $i: Pytanie ${stageData[i-1].first}, odpowiedź ${stageData[i-1].second}")
+                    }
+
                     if (isAfterTest) {
                         Text(
                             modifier = Modifier
