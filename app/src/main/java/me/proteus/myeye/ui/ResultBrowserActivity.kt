@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -81,10 +82,14 @@ fun ResultColumn(activity: ResultBrowserActivity, paddingValues: PaddingValues) 
                             .padding(vertical = 8.dp, horizontal = 16.dp)
                             .aspectRatio(1.0f)
                             .clip(shape = RoundedCornerShape(15.dp))
-                            .background(Color.Blue),
+                            .background(MaterialTheme.colorScheme.primary),
                         contentAlignment = Alignment.Center
                     ) {
-                        Icon(VisionTestUtils().getTestByID(result.testID).testIcon, null, tint = Color.White)
+                        Icon(
+                            imageVector = VisionTestUtils().getTestByID(result.testID).testIcon,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.onPrimary
+                        )
                     }
                     Column(
                         verticalArrangement = Arrangement.SpaceEvenly
