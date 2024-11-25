@@ -52,9 +52,9 @@ fun ResultColumn(activity: ResultBrowserActivity, paddingValues: PaddingValues) 
     val dbConnector = ResultDataSaver(activity)
     dbConnector.select("*")
 
-    val ids: List<Int> = dbConnector.idList;
+    val data: List<TestResult> = dbConnector.resultData
 
-    for (i in ids) print("$i ")
+    for (i in data) print("$i ")
     println()
 
     Column (
@@ -65,27 +65,7 @@ fun ResultColumn(activity: ResultBrowserActivity, paddingValues: PaddingValues) 
         verticalArrangement = Arrangement.SpaceEvenly
     ) {
 
-        for (i in ids) {
-
-            var testID = dbConnector.testNames[i-1]
-            var boxTitle: String;
-
-            val timestamp: Long = dbConnector.timestamps[i-1]
-            var date = LocalDateTime.ofEpochSecond(timestamp, 0, ZoneOffset.UTC)
-
-            val fmt = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm", Locale.getDefault())
-            var formattedDate = date.format(fmt)
-
-            try {
-
-                boxTitle = VisionTestUtils().getTestTypeByID(testID) + " " + VisionTestUtils().getTestNameByID(testID)
-
-            } catch (e: IllegalArgumentException) {
-
-                boxTitle = "Nieznany test"
-                Log.w(activity.localClassName, "Nieprawidlowe ID testu: '$testID' na pozycji $i")
-            }
-
+        for (result in data) {
 
             Box(
                 modifier = Modifier
@@ -94,7 +74,7 @@ fun ResultColumn(activity: ResultBrowserActivity, paddingValues: PaddingValues) 
                     .background(Color.LightGray)
                     .clickable {
                         val intent: Intent = Intent(activity, TestResultActivity::class.java)
-                        intent.putExtra("ID", i)
+                        intent.putExtra("RESULT_PARCEL", result)
                         activity.startActivity(intent)
                     }
             ) {
@@ -112,11 +92,11 @@ fun ResultColumn(activity: ResultBrowserActivity, paddingValues: PaddingValues) 
                         verticalArrangement = Arrangement.SpaceEvenly
                     ) {
                         Text(
-                            text = boxTitle,
+                            text = result.fullTestName,
                             fontSize = 18.sp
                         )
                         Text(
-                            text = formattedDate,
+                            text = result.formattedTimestamp,
                             fontSize = 14.sp
                         )
                     }

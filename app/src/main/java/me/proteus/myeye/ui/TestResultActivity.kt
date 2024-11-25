@@ -19,6 +19,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import androidx.core.content.IntentCompat
+import me.proteus.myeye.TestResult
 import me.proteus.myeye.ui.theme.MyEyeTheme
 
 class TestResultActivity : ComponentActivity() {
@@ -36,7 +38,11 @@ class TestResultActivity : ComponentActivity() {
 @Composable
 fun TestResultScreen(inputIntent: Intent) {
 
-    val testID = inputIntent.getIntExtra("ID", 1)
+    val resultData = IntentCompat.getParcelableExtra(inputIntent, "RESULT_PARCEL", TestResult::class.java)
+    if (resultData == null) return;
+
+    println(resultData.testID)
+    println(resultData.formattedTimestamp)
 
     Scaffold(
         content = { innerPadding ->
@@ -66,7 +72,7 @@ fun TestResultScreen(inputIntent: Intent) {
                     modifier = Modifier
                         .weight(0.35f)
                 ) {
-                    Text(testID.toString())
+                    Text(resultData.testID.toString())
                 }
 
             }

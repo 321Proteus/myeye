@@ -14,16 +14,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import me.proteus.myeye.SerializablePair;
+import me.proteus.myeye.TestResult;
 
 public class ResultDataSaver {
 
     private final SupportSQLiteOpenHelper dbHelper;
 
-
-    private final List<Integer> idList = new ArrayList<>();
-    private final List<String> testNames = new ArrayList<>();
-    private final List<byte[]> results = new ArrayList<>();
-    private final List<Long> timestamps = new ArrayList<>();
+    private final List<TestResult> resultData = new ArrayList<>();
 
     public ResultDataSaver(Context context) {
 
@@ -81,10 +78,14 @@ public class ResultDataSaver {
 
                 if (resultIndex >= 0 && testIndex >= 0 && idIndex >= 0) {
 
-                    this.idList.add(cursor.getInt(idIndex));
-                    this.timestamps.add(cursor.getLong(timestampIndex));
-                    this.testNames.add(cursor.getString(testIndex));
-                    this.results.add(cursor.getBlob(resultIndex));
+                    this.resultData.add(new TestResult(
+
+                            cursor.getInt(idIndex),
+                            cursor.getString(testIndex),
+                            cursor.getLong(timestampIndex),
+                            cursor.getBlob(resultIndex)
+
+                    ));
 
                 } else {
                     System.out.println("Bledna kolumna w tabeli RESULTS");
@@ -107,19 +108,8 @@ public class ResultDataSaver {
 
     }
 
-    public List<Integer> getIDList() {
-        return this.idList;
-    }
-
-    public List<String> getTestNames() {
-        return this.testNames;
-    }
-
-    public List<byte[]> getResults() {
-        return this.results;
-    }
-    public List<Long> getTimestamps() {
-        return this.timestamps;
+    public List<TestResult> getResultData() {
+        return this.resultData;
     }
 
 }
