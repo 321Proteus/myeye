@@ -1,8 +1,7 @@
-package me.proteus.myeye
+package me.proteus.myeye.ui
 
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -11,6 +10,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -21,14 +21,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import me.proteus.myeye.io.ResultDataSaver
-import me.proteus.myeye.ui.TestResultActivity
+import me.proteus.myeye.TestResult
 import me.proteus.myeye.ui.theme.MyEyeTheme
 import me.proteus.myeye.visiontests.VisionTestUtils
-import java.lang.IllegalArgumentException
-import java.time.LocalDateTime
-import java.time.ZoneOffset
-import java.time.format.DateTimeFormatter
-import java.util.Locale
 
 class ResultBrowserActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -86,8 +81,11 @@ fun ResultColumn(activity: ResultBrowserActivity, paddingValues: PaddingValues) 
                             .padding(vertical = 8.dp, horizontal = 16.dp)
                             .aspectRatio(1.0f)
                             .clip(shape = RoundedCornerShape(15.dp))
-                            .background(Color.Blue)
-                    )
+                            .background(Color.Blue),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Icon(VisionTestUtils().getTestByID(result.testID).testIcon, null, tint = Color.White)
+                    }
                     Column(
                         verticalArrangement = Arrangement.SpaceEvenly
                     ) {

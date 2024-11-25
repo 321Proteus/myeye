@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -22,6 +23,7 @@ import androidx.compose.ui.unit.dp
 import androidx.core.content.IntentCompat
 import me.proteus.myeye.TestResult
 import me.proteus.myeye.ui.theme.MyEyeTheme
+import me.proteus.myeye.visiontests.VisionTestUtils
 
 class TestResultActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -40,9 +42,6 @@ fun TestResultScreen(inputIntent: Intent) {
 
     val resultData = IntentCompat.getParcelableExtra(inputIntent, "RESULT_PARCEL", TestResult::class.java)
     if (resultData == null) return;
-
-    println(resultData.testID)
-    println(resultData.formattedTimestamp)
 
     Scaffold(
         content = { innerPadding ->
@@ -64,7 +63,7 @@ fun TestResultScreen(inputIntent: Intent) {
                     contentAlignment = Alignment.Center
                 ) {
 
-                    Text("Tu wstawic miniaturkę testu")
+                    Icon(VisionTestUtils().getTestByID(resultData.testID).testIcon, null)
 
                 }
 
