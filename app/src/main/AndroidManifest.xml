@@ -25,7 +25,7 @@
         <activity android:name=".MenuActivity" />
         <activity android:name=".ui.VisionTestLayoutActivity" />
         <activity android:name=".ui.TestResultActivity" />
-        <activity android:name=".ResultBrowserActivity" />
+        <activity android:name=".ui.ResultBrowserActivity" />
     </application>
 
 </manifest>
