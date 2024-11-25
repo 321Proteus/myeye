@@ -58,10 +58,10 @@ class MenuActivity : ComponentActivity() {
                     drawerContent = {
                         ModalDrawerSheet {
 
-                            VisionTestDrawerItem("TEST_CIRCLE", { Icon(Icons.Outlined.AccountCircle, null) }, this@MenuActivity)
-                            VisionTestDrawerItem("TEST_BUILD", { Icon(Icons.Outlined.Build, null) }, this@MenuActivity)
-                            VisionTestDrawerItem("TEST_INFO", { Icon(Icons.Outlined.Info, null) }, this@MenuActivity)
-                            VisionTestDrawerItem("SNELLEN_CHART", { Icon(Icons.TwoTone.Face, null) }, this@MenuActivity)
+                            VisionTestDrawerItem("TEST_CIRCLE", this@MenuActivity)
+                            VisionTestDrawerItem("TEST_BUILD", this@MenuActivity)
+                            VisionTestDrawerItem("TEST_INFO", this@MenuActivity)
+                            VisionTestDrawerItem("SNELLEN_CHART", this@MenuActivity)
 
                             NavigationDrawerItem(
                                 icon = { Icon(Icons.TwoTone.Check, contentDescription = null) },
@@ -127,12 +127,14 @@ fun MenuScreen(scope: CoroutineScope, state: DrawerState) {
 }
 
 @Composable
-fun VisionTestDrawerItem(testID: String, icon: @Composable () -> Unit, activity: MenuActivity) {
+fun VisionTestDrawerItem(testID: String, activity: MenuActivity) {
+
+    var icon = VisionTestUtils().getTestByID(testID).testIcon
 
     var description = VisionTestUtils().getTestTypeByID(testID) + " " + VisionTestUtils().getTestNameByID(testID)
 
     NavigationDrawerItem(
-        icon = icon,
+        icon = { Icon(icon, null) },
         label = { Text(description) },
         selected = false,
         onClick = {
