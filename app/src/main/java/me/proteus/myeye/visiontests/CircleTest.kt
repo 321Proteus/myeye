@@ -171,7 +171,7 @@ class CircleTest : VisionTest {
     @Composable
     override fun DisplayStage(activity: VisionTestLayoutActivity, modifier: Modifier, stages: List<SerializablePair>, isResult: Boolean) {
 
-        var stageIterator: Int by remember { mutableIntStateOf(1) }
+        var stageIterator: Int by remember { mutableIntStateOf(0) }
 
         Column(
             modifier = Modifier
@@ -199,7 +199,7 @@ class CircleTest : VisionTest {
 
                 onSizeDecrease = {
 
-                    if (stageIterator < stageCount) {
+                    if (stageIterator < stageCount - 1) {
 
                         // TODO: Zaimplementowac polecenia glosowe do zbierania odpowiedzi
                         storeResult(stages[stageIterator].first, generateDirections())

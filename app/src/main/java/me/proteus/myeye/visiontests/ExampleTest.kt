@@ -123,11 +123,9 @@ class ExampleTest : VisionTest {
 
                     Button(onClick = {
 
-                        println("$ans $correctAnswer")
-
                         if (ans == stages[stageIterator].first) score++
 
-                        if (stageIterator < stageCount) {
+                        if (stageIterator < stageCount - 1) {
 
                             storeResult(stages[stageIterator].first, ans)
 

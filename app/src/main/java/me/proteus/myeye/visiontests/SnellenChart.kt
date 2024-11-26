@@ -213,9 +213,7 @@ class SnellenChart : VisionTest {
                     onRegenerate = { questionIterator++ },
                     onSizeDecrease = {
 
-                        println("$questionIterator $stageCount")
-
-                        if (questionIterator < stageCount) {
+                        if (questionIterator < stageCount - 1) {
 
                             // TODO: Zaimplementowac polecenia glosowe do zbierania odpowiedzi
                             storeResult(stages[questionIterator].first, randomText(5))
