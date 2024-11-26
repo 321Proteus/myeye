@@ -27,11 +27,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import me.proteus.myeye.io.ResultDataSaver
-import me.proteus.myeye.TestResult
 import me.proteus.myeye.ui.theme.MyEyeTheme
 import me.proteus.myeye.visiontests.VisionTestUtils
 
@@ -75,9 +73,8 @@ fun ResultColumn(activity: ResultBrowserActivity, paddingValues: PaddingValues) 
                     .fillMaxWidth()
                     .background(Color.LightGray)
                     .clickable {
-                        val intent: Intent = Intent(activity, VisionTestLayoutActivity::class.java)
-                        intent.putExtra("IS_RESULT", true)
-                        intent.putExtra("TEST_ID", result.testID)
+                        val intent: Intent = Intent(activity, TestResultActivity::class.java)
+                        intent.putExtra("IS_AFTER", false)
                         intent.putExtra("RESULT_PARCEL", result)
                         activity.startActivity(intent)
                     }

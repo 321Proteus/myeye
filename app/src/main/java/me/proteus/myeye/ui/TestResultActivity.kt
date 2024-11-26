@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -22,12 +23,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.IntentCompat
 import me.proteus.myeye.TestResult
-import me.proteus.myeye.io.ResultDataCollector
 import me.proteus.myeye.ui.theme.MyEyeTheme
 import me.proteus.myeye.visiontests.VisionTestUtils
 
@@ -49,7 +50,9 @@ fun TestResultScreen(inputIntent: Intent) {
     val resultData = IntentCompat.getParcelableExtra(inputIntent, "RESULT_PARCEL", TestResult::class.java)
     if (resultData == null) return;
 
-    val isAfterTest = inputIntent.getBooleanExtra("TEST_ENDED", true)
+    val isAfterTest = inputIntent.getBooleanExtra("IS_AFTER", false)
+
+    val activityContext = LocalContext.current
 
     Scaffold(
         content = { innerPadding ->
@@ -98,15 +101,8 @@ fun TestResultScreen(inputIntent: Intent) {
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
 
-                    Box(
-                    ) {
+                    Box() {
                         Text("Data wykonania: " + resultData.formattedTimestamp)
-                    }
-
-                    val stageData = ResultDataCollector.deserializeResult(resultData.result)
-
-                    for (i in 1..stageData.size) {
-                        Text("Etap $i: Pytanie ${stageData[i-1].first}, odpowiedź ${stageData[i-1].second}")
                     }
 
                     if (isAfterTest) {
@@ -117,6 +113,24 @@ fun TestResultScreen(inputIntent: Intent) {
                             fontWeight = FontWeight.Bold,
                             fontSize = 24.sp
                         )
+                    }
+
+                    Box(
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Button(
+                            modifier = Modifier,
+                            onClick = {
+
+                                val detailsIntent: Intent = Intent(activityContext, VisionTestLayoutActivity::class.java)
+                                detailsIntent.putExtra("IS_RESULT", true)
+                                detailsIntent.putExtra("RESULT_PARCEL", resultData)
+                                activityContext.startActivity(detailsIntent)
+
+                            }
+                        ) {
+                            Text(text = "Zobacz wyniki", fontSize = 20.sp)
+                        }
                     }
                 }
 

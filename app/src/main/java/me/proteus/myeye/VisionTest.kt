@@ -36,19 +36,21 @@ interface VisionTest {
 
     fun checkAnswer(answer: String): Boolean
 
-    fun storeResult(question: String, answer: String)
+    fun storeResult(question: String, answer: String) {}
 
 
      fun endTest(activity: VisionTestLayoutActivity) {
 
-        var localSaver = ResultDataSaver(activity.applicationContext)
+         var localSaver = ResultDataSaver(activity.applicationContext)
 
-        var timestamp = LocalDateTime.now().toEpochSecond(ZoneOffset.UTC)
-        localSaver.insert(this.testID, this.resultCollector.stages, timestamp)
+         var timestamp = LocalDateTime.now().toEpochSecond(ZoneOffset.UTC)
+         localSaver.insert(this.testID, this.resultCollector.stages, timestamp)
 
-        val testLeavingIntent = Intent(activity, TestResultActivity::class.java)
+         val testLeavingIntent = Intent(activity, TestResultActivity::class.java)
+         testLeavingIntent.putExtra("IS_AFTER", true)
+         testLeavingIntent.putExtra("RESULT_PARCEL", localSaver.lastResult)
 
-        activity.startActivity(testLeavingIntent)
+         activity.startActivity(testLeavingIntent)
 
     }
 

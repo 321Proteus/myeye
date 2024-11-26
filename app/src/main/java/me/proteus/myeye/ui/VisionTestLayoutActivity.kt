@@ -36,7 +36,13 @@ class VisionTestLayoutActivity : ComponentActivity() {
 
                         println(if (resultData != null) "Znaleziono TestResult o ID ${resultData.resultID}" else "Nie przekazano TestResult")
 
-                        var testID: String? = intent.getStringExtra("TEST_ID")
+                        var testID: String?
+
+                        if (isResult && resultData != null) {
+                            testID = resultData.testID
+                        } else {
+                            testID = intent.getStringExtra("TEST_ID")
+                        }
 
                         val testObject: VisionTest = VisionTestUtils().getTestByID(testID)
 
