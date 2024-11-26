@@ -71,6 +71,7 @@ fun ResultColumn(activity: ResultBrowserActivity, paddingValues: PaddingValues) 
                     .clickable {
                         val intent: Intent = Intent(activity, VisionTestLayoutActivity::class.java)
                         intent.putExtra("IS_RESULT", true)
+                        intent.putExtra("TEST_ID", result.testID)
                         intent.putExtra("RESULT_PARCEL", result)
                         activity.startActivity(intent)
                     }

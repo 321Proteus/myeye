@@ -1,6 +1,5 @@
 package me.proteus.myeye.ui
 
-import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -33,12 +32,15 @@ class VisionTestLayoutActivity : ComponentActivity() {
                     ) {
 
                         var isResult: Boolean = intent.getBooleanExtra("IS_RESULT", false)
-
                         var resultData: TestResult? = IntentCompat.getParcelableExtra(intent, "RESULT_PARCEL", TestResult::class.java)
 
                         println(if (resultData != null) "Znaleziono TestResult o ID ${resultData.resultID}" else "Nie przekazano TestResult")
 
-                        getTest(intent).BeginTest(activity = this@VisionTestLayoutActivity, modifier = Modifier, isResult = isResult, result = resultData)
+                        var testID: String? = intent.getStringExtra("TEST_ID")
+
+                        val testObject: VisionTest = VisionTestUtils().getTestByID(testID)
+
+                        testObject.BeginTest(activity = this@VisionTestLayoutActivity, modifier = Modifier, isResult = isResult, result = resultData)
 
                     }
 
@@ -47,12 +49,4 @@ class VisionTestLayoutActivity : ComponentActivity() {
 
         }
     }
-}
-
-fun getTest(intent: Intent): VisionTest {
-    val testID = intent.getStringExtra("TEST_ID")
-
-    val test: VisionTest = VisionTestUtils().getTestByID(testID)
-
-    return test
 }
