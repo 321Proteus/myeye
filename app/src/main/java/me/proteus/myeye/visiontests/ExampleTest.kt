@@ -58,7 +58,7 @@ class ExampleTest : VisionTest {
             var resultStages: MutableList<SerializablePair> = ArrayList<SerializablePair>()
             val resultData = ResultDataCollector.deserializeResult(result!!.result)
 
-            for (i in 0..stageCount) {
+            for (i in 0..stageCount-1) {
                 resultStages.add(resultData[i])
             }
 
@@ -68,7 +68,7 @@ class ExampleTest : VisionTest {
 
             var testStages: MutableList<SerializablePair> = ArrayList<SerializablePair>()
 
-            for (i in 0..stageCount) {
+            for (i in 0..stageCount-1) {
 
                 correctAnswer = this.generateQuestion().toString()
 
@@ -87,7 +87,7 @@ class ExampleTest : VisionTest {
     @Composable
     override fun DisplayStage(activity: VisionTestLayoutActivity, modifier: Modifier, stages: List<SerializablePair>, isResult: Boolean) {
 
-        var stageIterator: Int by remember { mutableIntStateOf(1) }
+        var stageIterator: Int by remember { mutableIntStateOf(0) }
 
         println("$score $stageIterator")
 
