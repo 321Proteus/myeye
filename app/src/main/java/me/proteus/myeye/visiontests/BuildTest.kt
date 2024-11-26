@@ -1,8 +1,11 @@
 package me.proteus.myeye.visiontests
 
 import android.content.Intent
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Build
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
 import me.proteus.myeye.MenuActivity
 import me.proteus.myeye.VisionTest
 import me.proteus.myeye.io.ResultDataCollector
@@ -11,6 +14,9 @@ import me.proteus.myeye.ui.VisionTestLayoutActivity
 import java.util.Random
 
 class BuildTest : VisionTest {
+
+    override val testID: String = "TEST_BUILD"
+    override val testIcon: ImageVector = Icons.Outlined.Build
 
     override val stageCount: Int
         get() = TODO("Not yet implemented")
@@ -52,7 +58,6 @@ class BuildTest : VisionTest {
 
         var localSaver = ResultDataSaver(activity.applicationContext)
         localSaver.insert("TEST_BUILD", resultCollector.stages)
-        localSaver.selectAll()
 
         val testLeavingIntent = Intent(activity, MenuActivity::class.java)
         activity.startActivity(testLeavingIntent)

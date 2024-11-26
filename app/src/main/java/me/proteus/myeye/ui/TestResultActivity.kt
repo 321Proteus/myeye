@@ -1,24 +1,35 @@
 package me.proteus.myeye.ui
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.border
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.core.content.IntentCompat
+import me.proteus.myeye.TestResult
+import me.proteus.myeye.io.ResultDataCollector
 import me.proteus.myeye.ui.theme.MyEyeTheme
+import me.proteus.myeye.visiontests.VisionTestUtils
 
 class TestResultActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -26,14 +37,20 @@ class TestResultActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             MyEyeTheme {
-                TestResultScreen()
+                TestResultScreen(intent)
             }
         }
     }
 }
 
 @Composable
-fun TestResultScreen() {
+fun TestResultScreen(inputIntent: Intent) {
+
+    val resultData = IntentCompat.getParcelableExtra(inputIntent, "RESULT_PARCEL", TestResult::class.java)
+    if (resultData == null) return;
+
+    val isAfterTest = inputIntent.getBooleanExtra("TEST_ENDED", true)
+
     Scaffold(
         content = { innerPadding ->
 
@@ -45,25 +62,64 @@ fun TestResultScreen() {
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
 
-                Box(
+                Column(
                     modifier = Modifier
-                        .padding(horizontal = 48.dp, vertical = 32.dp)
-                        .weight(0.65f)
-                        .aspectRatio(1.0f)
-                        .border(width = 2.dp, color = Color.Black),
-                    contentAlignment = Alignment.Center
+                        .fillMaxHeight(0.5f)
+                        .padding(top = 16.dp),
+                    verticalArrangement = Arrangement.SpaceEvenly,
+                    horizontalAlignment = Alignment.CenterHorizontally
                 ) {
 
-                    Text("Tu wstawic miniaturkę testu")
+                    Text(text = resultData.fullTestName, fontSize = 24.sp)
 
+                    Box(
+                        modifier = Modifier
+                            .padding(start = 100.dp, end = 100.dp)
+                            .weight(0.65f)
+                            .aspectRatio(1.0f)
+                            .clip(shape = RoundedCornerShape(15.dp))
+                            .background(MaterialTheme.colorScheme.primary),
+                        contentAlignment = Alignment.Center
+                    ) {
+
+                        Icon(
+                            modifier = Modifier.fillMaxSize(0.4f),
+                            imageVector = VisionTestUtils().getTestByID(resultData.testID).testIcon,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.onPrimary
+                        )
+
+                    }
                 }
 
-                Box(
-                    modifier = Modifier
-                        .weight(0.35f)
+                Column(
+                    modifier = Modifier.weight(0.8f),
+                    verticalArrangement = Arrangement.SpaceEvenly,
+                    horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    Text("Tu wstawic opis, date i przebieg testu")
+
+                    Box(
+                    ) {
+                        Text("Data wykonania: " + resultData.formattedTimestamp)
+                    }
+
+                    val stageData = ResultDataCollector.deserializeResult(resultData.result)
+
+                    for (i in 1..stageData.size) {
+                        Text("Etap $i: Pytanie ${stageData[i-1].first}, odpowiedź ${stageData[i-1].second}")
+                    }
+
+                    if (isAfterTest) {
+                        Text(
+                            modifier = Modifier
+                                .padding(top = 32.dp, bottom = 16.dp),
+                            text = "Dziękujemy za wykonanie testu!",
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 24.sp
+                        )
+                    }
                 }
+
 
             }
 

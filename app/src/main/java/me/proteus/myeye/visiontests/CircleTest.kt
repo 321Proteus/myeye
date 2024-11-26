@@ -10,6 +10,8 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.AccountCircle
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -22,6 +24,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
@@ -39,6 +42,9 @@ import java.util.Random
 import kotlin.math.*
 
 class CircleTest : VisionTest {
+
+    override val testID: String = "TEST_CIRCLE"
+    override val testIcon: ImageVector = Icons.Outlined.AccountCircle
 
     private var correctAnswer: String = ""
 
@@ -239,7 +245,6 @@ class CircleTest : VisionTest {
 
         var localSaver = ResultDataSaver(activity.applicationContext)
         localSaver.insert("TEST_CIRCLE", resultCollector.stages)
-        localSaver.selectAll()
 
         val testLeavingIntent = Intent(activity, MenuActivity::class.java)
         activity.startActivity(testLeavingIntent)

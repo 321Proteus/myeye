@@ -13,11 +13,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Create
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Menu
-import androidx.compose.material.icons.outlined.AccountCircle
-import androidx.compose.material.icons.outlined.Build
-import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.twotone.Check
-import androidx.compose.material.icons.twotone.Face
 import androidx.compose.material3.DrawerState
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -38,9 +34,10 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import me.proteus.myeye.ui.TestResultActivity
+import me.proteus.myeye.ui.ResultBrowserActivity
 import me.proteus.myeye.ui.VisionTestLayoutActivity
 import me.proteus.myeye.ui.theme.MyEyeTheme
+import me.proteus.myeye.visiontests.VisionTestUtils
 
 class MenuActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -55,52 +52,18 @@ class MenuActivity : ComponentActivity() {
                     drawerState = drawerState,
                     drawerContent = {
                         ModalDrawerSheet {
-                            NavigationDrawerItem(
-                                icon = { Icon(Icons.Outlined.AccountCircle, contentDescription = null) },
-                                label = { Text("Test Landolt C") },
-                                selected = false,
-                                onClick = {
-                                    val intent = Intent(this@MenuActivity, VisionTestLayoutActivity::class.java)
-                                    intent.putExtra("TEST_ID", "TEST_CIRCLE")
-                                    startActivity(intent)
-                                }
-                            )
-                            NavigationDrawerItem(
-                                icon = { Icon(Icons.Outlined.Build, contentDescription = null) },
-                                label = { Text("Test wzroku TODO") },
-                                selected = false,
-                                onClick = {
-                                    val intent = Intent(this@MenuActivity, VisionTestLayoutActivity::class.java)
-                                    intent.putExtra("TEST_ID", "TEST_BUILD")
-                                    startActivity(intent)
-                                }
-                            )
-                            NavigationDrawerItem(
-                                icon = { Icon(Icons.Outlined.Info, contentDescription = null) },
-                                label = { Text("Test wzroku Example") },
-                                selected = false,
-                                onClick = {
-                                    val intent = Intent(this@MenuActivity, VisionTestLayoutActivity::class.java)
-                                    intent.putExtra("TEST_ID", "TEST_INFO")
-                                    startActivity(intent)
-                                }
-                            )
-                            NavigationDrawerItem(
-                                icon = { Icon(Icons.TwoTone.Face, contentDescription = null) },
-                                label = { Text("Test Wzroku LogMAR") },
-                                selected = false,
-                                onClick = {
-                                    val intent = Intent(this@MenuActivity, VisionTestLayoutActivity::class.java)
-                                    intent.putExtra("TEST_ID", "SNELLEN_CHART")
-                                    startActivity(intent)
-                                },
-                            )
+
+                            VisionTestDrawerItem("TEST_CIRCLE", this@MenuActivity)
+                            VisionTestDrawerItem("TEST_BUILD", this@MenuActivity)
+                            VisionTestDrawerItem("TEST_INFO", this@MenuActivity)
+                            VisionTestDrawerItem("SNELLEN_CHART", this@MenuActivity)
+
                             NavigationDrawerItem(
                                 icon = { Icon(Icons.TwoTone.Check, contentDescription = null) },
                                 label = { Text("Przeglądaj wyniki") },
                                 selected = false,
                                 onClick = {
-                                    val intent = Intent(this@MenuActivity, TestResultActivity::class.java)
+                                    val intent = Intent(this@MenuActivity, ResultBrowserActivity::class.java)
                                     startActivity(intent)
                                 },
                             )
@@ -156,5 +119,25 @@ fun MenuScreen(scope: CoroutineScope, state: DrawerState) {
             }
         }
     )
+}
+
+@Composable
+fun VisionTestDrawerItem(testID: String, activity: MenuActivity) {
+
+    var icon = VisionTestUtils().getTestByID(testID).testIcon
+
+    var description = VisionTestUtils().getTestTypeByID(testID) + " " + VisionTestUtils().getTestNameByID(testID)
+
+    NavigationDrawerItem(
+        icon = { Icon(icon, null) },
+        label = { Text(description) },
+        selected = false,
+        onClick = {
+            val intent = Intent(activity, VisionTestLayoutActivity::class.java)
+            intent.putExtra("TEST_ID", testID)
+            activity.startActivity(intent)
+        },
+    )
+
 }
 

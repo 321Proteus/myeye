@@ -8,13 +8,19 @@ import androidx.sqlite.db.*;
 import androidx.sqlite.db.framework.*;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.util.ArrayList;
 import java.util.List;
 
 import me.proteus.myeye.SerializablePair;
+import me.proteus.myeye.TestResult;
 
 public class ResultDataSaver {
 
     private final SupportSQLiteOpenHelper dbHelper;
+
+    private final List<TestResult> resultData = new ArrayList<>();
 
     public ResultDataSaver(Context context) {
 
@@ -27,6 +33,7 @@ public class ResultDataSaver {
                     public void onCreate(SupportSQLiteDatabase db) {
                         String schema = "CREATE TABLE IF NOT EXISTS RESULTS (" +
                                 "ID INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                                "TIMESTAMP INTEGER NOT NULL, " +
                                 "TEST TEXT NOT NULL, " +
                                 "RESULT BLOB NOT NULL)";
                         db.execSQL(schema);
@@ -54,9 +61,9 @@ public class ResultDataSaver {
 
     }
 
-    public void selectAll() {
+    public void select(String fields) {
         SupportSQLiteDatabase db = this.dbHelper.getWritableDatabase();
-        String ResultSelectionQuery = "SELECT * FROM RESULTS";
+        String ResultSelectionQuery = "SELECT " + fields + " FROM RESULTS";
 
         try (Cursor cursor = db.query(ResultSelectionQuery)) {
 
@@ -65,23 +72,20 @@ public class ResultDataSaver {
             while (cursor.moveToNext()) {
 
                 int idIndex = cursor.getColumnIndex("ID");
+                int timestampIndex = cursor.getColumnIndex("TIMESTAMP");
                 int testIndex = cursor.getColumnIndex("TEST");
                 int resultIndex = cursor.getColumnIndex("RESULT");
 
                 if (resultIndex >= 0 && testIndex >= 0 && idIndex >= 0) {
 
-                    int id = cursor.getInt(idIndex);
-                    String test = cursor.getString(testIndex);
-                    byte[] resultObject = cursor.getBlob(resultIndex);
+                    this.resultData.add(new TestResult(
 
-                    List<SerializablePair> result = ResultDataCollector.deserializeResult(resultObject);
+                            cursor.getInt(idIndex),
+                            cursor.getString(testIndex),
+                            cursor.getLong(timestampIndex),
+                            cursor.getBlob(resultIndex)
 
-                    System.out.println(id + " " + test + "(" + result.size() + "):");
-
-                    for (int i = 0; i < result.size(); i++) {
-
-                        System.out.println(result.get(i).getFirst() + " " + result.get(i).getSecond());
-                    }
+                    ));
 
                 } else {
                     System.out.println("Bledna kolumna w tabeli RESULTS");
@@ -96,9 +100,16 @@ public class ResultDataSaver {
 
         SupportSQLiteDatabase db = this.dbHelper.getWritableDatabase();
 
-        String ResultInsertionQuery = "INSERT INTO RESULTS (TEST, RESULT) VALUES (?, ?)";
-        db.execSQL(ResultInsertionQuery, new Object[]{ testName, ResultDataCollector.serializeResult(result) });
+        String ResultInsertionQuery = "INSERT INTO RESULTS (TIMESTAMP, TEST, RESULT) VALUES (?, ?, ?)";
 
+        long ts = LocalDateTime.now().toEpochSecond(ZoneOffset.UTC);
+
+        db.execSQL(ResultInsertionQuery, new Object[]{ ts, testName, ResultDataCollector.serializeResult(result) });
+
+    }
+
+    public List<TestResult> getResultData() {
+        return this.resultData;
     }
 
 }

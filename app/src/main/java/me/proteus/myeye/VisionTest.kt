@@ -2,10 +2,14 @@ package me.proteus.myeye
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
 import me.proteus.myeye.io.ResultDataCollector
 import me.proteus.myeye.ui.VisionTestLayoutActivity
 
 interface VisionTest {
+
+    val testID: String
+    val testIcon: ImageVector
 
     val stageCount: Int
     val currentStage: Int

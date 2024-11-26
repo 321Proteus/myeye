@@ -8,6 +8,8 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -18,6 +20,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import me.proteus.myeye.MenuActivity
@@ -29,6 +32,9 @@ import java.util.Random
 import kotlin.math.abs
 
 class ExampleTest : VisionTest {
+
+    override val testID: String = "TEST_INFO"
+    override val testIcon: ImageVector = Icons.Outlined.Info
 
     private var correctAnswer: String = ""
     private var score: Int = 0
@@ -148,8 +154,7 @@ class ExampleTest : VisionTest {
     override fun endTest(activity: VisionTestLayoutActivity) {
 
         var localSaver = ResultDataSaver(activity.applicationContext)
-        localSaver.insert("TEST_EXAMPLE", resultCollector.stages)
-        localSaver.selectAll()
+        localSaver.insert("TEST_INFO", resultCollector.stages)
 
         val testLeavingIntent = Intent(activity, MenuActivity::class.java)
         activity.startActivity(testLeavingIntent)
