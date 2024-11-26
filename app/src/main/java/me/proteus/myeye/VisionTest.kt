@@ -12,7 +12,6 @@ interface VisionTest {
     val testIcon: ImageVector
 
     val stageCount: Int
-    val currentStage: Int
 
     val resultCollector: ResultDataCollector
 
@@ -21,7 +20,10 @@ interface VisionTest {
      * @param activity The canvas activity to display the layout
      */
     @Composable
-    fun DisplayStage(activity: VisionTestLayoutActivity, modifier: Modifier)
+    fun DisplayStage(activity: VisionTestLayoutActivity, modifier: Modifier, stages: List<SerializablePair>, isResult: Boolean)
+
+    @Composable
+    fun BeginTest(activity: VisionTestLayoutActivity, modifier: Modifier, isResult: Boolean, result: TestResult?)
 
     fun generateQuestion(): Any
 
