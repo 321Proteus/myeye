@@ -69,7 +69,8 @@ fun ResultColumn(activity: ResultBrowserActivity, paddingValues: PaddingValues) 
                     .fillMaxWidth()
                     .background(Color.LightGray)
                     .clickable {
-                        val intent: Intent = Intent(activity, TestResultActivity::class.java)
+                        val intent: Intent = Intent(activity, VisionTestLayoutActivity::class.java)
+                        intent.putExtra("IS_RESULT", true)
                         intent.putExtra("RESULT_PARCEL", result)
                         activity.startActivity(intent)
                     }
