@@ -159,8 +159,6 @@ class SnellenChart : VisionTest {
 
             var testStages: MutableList<SerializablePair> = ArrayList<SerializablePair>(stageCount);
 
-            println(testStages.size)
-
             for (i in 0..stageCount) {
                 testStages.add(SerializablePair(this.generateQuestion().toString(), randomText(5)))
             }
@@ -174,10 +172,8 @@ class SnellenChart : VisionTest {
     @Composable
     override fun DisplayStage(activity: VisionTestLayoutActivity, modifier: Modifier, stages: List<SerializablePair>, isResult: Boolean) {
 
-        var questionIterator: Int by remember { mutableIntStateOf(0) }
+        var questionIterator: Int by remember { mutableIntStateOf(1) }
         var answerIterator: Int by remember { mutableIntStateOf(0) }
-
-        println("Stage: $questionIterator")
 
         Column(
             modifier = Modifier
@@ -217,6 +213,8 @@ class SnellenChart : VisionTest {
                 ButtonRow(
                     onRegenerate = { questionIterator++ },
                     onSizeDecrease = {
+
+                        println("$questionIterator $stageCount")
 
                         if (questionIterator < stageCount) {
 

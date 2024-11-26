@@ -89,7 +89,7 @@ class ExampleTest : VisionTest {
     @Composable
     override fun DisplayStage(activity: VisionTestLayoutActivity, modifier: Modifier, stages: List<SerializablePair>, isResult: Boolean) {
 
-        var stageIterator: Int by remember { mutableIntStateOf(0) }
+        var stageIterator: Int by remember { mutableIntStateOf(1) }
 
         println("$score $stageIterator")
 
