@@ -148,7 +148,7 @@ class SnellenChart : VisionTest {
             val resultData = ResultDataCollector.deserializeResult(result!!.result)
 
 
-            for (i in 0..stageCount-1) {
+            for (i in 0..<stageCount) {
                 resultStages.add(resultData[i])
             }
 
@@ -158,7 +158,7 @@ class SnellenChart : VisionTest {
 
             var testStages: MutableList<SerializablePair> = ArrayList<SerializablePair>(stageCount)
 
-            for (i in 0..stageCount-1) {
+            for (i in 0..<stageCount) {
                 testStages.add(SerializablePair(this.generateQuestion().toString(), randomText(5)))
             }
 

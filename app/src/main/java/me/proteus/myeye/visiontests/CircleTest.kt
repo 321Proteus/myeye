@@ -151,7 +151,7 @@ class CircleTest : VisionTest {
             var resultStages: MutableList<SerializablePair> = ArrayList<SerializablePair>()
             val resultData = ResultDataCollector.deserializeResult(result!!.result)
 
-            for (i in 0..stageCount - 1) {
+            for (i in 0..<stageCount) {
                 resultStages.add(resultData[i])
             }
 
@@ -161,7 +161,7 @@ class CircleTest : VisionTest {
 
             var testStages: MutableList<SerializablePair> = ArrayList<SerializablePair>()
 
-            for (i in 0..stageCount - 1) {
+            for (i in 0..<stageCount) {
                 testStages.add(SerializablePair(this.generateQuestion().toString(), generateDirections()))
             }
 
