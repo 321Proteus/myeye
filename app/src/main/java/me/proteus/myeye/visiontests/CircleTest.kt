@@ -284,14 +284,4 @@ class CircleTest : VisionTest {
 
     }
 
-    override fun endTest(activity: VisionTestLayoutActivity) {
-
-        var localSaver = ResultDataSaver(activity.applicationContext)
-        localSaver.insert("TEST_CIRCLE", resultCollector.stages)
-
-        val testLeavingIntent = Intent(activity, MenuActivity::class.java)
-        activity.startActivity(testLeavingIntent)
-
-    }
-
 }

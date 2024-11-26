@@ -1,9 +1,12 @@
 package me.proteus.myeye
 
+import android.content.Intent
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import me.proteus.myeye.io.ResultDataCollector
+import me.proteus.myeye.io.ResultDataSaver
+import me.proteus.myeye.ui.TestResultActivity
 import me.proteus.myeye.ui.VisionTestLayoutActivity
 
 interface VisionTest {
@@ -33,6 +36,16 @@ interface VisionTest {
 
     fun storeResult(question: String, answer: String)
 
-    fun endTest(activity: VisionTestLayoutActivity)
+
+     fun endTest(activity: VisionTestLayoutActivity) {
+
+        var localSaver = ResultDataSaver(activity.applicationContext)
+        localSaver.insert(this.testID, resultCollector.stages)
+
+        val testLeavingIntent = Intent(activity, TestResultActivity::class.java)
+        testLeavingIntent
+        activity.startActivity(testLeavingIntent)
+
+    }
 
 }

@@ -204,14 +204,4 @@ class ExampleTest : VisionTest {
         return ((abs(random.nextInt() % 25)) + 65).toChar()
     }
 
-    override fun endTest(activity: VisionTestLayoutActivity) {
-
-        var localSaver = ResultDataSaver(activity.applicationContext)
-        localSaver.insert("TEST_INFO", resultCollector.stages)
-
-        val testLeavingIntent = Intent(activity, MenuActivity::class.java)
-        activity.startActivity(testLeavingIntent)
-
-    }
-
 }
