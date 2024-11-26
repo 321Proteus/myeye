@@ -172,7 +172,6 @@ class SnellenChart : VisionTest {
     override fun DisplayStage(activity: VisionTestLayoutActivity, modifier: Modifier, stages: List<SerializablePair>, isResult: Boolean) {
 
         var questionIterator: Int by remember { mutableIntStateOf(0) }
-        var answerIterator: Int by remember { mutableIntStateOf(0) }
 
         Column(
             modifier = Modifier
@@ -219,7 +218,6 @@ class SnellenChart : VisionTest {
                             // TODO: Zaimplementowac polecenia glosowe do zbierania odpowiedzi
                             storeResult(stages[questionIterator].first, randomText(5))
                             questionIterator++
-                            answerIterator++
                         } else {
                             storeResult(stages[questionIterator].first, randomText(5))
                             if (!isResult) endTest(activity)
