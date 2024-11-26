@@ -19,6 +19,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -31,6 +33,7 @@ import me.proteus.myeye.io.ResultDataSaver
 import me.proteus.myeye.ui.VisionTestLayoutActivity
 import java.util.Random
 import kotlin.math.abs
+import kotlin.text.digitToInt
 
 class ExampleTest : VisionTest {
 
@@ -108,7 +111,27 @@ class ExampleTest : VisionTest {
                     .padding(bottom = 32.dp),
                 contentAlignment = Alignment.Center,
             ) {
-                Text(text = stages[stageIterator].first, fontSize = 48.sp)
+
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
+                    Text(
+                        text = stages[stageIterator].first,
+                        color = Color.Black,
+                        fontSize = 48.sp
+                    )
+
+                    if (isResult) {
+                        Text(
+                            text = stages[stageIterator].second,
+                            color = (if (stages[stageIterator].first == stages[stageIterator].second) Color.Green else Color.Red),
+                            fontSize = 48.sp
+                        )
+                    }
+                }
+
+
+
             }
 
             Row(
@@ -126,20 +149,15 @@ class ExampleTest : VisionTest {
                         if (ans == stages[stageIterator].first) score++
 
                         if (stageIterator < stageCount - 1) {
-
                             storeResult(stages[stageIterator].first, ans)
-
                             stageIterator++
-
                         } else {
-
                             storeResult(stages[stageIterator].first, ans)
-                            endTest(activity)
-
+                            if (!isResult) endTest(activity)
                         }
 
                     }) {
-                        Text(ans)
+                        Text(if (isResult) "Dalej" else ans)
                     }
                 }
             }

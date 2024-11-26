@@ -64,7 +64,7 @@ class SnellenChart : VisionTest {
     }
 
     @Composable
-    fun LetterContainer(stage: Int, text: String, modifier: Modifier = Modifier) {
+    fun LetterContainer(stage: Int, text: String, key: String?, modifier: Modifier = Modifier) {
 
         val config = LocalConfiguration.current
         val opticianSansFamily = FontFamily(Font(R.font.opticiansans))
@@ -80,10 +80,10 @@ class SnellenChart : VisionTest {
                     .fillMaxWidth(),
                 horizontalArrangement = Arrangement.Center
             ) {
-                for (char in text) {
+                for (i in 0..<text.length) {
                     Text(
-                        text = char.toString(),
-                        color = Color.Black,
+                        text = text[i].toString(),
+                        color = (if (key != null) (if (text[i] == key[i]) Color.Green else Color.Red) else Color.Black),
                         fontSize = pixelSize * 15,
                         fontFamily = opticianSansFamily,
                         modifier = modifier.padding(8.dp)
@@ -97,10 +97,10 @@ class SnellenChart : VisionTest {
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                for (char in text) {
+                for (i in 0..<text.length) {
                     Text(
-                        text = char.toString(),
-                        color = Color.Black,
+                        text = text[i].toString(),
+                        color = (if (key != null) (if (text[i] == key[i]) Color.Green else Color.Red) else Color.Black),
                         fontSize = pixelSize * 15,
                         fontFamily = opticianSansFamily,
                         modifier = modifier.padding(8.dp)
@@ -194,12 +194,14 @@ class SnellenChart : VisionTest {
                     LetterContainer(
                         stage = questionIterator,
                         text = stages[questionIterator].first,
+                        key = null,
                         modifier = modifier
                     )
                     if (isResult) {
                         LetterContainer(
                             stage = questionIterator,
                             text = stages[questionIterator].second,
+                            key = stages[questionIterator].first,
                             modifier = modifier
                         )
                     }
@@ -208,7 +210,6 @@ class SnellenChart : VisionTest {
 
             }
 
-            if (!isResult) {
                 ButtonRow(
                     onRegenerate = { questionIterator++ },
                     onSizeDecrease = {
@@ -217,19 +218,15 @@ class SnellenChart : VisionTest {
 
                             // TODO: Zaimplementowac polecenia glosowe do zbierania odpowiedzi
                             storeResult(stages[questionIterator].first, randomText(5))
-
                             questionIterator++
                             answerIterator++
-
                         } else {
-
                             storeResult(stages[questionIterator].first, randomText(5))
-                            endTest(activity)
+                            if (!isResult) endTest(activity)
 
                         }
                     }
                 )
-            }
 
         }
     }

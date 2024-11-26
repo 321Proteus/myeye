@@ -65,7 +65,7 @@ class CircleTest : VisionTest {
     }
 
     @Composable
-    fun LetterContainer(currentStage: Int, directions: String, modifier: Modifier = Modifier) {
+    fun LetterContainer(currentStage: Int, directions: String, key: String?, modifier: Modifier = Modifier) {
 
         val config = LocalConfiguration.current
         val opticianSansFamily = FontFamily(Font(R.font.opticiansans))
@@ -79,15 +79,17 @@ class CircleTest : VisionTest {
             Row(
                 modifier = Modifier
                     .fillMaxWidth(),
-                horizontalArrangement = Arrangement.Center
+                horizontalArrangement = Arrangement.Center,
+
             ) {
-                for (char in directions) {
+                for (i in 0..<directions.length) {
                     Text(
                         text = "C",
-                        color = Color.Black,
-                        fontSize = pixelSize * 20,
+                        modifier = modifier
+                            .rotate(directions[i].digitToInt().toFloat() * 90f),
+                        color =(if (key != null) (if (directions[i] == key[i]) Color.Green else Color.Red) else Color.Black),
+                        fontSize = pixelSize * 15,
                         fontFamily = opticianSansFamily,
-                        modifier = modifier.padding(8.dp).rotate(char.digitToInt().toFloat() * 90f)
                     )
                 }
             }
@@ -98,13 +100,15 @@ class CircleTest : VisionTest {
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                for (char in directions) {
+                for (i in 0..<directions.length) {
                     Text(
                         text = "C",
-                        color = Color.Black,
-                        fontSize = pixelSize * 20,
+                        modifier = modifier
+                            .rotate(directions[i].digitToInt().toFloat() * 90f),
+                        color =(if (key != null) (if (directions[i] == key[i]) Color.Green else Color.Red) else Color.Black),
+                        fontSize = pixelSize * 15,
                         fontFamily = opticianSansFamily,
-                        modifier = modifier.padding(8.dp).rotate(char.digitToInt().toFloat() * 90f)
+
                     )
                 }
             }
@@ -187,11 +191,28 @@ class CircleTest : VisionTest {
                     .padding(bottom = 16.dp),
                 contentAlignment = Alignment.Center,
             ) {
-                LetterContainer(
-                    directions = stages[stageIterator].first,
-                    currentStage = stageIterator,
-                    modifier = modifier
-                )
+
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
+
+                    LetterContainer(
+                        directions = stages[stageIterator].first,
+                        key = null,
+                        currentStage = stageIterator,
+                        modifier = modifier
+                    )
+
+                    if (isResult) {
+                        LetterContainer(
+                            directions = stages[stageIterator].second,
+                            key = stages[stageIterator].first,
+                            currentStage = stageIterator,
+                            modifier = modifier
+                        )
+                    }
+                }
+
             }
 
             ButtonRow(
@@ -203,14 +224,10 @@ class CircleTest : VisionTest {
 
                         // TODO: Zaimplementowac polecenia glosowe do zbierania odpowiedzi
                         storeResult(stages[stageIterator].first, generateDirections())
-
                         stageIterator++
-
                     } else {
-
                         storeResult(stages[stageIterator].first, generateDirections())
-                        endTest(activity)
-
+                        if (!isResult) endTest(activity)
                     }
                 }
             )
