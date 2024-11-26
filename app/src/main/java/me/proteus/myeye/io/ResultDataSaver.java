@@ -96,13 +96,11 @@ public class ResultDataSaver {
         }
     }
 
-    public void insert(String testName, List<SerializablePair> result) {
+    public void insert(String testName, List<SerializablePair> result, long ts) {
 
         SupportSQLiteDatabase db = this.dbHelper.getWritableDatabase();
 
         String ResultInsertionQuery = "INSERT INTO RESULTS (TIMESTAMP, TEST, RESULT) VALUES (?, ?, ?)";
-
-        long ts = LocalDateTime.now().toEpochSecond(ZoneOffset.UTC);
 
         db.execSQL(ResultInsertionQuery, new Object[]{ ts, testName, ResultDataCollector.serializeResult(result) });
 

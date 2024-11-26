@@ -8,6 +8,8 @@ import me.proteus.myeye.io.ResultDataCollector
 import me.proteus.myeye.io.ResultDataSaver
 import me.proteus.myeye.ui.TestResultActivity
 import me.proteus.myeye.ui.VisionTestLayoutActivity
+import java.time.LocalDateTime
+import java.time.ZoneOffset
 
 interface VisionTest {
 
@@ -40,10 +42,12 @@ interface VisionTest {
      fun endTest(activity: VisionTestLayoutActivity) {
 
         var localSaver = ResultDataSaver(activity.applicationContext)
-        localSaver.insert(this.testID, resultCollector.stages)
+
+        var timestamp = LocalDateTime.now().toEpochSecond(ZoneOffset.UTC)
+        localSaver.insert(this.testID, this.resultCollector.stages, timestamp)
 
         val testLeavingIntent = Intent(activity, TestResultActivity::class.java)
-        testLeavingIntent
+
         activity.startActivity(testLeavingIntent)
 
     }
