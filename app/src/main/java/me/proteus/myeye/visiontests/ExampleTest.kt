@@ -127,7 +127,7 @@ class ExampleTest : VisionTest {
 
                         println("$ans $correctAnswer")
 
-                        if (this@ExampleTest.checkAnswer(ans)) score++
+                        if (ans == stages[stageIterator].first) score++
 
                         if (stageIterator < stageCount) {
 
