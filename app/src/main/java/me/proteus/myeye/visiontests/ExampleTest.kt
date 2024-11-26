@@ -23,7 +23,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import kotlinx.coroutines.processNextEventInCurrentThread
 import me.proteus.myeye.MenuActivity
+import me.proteus.myeye.SerializablePair
+import me.proteus.myeye.TestResult
 import me.proteus.myeye.VisionTest
 import me.proteus.myeye.io.ResultDataCollector
 import me.proteus.myeye.io.ResultDataSaver
@@ -41,19 +44,54 @@ class ExampleTest : VisionTest {
 
     override val stageCount: Int = 10
 
-    private var currentStageState = mutableIntStateOf(1)
-
-    override val currentStage: Int get() = currentStageState.intValue
-
     override val resultCollector: ResultDataCollector = ResultDataCollector()
 
+
     @Composable
-    override fun DisplayStage(activity: VisionTestLayoutActivity, modifier: Modifier) {
+    override fun BeginTest(
+        activity: VisionTestLayoutActivity,
+        modifier: Modifier,
+        isResult: Boolean,
+        result: TestResult?
+    ) {
 
-        println("$score $currentStage")
+        if (isResult) {
 
-        var question by remember { mutableStateOf(this.generateQuestion().toString()) }
-        var answers by remember { mutableStateOf(this.getExampleAnswers()) }
+            var resultStages: MutableList<SerializablePair> = ArrayList<SerializablePair>();
+            val resultData = ResultDataCollector.deserializeResult(result!!.result)
+
+            for (i in 0..stageCount) {
+                resultStages.add(resultData[i])
+            }
+
+            DisplayStage(activity, modifier, resultStages, true)
+
+        } else {
+
+            var testStages: MutableList<SerializablePair> = ArrayList<SerializablePair>();
+
+            for (i in 0..stageCount) {
+
+                correctAnswer = this.generateQuestion().toString()
+
+                var variants = this.getExampleAnswers()
+                var joinedVariants = variants.joinToString(separator = "")
+
+                testStages.add(SerializablePair(correctAnswer, joinedVariants))
+            }
+
+            DisplayStage(activity, modifier, testStages, false)
+
+        }
+
+    }
+
+    @Composable
+    override fun DisplayStage(activity: VisionTestLayoutActivity, modifier: Modifier, stages: List<SerializablePair>, isResult: Boolean) {
+
+        var stageIterator: Int by remember { mutableIntStateOf(0) }
+
+        println("$score $stageIterator")
 
         Column(
             modifier = Modifier
@@ -72,7 +110,7 @@ class ExampleTest : VisionTest {
                     .padding(bottom = 32.dp),
                 contentAlignment = Alignment.Center,
             ) {
-                Text(text = question.toString(), fontSize = 48.sp)
+                Text(text = stages[stageIterator].first, fontSize = 48.sp)
             }
 
             Row(
@@ -81,22 +119,25 @@ class ExampleTest : VisionTest {
                 horizontalArrangement = Arrangement.SpaceEvenly,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                for (ans in answers) {
+                for (el in stages[stageIterator].second) {
+
+                    var ans: String = el.toString()
+
                     Button(onClick = {
+
+                        println("$ans $correctAnswer")
 
                         if (this@ExampleTest.checkAnswer(ans)) score++
 
-                        if (currentStage < stageCount) {
+                        if (stageIterator < stageCount) {
 
-                            storeResult(question, ans)
+                            storeResult(stages[stageIterator].first, ans)
 
-                            currentStageState.intValue++
-                            question = this@ExampleTest.generateQuestion().toString()
-                            answers = this@ExampleTest.getExampleAnswers()
+                            stageIterator++
 
                         } else {
 
-                            storeResult(question, ans)
+                            storeResult(stages[stageIterator].first, ans)
                             endTest(activity)
 
                         }

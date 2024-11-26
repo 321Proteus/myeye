@@ -29,7 +29,9 @@ class VisionTestLayoutActivity : ComponentActivity() {
                             .fillMaxSize(),
                         contentAlignment = Alignment.Center
                     ) {
-                        getTest(intent).DisplayStage(activity = this@VisionTestLayoutActivity, modifier = Modifier)
+
+                        getTest(intent).BeginTest(activity = this@VisionTestLayoutActivity, modifier = Modifier, isResult = false, result = null)
+
                     }
 
                 }

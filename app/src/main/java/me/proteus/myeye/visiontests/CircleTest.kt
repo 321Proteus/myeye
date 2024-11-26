@@ -34,6 +34,8 @@ import androidx.compose.ui.unit.dp
 import me.proteus.myeye.MenuActivity
 import me.proteus.myeye.R
 import me.proteus.myeye.ScreenScalingUtils.getScreenInfo
+import me.proteus.myeye.SerializablePair
+import me.proteus.myeye.TestResult
 import me.proteus.myeye.VisionTest
 import me.proteus.myeye.io.ResultDataCollector
 import me.proteus.myeye.io.ResultDataSaver
@@ -46,13 +48,9 @@ class CircleTest : VisionTest {
     override val testID: String = "TEST_CIRCLE"
     override val testIcon: ImageVector = Icons.Outlined.AccountCircle
 
-    private var correctAnswer: String = ""
-
     override val stageCount: Int = 10
 
-    private var currentStageState = mutableIntStateOf(1)
-
-    override val currentStage: Int get() = currentStageState.intValue
+    private var correctAnswer: String = ""
 
     override val resultCollector: ResultDataCollector = ResultDataCollector()
 
@@ -68,7 +66,7 @@ class CircleTest : VisionTest {
     }
 
     @Composable
-    fun LetterContainer(directions: String, modifier: Modifier = Modifier) {
+    fun LetterContainer(currentStage: Int, directions: String, modifier: Modifier = Modifier) {
 
         val config = LocalConfiguration.current
         val opticianSansFamily = FontFamily(Font(R.font.opticiansans))
@@ -138,10 +136,43 @@ class CircleTest : VisionTest {
     }
 
     @Composable
-    override fun DisplayStage(activity: VisionTestLayoutActivity, modifier: Modifier) {
+    override fun BeginTest(
+        activity: VisionTestLayoutActivity,
+        modifier: Modifier,
+        isResult: Boolean,
+        result: TestResult?
+    ) {
 
-        var question: String by remember { mutableStateOf(this.generateQuestion().toString()) }
-        var answers: Array<String> by remember { mutableStateOf(this.getExampleAnswers()) }
+        if (isResult) {
+
+            var resultStages: MutableList<SerializablePair> = ArrayList<SerializablePair>();
+            val resultData = ResultDataCollector.deserializeResult(result!!.result)
+
+            for (i in 0..stageCount) {
+                resultStages.add(resultData[i])
+            }
+
+            DisplayStage(activity, modifier, resultStages, true)
+
+        } else {
+
+            var testStages: MutableList<SerializablePair> = ArrayList<SerializablePair>();
+
+            for (i in 0..stageCount) {
+                testStages.add(SerializablePair(this.generateQuestion().toString(), generateDirections()))
+            }
+
+            DisplayStage(activity, modifier, testStages, false)
+
+        }
+
+    }
+
+
+    @Composable
+    override fun DisplayStage(activity: VisionTestLayoutActivity, modifier: Modifier, stages: List<SerializablePair>, isResult: Boolean) {
+
+        var stageIterator: Int by remember { mutableIntStateOf(0) }
 
         Column(
             modifier = Modifier
@@ -158,31 +189,27 @@ class CircleTest : VisionTest {
                 contentAlignment = Alignment.Center,
             ) {
                 LetterContainer(
-                    directions = question,
+                    directions = stages[stageIterator].first,
+                    currentStage = stageIterator,
                     modifier = modifier
                 )
             }
 
             ButtonRow(
-                onRegenerate = {
-                    question = this@CircleTest.generateQuestion().toString()
-                    answers = this@CircleTest.getExampleAnswers()
-                },
+                onRegenerate = { stageIterator++ },
 
                 onSizeDecrease = {
 
-                    if (currentStage < stageCount) {
+                    if (stageIterator < stageCount) {
 
                         // TODO: Zaimplementowac polecenia glosowe do zbierania odpowiedzi
-                        storeResult(question, generateDirections())
+                        storeResult(stages[stageIterator].first, generateDirections())
 
-                        currentStageState.intValue++
-                        question = this@CircleTest.generateQuestion().toString()
-                        answers = this@CircleTest.getExampleAnswers()
+                        stageIterator++
 
                     } else {
 
-                        storeResult(question, generateDirections())
+                        storeResult(stages[stageIterator].first, generateDirections())
                         endTest(activity)
 
                     }

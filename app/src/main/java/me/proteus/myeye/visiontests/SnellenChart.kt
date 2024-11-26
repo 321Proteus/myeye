@@ -33,6 +33,8 @@ import androidx.compose.ui.unit.dp
 import me.proteus.myeye.MenuActivity
 import me.proteus.myeye.R
 import me.proteus.myeye.ScreenScalingUtils.getScreenInfo
+import me.proteus.myeye.SerializablePair
+import me.proteus.myeye.TestResult
 import me.proteus.myeye.VisionTest
 import me.proteus.myeye.io.ResultDataCollector
 import me.proteus.myeye.io.ResultDataSaver
@@ -48,10 +50,6 @@ class SnellenChart : VisionTest {
     private var correctAnswer: String = ""
 
     override val stageCount: Int = 10
-
-    private var currentStageState = mutableIntStateOf(1)
-
-    override val currentStage: Int get() = currentStageState.intValue
 
     override val resultCollector: ResultDataCollector = ResultDataCollector()
 
@@ -87,7 +85,7 @@ class SnellenChart : VisionTest {
                     Text(
                         text = char.toString(),
                         color = Color.Black,
-                        fontSize = pixelSize * 20,
+                        fontSize = pixelSize * 15,
                         fontFamily = opticianSansFamily,
                         modifier = modifier.padding(8.dp)
                     )
@@ -104,7 +102,7 @@ class SnellenChart : VisionTest {
                     Text(
                         text = char.toString(),
                         color = Color.Black,
-                        fontSize = pixelSize * 20,
+                        fontSize = pixelSize * 15,
                         fontFamily = opticianSansFamily,
                         modifier = modifier.padding(8.dp)
                     )
@@ -137,11 +135,49 @@ class SnellenChart : VisionTest {
     }
 
     @Composable
-    override fun DisplayStage(activity: VisionTestLayoutActivity, modifier: Modifier) {
+    override fun BeginTest(
+        activity: VisionTestLayoutActivity,
+        modifier: Modifier,
+        isResult: Boolean,
+        result: TestResult?
+    ) {
 
-        println("Stage: $currentStage")
+        if (isResult) {
 
-        var question: String by remember { mutableStateOf(this.generateQuestion().toString()) }
+            var resultStages: MutableList<SerializablePair> = ArrayList<SerializablePair>(stageCount);
+
+            val resultData = ResultDataCollector.deserializeResult(result!!.result)
+
+
+            for (i in 0..stageCount) {
+                resultStages.add(resultData[i])
+            }
+
+            DisplayStage(activity, modifier, resultStages, true)
+
+        } else {
+
+            var testStages: MutableList<SerializablePair> = ArrayList<SerializablePair>(stageCount);
+
+            println(testStages.size)
+
+            for (i in 0..stageCount) {
+                testStages.add(SerializablePair(this.generateQuestion().toString(), randomText(5)))
+            }
+
+            DisplayStage(activity, modifier, testStages, false)
+
+        }
+
+    }
+
+    @Composable
+    override fun DisplayStage(activity: VisionTestLayoutActivity, modifier: Modifier, stages: List<SerializablePair>, isResult: Boolean) {
+
+        var questionIterator: Int by remember { mutableIntStateOf(0) }
+        var answerIterator: Int by remember { mutableIntStateOf(0) }
+
+        println("Stage: $questionIterator")
 
         Column(
             modifier = Modifier
@@ -157,33 +193,49 @@ class SnellenChart : VisionTest {
                     .padding(bottom = 16.dp),
                 contentAlignment = Alignment.Center,
             ) {
-                LetterContainer(
-                    stage = currentStage,
-                    text = question,
-                    modifier = modifier
+                Row(
+                    horizontalArrangement = Arrangement.SpaceEvenly
+                ) {
+                    LetterContainer(
+                        stage = questionIterator,
+                        text = stages[questionIterator].first,
+                        modifier = modifier
+                    )
+                    if (isResult) {
+                        LetterContainer(
+                            stage = questionIterator,
+                            text = stages[questionIterator].second,
+                            modifier = modifier
+                        )
+                    }
+
+                }
+
+            }
+
+            if (!isResult) {
+                ButtonRow(
+                    onRegenerate = { questionIterator++ },
+                    onSizeDecrease = {
+
+                        if (questionIterator < stageCount) {
+
+                            // TODO: Zaimplementowac polecenia glosowe do zbierania odpowiedzi
+                            storeResult(stages[questionIterator].first, randomText(5))
+
+                            questionIterator++
+                            answerIterator++
+
+                        } else {
+
+                            storeResult(stages[questionIterator].first, randomText(5))
+                            endTest(activity)
+
+                        }
+                    }
                 )
             }
 
-            ButtonRow(
-                onRegenerate = { question = this@SnellenChart.generateQuestion().toString() },
-                onSizeDecrease = {
-
-                    if (currentStage < stageCount) {
-
-                        // TODO: Zaimplementowac polecenia glosowe do zbierania odpowiedzi
-                        storeResult(question, randomText(5))
-
-                        currentStageState.intValue++
-                        question = this@SnellenChart.generateQuestion().toString()
-
-                    } else {
-
-                        storeResult(question, randomText(5))
-                        endTest(activity)
-
-                    }
-                }
-            )
         }
     }
 
