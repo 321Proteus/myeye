@@ -108,6 +108,16 @@ public class ResultDataSaver {
 
     }
 
+    public void delete(int key) {
+
+        SupportSQLiteDatabase db = this.dbHelper.getWritableDatabase();
+
+        String deletionQuery = "DELETE FROM RESULTS WHERE ID = " + key;
+
+        db.execSQL(deletionQuery);
+
+    }
+
     public List<TestResult> getResultData() {
         return this.resultData;
     }
