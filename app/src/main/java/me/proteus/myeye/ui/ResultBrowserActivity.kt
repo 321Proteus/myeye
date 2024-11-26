@@ -9,6 +9,8 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -53,7 +55,7 @@ fun ResultColumn(activity: ResultBrowserActivity, paddingValues: PaddingValues) 
     for (i in data) print("$i ")
     println()
 
-    Column (
+    LazyColumn (
         modifier = Modifier
             .fillMaxWidth()
             .padding(paddingValues),
@@ -61,7 +63,7 @@ fun ResultColumn(activity: ResultBrowserActivity, paddingValues: PaddingValues) 
         verticalArrangement = Arrangement.SpaceEvenly
     ) {
 
-        for (result in data) {
+        items(data) { result ->
 
             Box(
                 modifier = Modifier
