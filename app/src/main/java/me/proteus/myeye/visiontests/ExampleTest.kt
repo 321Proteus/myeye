@@ -14,7 +14,6 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
@@ -23,7 +22,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import kotlinx.coroutines.processNextEventInCurrentThread
 import me.proteus.myeye.MenuActivity
 import me.proteus.myeye.SerializablePair
 import me.proteus.myeye.TestResult
@@ -57,7 +55,7 @@ class ExampleTest : VisionTest {
 
         if (isResult) {
 
-            var resultStages: MutableList<SerializablePair> = ArrayList<SerializablePair>();
+            var resultStages: MutableList<SerializablePair> = ArrayList<SerializablePair>()
             val resultData = ResultDataCollector.deserializeResult(result!!.result)
 
             for (i in 0..stageCount) {
@@ -68,7 +66,7 @@ class ExampleTest : VisionTest {
 
         } else {
 
-            var testStages: MutableList<SerializablePair> = ArrayList<SerializablePair>();
+            var testStages: MutableList<SerializablePair> = ArrayList<SerializablePair>()
 
             for (i in 0..stageCount) {
 

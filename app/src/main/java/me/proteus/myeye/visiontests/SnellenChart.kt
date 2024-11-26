@@ -16,7 +16,6 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
@@ -144,7 +143,7 @@ class SnellenChart : VisionTest {
 
         if (isResult) {
 
-            var resultStages: MutableList<SerializablePair> = ArrayList<SerializablePair>(stageCount);
+            var resultStages: MutableList<SerializablePair> = ArrayList<SerializablePair>(stageCount)
 
             val resultData = ResultDataCollector.deserializeResult(result!!.result)
 
@@ -157,7 +156,7 @@ class SnellenChart : VisionTest {
 
         } else {
 
-            var testStages: MutableList<SerializablePair> = ArrayList<SerializablePair>(stageCount);
+            var testStages: MutableList<SerializablePair> = ArrayList<SerializablePair>(stageCount)
 
             for (i in 0..stageCount) {
                 testStages.add(SerializablePair(this.generateQuestion().toString(), randomText(5)))
