@@ -132,33 +132,50 @@ class ExampleTest : VisionTest {
 
             }
 
-            Row(
-                modifier = modifier
-                    .fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceEvenly,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                for (el in stages[stageIterator].second) {
+            if (!isResult) {
+                Row(
+                    modifier = modifier
+                        .fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceEvenly,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    for (el in stages[stageIterator].second) {
 
-                    var ans: String = el.toString()
+                        var ans: String = el.toString()
 
-                    Button(onClick = {
+                        Button(onClick = {
 
-                        if (ans == stages[stageIterator].first) score++
+                            if (ans == stages[stageIterator].first) score++
 
-                        if (stageIterator < stageCount - 1) {
-                            storeResult(stages[stageIterator].first, ans)
-                            stageIterator++
-                        } else {
-                            storeResult(stages[stageIterator].first, ans)
-                            if (!isResult) endTest(activity)
+                            if (stageIterator < stageCount - 1) {
+                                storeResult(stages[stageIterator].first, ans)
+                                stageIterator++
+                            } else {
+                                storeResult(stages[stageIterator].first, ans)
+                                if (!isResult) endTest(activity)
+                            }
+
+                        }) {
+                            Text(if (isResult) "Dalej" else ans)
                         }
-
-                    }) {
-                        Text(if (isResult) "Dalej" else ans)
+                    }
+                }
+            } else {
+                Row(
+                    modifier = modifier
+                        .fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceEvenly,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Button(onClick = { stageIterator-- }) {
+                        Text(text = "Poprzedni etap")
+                    }
+                    Button(onClick = { stageIterator++ }) {
+                        Text(text = "Następny etap")
                     }
                 }
             }
+
         }
 
     }

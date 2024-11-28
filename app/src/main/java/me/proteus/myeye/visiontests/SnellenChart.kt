@@ -207,6 +207,7 @@ class SnellenChart : VisionTest {
 
             }
 
+            if (!isResult) {
                 ButtonRow(
                     onRegenerate = { questionIterator++ },
                     onSizeDecrease = {
@@ -223,6 +224,22 @@ class SnellenChart : VisionTest {
                         }
                     }
                 )
+            } else {
+
+                Row(
+                    modifier = modifier
+                        .fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceEvenly,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Button(onClick = { questionIterator-- }) {
+                        Text(text = "Poprzedni etap")
+                    }
+                    Button(onClick = { questionIterator++ }) {
+                        Text(text = "Następny etap")
+                    }
+                }
+            }
 
         }
     }

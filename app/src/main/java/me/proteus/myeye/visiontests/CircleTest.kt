@@ -215,22 +215,39 @@ class CircleTest : VisionTest {
 
             }
 
-            ButtonRow(
-                onRegenerate = { stageIterator++ },
+            if (!isResult) {
+                ButtonRow(
+                    onRegenerate = { stageIterator++ },
 
-                onSizeDecrease = {
+                    onSizeDecrease = {
 
-                    if (stageIterator < stageCount - 1) {
+                        if (stageIterator < stageCount - 1) {
 
-                        // TODO: Zaimplementowac polecenia glosowe do zbierania odpowiedzi
-                        storeResult(stages[stageIterator].first, generateDirections())
-                        stageIterator++
-                    } else {
-                        storeResult(stages[stageIterator].first, generateDirections())
-                        if (!isResult) endTest(activity)
+                            // TODO: Zaimplementowac polecenia glosowe do zbierania odpowiedzi
+                            storeResult(stages[stageIterator].first, generateDirections())
+                            stageIterator++
+                        } else {
+                            storeResult(stages[stageIterator].first, generateDirections())
+                            if (!isResult) endTest(activity)
+                        }
+                    }
+                )
+            } else {
+                Row(
+                    modifier = modifier
+                        .fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceEvenly,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Button(onClick = { stageIterator-- }) {
+                        Text(text = "Poprzedni etap")
+                    }
+                    Button(onClick = { stageIterator++ }) {
+                        Text(text = "Następny etap")
                     }
                 }
-            )
+            }
+
         }
     }
 
