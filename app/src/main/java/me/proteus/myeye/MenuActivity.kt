@@ -55,6 +55,7 @@ class MenuActivity : ComponentActivity() {
                             VisionTestDrawerItem("TEST_BUILD", this@MenuActivity)
                             VisionTestDrawerItem("TEST_INFO", this@MenuActivity)
                             VisionTestDrawerItem("SNELLEN_CHART", this@MenuActivity)
+                            VisionTestDrawerItem("COLOR_ARRANGE", this@MenuActivity)
 
                             NavigationDrawerItem(
                                 icon = { Icon(Icons.TwoTone.Check, contentDescription = null) },
@@ -118,6 +119,8 @@ fun MenuScreen(scope: CoroutineScope, state: DrawerState) {
 fun VisionTestDrawerItem(testID: String, activity: MenuActivity) {
 
     var icon = VisionTestUtils().getTestByID(testID).testIcon
+
+    println()
 
     var description = VisionTestUtils().getTestTypeByID(testID) + " " + VisionTestUtils().getTestNameByID(testID)
 

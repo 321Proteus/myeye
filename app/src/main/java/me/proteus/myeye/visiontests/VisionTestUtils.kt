@@ -16,6 +16,7 @@ class VisionTestUtils {
             "TEST_CIRCLE" -> CircleTest()
             "TEST_BUILD" -> BuildTest()
             "TEST_INFO" -> ExampleTest()
+            "COLOR_ARRANGE" -> ColorArrangementTest()
             else -> throw IllegalArgumentException("Nie znaleziono testu o podanym ID")
         }
 
@@ -28,6 +29,7 @@ class VisionTestUtils {
             "TEST_CIRCLE" -> "Landolt C"
             "TEST_BUILD" -> "TODO"
             "TEST_INFO" -> "Przykładowy"
+            "COLOR_ARRANGE" -> "Farnsworth"
             else -> throw IllegalArgumentException("Nie znaleziono testu o podanym ID")
         }
 
