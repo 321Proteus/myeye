@@ -60,6 +60,8 @@ class ColorArrangementTest : VisionTest {
         var stageIterator: Int by remember { mutableIntStateOf(1) }
 
         var shuffledStageColors by remember { mutableStateOf(stages[stageIterator-1].second.split(" ")) }
+        var currentlyDragged by remember { mutableStateOf<Int?>(null) }
+        var currentOffset by remember { mutableFloatStateOf(0f) }
 
         Column(
             horizontalAlignment = Alignment.CenterHorizontally
@@ -74,7 +76,37 @@ class ColorArrangementTest : VisionTest {
 
                     Column(
                         modifier = Modifier
+                            .offset { IntOffset(0, if (currentlyDragged == index) currentOffset.toInt() else 0) }//IntOffset(0, if (currentlyDragged == index) currentOffset else 0) }
+                            .draggable(
+                                orientation = Orientation.Vertical,
+                                state = rememberDraggableState { delta ->
 
+                                    if (currentlyDragged == null) currentlyDragged = index
+                                    currentOffset += delta
+
+                                    val currentIndex = currentlyDragged ?: return@rememberDraggableState
+                                    val targetIndex = when {
+                                        currentOffset > 120 -> currentIndex + 1
+                                        currentOffset < -120 -> currentIndex - 1
+                                        else -> null
+                                    }
+
+                                    targetIndex?.let { target ->
+                                        if (target in shuffledStageColors.indices) {
+                                            shuffledStageColors = shuffledStageColors.toMutableList().apply {
+                                                val draggedItem = removeAt(currentIndex)
+                                                add(target, draggedItem)
+                                            }
+                                            currentlyDragged = target
+                                            currentOffset = 0f
+                                        }
+                                    }
+                                },
+                                onDragStopped = {
+                                    currentlyDragged = null
+                                    currentOffset = 0f
+                                }
+                            )
                     ) {
                         Box(
                             modifier = Modifier
