@@ -2,9 +2,10 @@ package me.proteus.myeye.ui
 
 import android.content.Intent
 import android.os.Bundle
-import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.viewModels
+import androidx.biometric.BiometricPrompt
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -23,36 +24,58 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.content.ContextCompat
 import androidx.core.content.IntentCompat
+import androidx.fragment.app.FragmentActivity
 import me.proteus.myeye.TestResult
 import me.proteus.myeye.ui.theme.MyEyeTheme
 import me.proteus.myeye.visiontests.VisionTestUtils
 
-class TestResultActivity : ComponentActivity() {
+class TestResultActivity : FragmentActivity() {
+
+    private val viewModel: AuthorizationViewModel by viewModels()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
             MyEyeTheme {
-                TestResultScreen(intent)
+                TestResultScreen(
+                    intent,
+                    viewModel,
+                    navigate = { data -> openTest(data) },
+                    this
+                )
             }
         }
     }
+
+    fun openTest(data: TestResult?) {
+
+        val detailsIntent: Intent = Intent(this, VisionTestLayoutActivity::class.java)
+        detailsIntent.putExtra("IS_RESULT", true)
+        detailsIntent.putExtra("RESULT_PARCEL", data)
+        this.startActivity(detailsIntent)
+
+    }
+
 }
 
 @Composable
-fun TestResultScreen(inputIntent: Intent) {
+fun TestResultScreen(
+    inputIntent: Intent,
+    viewModel: AuthorizationViewModel,
+    navigate: (TestResult?) -> Unit,
+    activity: TestResultActivity
+    ) {
 
     val resultData = IntentCompat.getParcelableExtra(inputIntent, "RESULT_PARCEL", TestResult::class.java)
     if (resultData == null) return;
 
     val isAfterTest = inputIntent.getBooleanExtra("IS_AFTER", false)
-
-    val activityContext = LocalContext.current
 
     Scaffold(
         content = { innerPadding ->
@@ -122,10 +145,17 @@ fun TestResultScreen(inputIntent: Intent) {
                             modifier = Modifier,
                             onClick = {
 
-                                val detailsIntent: Intent = Intent(activityContext, VisionTestLayoutActivity::class.java)
-                                detailsIntent.putExtra("IS_RESULT", true)
-                                detailsIntent.putExtra("RESULT_PARCEL", resultData)
-                                activityContext.startActivity(detailsIntent)
+                                if (viewModel.isAuthorized) {
+                                    navigate(resultData)
+                                } else {
+                                    authenticateUser(activity,
+                                        onSuccess = {
+                                            viewModel.authenticate()
+                                            activity.openTest(resultData)
+                                        },
+                                        onFailure = { println("Autoryzacja nieudana") }
+                                    )
+                                }
 
                             }
                         ) {
@@ -141,3 +171,30 @@ fun TestResultScreen(inputIntent: Intent) {
     )
 }
 
+
+fun authenticateUser(activity: FragmentActivity, onSuccess: () -> Unit, onFailure: () -> Unit) {
+
+    val executor = ContextCompat.getMainExecutor(activity)
+
+
+    val prompt = BiometricPrompt(activity, executor,
+        object : BiometricPrompt.AuthenticationCallback() {
+            override fun onAuthenticationSucceeded(result: BiometricPrompt.AuthenticationResult) {
+                onSuccess()
+            }
+
+            override fun onAuthenticationFailed() {
+                onFailure()
+            }
+        }
+    )
+
+    val promptInfo = BiometricPrompt.PromptInfo.Builder()
+        .setTitle("Potwierdź swoją tożsamość")
+        .setDescription("Użyj odcisku palca lub hasła, aby wyświetlić wyniki testu")
+        .setNegativeButtonText("Anuluj")
+        .build()
+
+    prompt.authenticate(promptInfo)
+
+}
