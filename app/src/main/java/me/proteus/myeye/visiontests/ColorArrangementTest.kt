@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.List
 import androidx.compose.material3.Text
@@ -28,11 +29,14 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.zIndex
 import me.proteus.myeye.R
 import me.proteus.myeye.SerializablePair
 import me.proteus.myeye.TestResult
@@ -75,7 +79,16 @@ class ColorArrangementTest : VisionTest {
 
                     Column(
                         modifier = Modifier
-                            .offset { IntOffset(0, if (currentlyDragged == index) currentOffset.toInt() else 0) }//IntOffset(0, if (currentlyDragged == index) currentOffset else 0) }
+                            .offset { IntOffset(0, if (currentlyDragged == index) currentOffset.toInt() else 0) }
+                            .scale(scaleX = (if (index == currentlyDragged) 1.5f else 1f), scaleY = 1f)
+                            .zIndex((if (index == currentlyDragged) 1f else 0f))
+                            .clip(RoundedCornerShape(
+                                    topStart = (if (index == 0) 15.dp else 0.dp),
+                                    topEnd = (if (index == 0) 15.dp else 0.dp),
+                                    bottomEnd = (if (index == shuffledStageColors.size - 1) 15.dp else 0.dp),
+                                    bottomStart = (if (index == shuffledStageColors.size - 1) 15.dp else 0.dp)
+                                )
+                            )
                             .draggable(
                                 orientation = Orientation.Vertical,
                                 state = rememberDraggableState { delta ->
@@ -84,6 +97,7 @@ class ColorArrangementTest : VisionTest {
                                     currentOffset += delta
 
                                     val currentIndex = currentlyDragged ?: return@rememberDraggableState
+
                                     val targetIndex = when {
                                         currentOffset > 120 -> currentIndex + 1
                                         currentOffset < -120 -> currentIndex - 1
@@ -115,7 +129,11 @@ class ColorArrangementTest : VisionTest {
                                 .background(Color(parseColor(item))),
                             contentAlignment = Alignment.Center
                         ) {
-                            Text("${getHue(item)}")
+                            Text(
+                                modifier = Modifier
+                                    .scale(scaleX = (if (index == currentlyDragged) 0.66f else 1f), scaleY = 1f),
+                                text = "${getHue(item)}"
+                            )
                         }
                     }
 
