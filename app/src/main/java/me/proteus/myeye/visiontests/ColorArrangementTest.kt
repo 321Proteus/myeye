@@ -39,7 +39,6 @@ import me.proteus.myeye.TestResult
 import me.proteus.myeye.VisionTest
 import me.proteus.myeye.io.ResultDataCollector
 import me.proteus.myeye.ui.VisionTestLayoutActivity
-import kotlin.math.max
 
 class ColorArrangementTest : VisionTest {
     override val testID: String = "COLOR_ARRANGE"
@@ -93,6 +92,7 @@ class ColorArrangementTest : VisionTest {
 
                                     targetIndex?.let { target ->
                                         if (target in shuffledStageColors.indices) {
+
                                             shuffledStageColors = shuffledStageColors.toMutableList().apply {
                                                 val draggedItem = removeAt(currentIndex)
                                                 add(target, draggedItem)
@@ -127,7 +127,12 @@ class ColorArrangementTest : VisionTest {
             ) {
                 Button(
                     onClick = {
-                        if (stageIterator < stageCount) stageIterator++
+                        if (stageIterator < stageCount) {
+
+                            stageIterator++;
+                            shuffledStageColors = stages[stageIterator-1].second.split(" ")
+
+                        }
                         else println("I po tescie")
                     }
                 ) {
@@ -166,7 +171,7 @@ class ColorArrangementTest : VisionTest {
 
         } else {
 
-            var list = ResultDataCollector.deserializeResult(result!!.result)
+           // var list = ResultDataCollector.deserializeResult(result!!.result)
 
         }
 
