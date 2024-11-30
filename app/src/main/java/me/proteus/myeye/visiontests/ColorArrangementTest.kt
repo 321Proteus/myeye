@@ -238,7 +238,6 @@ class ColorArrangementTest : VisionTest {
         return hsv[0]
     }
 
-    @Suppress("UNCHECKED_CAST")
     fun prepareArray(old: List<String>, n: Int, limit: Int): ArrayList<String> {
 
         var new = ArrayList<String>()
