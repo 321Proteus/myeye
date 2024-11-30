@@ -54,6 +54,8 @@ class ColorArrangementTest : VisionTest {
     override val stageCount: Int = 6
     override val resultCollector: ResultDataCollector = ResultDataCollector()
 
+    val measurementMode = "RELATIVE"
+
     val difficultyScale = listOf(8, 7, 5, 4, 3, 2, 1)
 
     var colors: Array<String> = arrayOf()
@@ -174,6 +176,10 @@ class ColorArrangementTest : VisionTest {
                         if (difficulty < stageCount) {
 
                             difficulty++;
+
+                            var answer = stageColors.joinToString(" ")
+                            checkAnswer(answer)
+
                             stageColors = prepareArray(colorArray, difficultyScale[difficulty], 10).toList()//stages[stageIterator-1].second.split(" ")
 
                         }
@@ -225,7 +231,53 @@ class ColorArrangementTest : VisionTest {
     }
 
     override fun checkAnswer(answer: String): Boolean {
-        TODO("Not yet implemented")
+
+        var answeredArray = answer.split(' ').map { getHue(it) }
+        var orderedArray = answeredArray.sorted()
+        val size = answeredArray.size
+
+        var percent = 0
+
+        if (measurementMode == "RELATIVE") {
+
+            val lengths = MutableList(size) { 0 }
+            var i = 0
+
+            while (i < size - 1) {
+
+                var j = 1
+
+                while (i+j < size &&  isSubArray(orderedArray.slice(i..i+j), answeredArray.slice(i..i+j))) j++
+
+                lengths[i] = j
+                i += j
+
+            }
+
+            for (l in lengths) {
+                if (l > 1) percent += 10*l
+            }
+            println(lengths)
+            println(percent)
+
+        } else {
+
+            for (i in 0..<size) {
+                if (i == orderedArray.indexOf(answeredArray[i])) percent += 10
+            }
+
+        }
+
+        return true
+
+    }
+
+    inline fun <reified T> isSubArray(a: List<T>, b: List<T>): Boolean {
+
+        return a.windowed(b.size).any {
+            it.toTypedArray().contentEquals(b.toTypedArray())
+        }
+
     }
 
     fun getHue(color: String): Float {
