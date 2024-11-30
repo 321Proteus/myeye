@@ -50,6 +50,7 @@ import me.proteus.myeye.io.ResultDataCollector
 import me.proteus.myeye.ui.VisionTestLayoutActivity
 
 class ColorArrangementTest : VisionTest {
+
     override val testID: String = "COLOR_ARRANGE"
     override val testIcon: ImageVector = Icons.AutoMirrored.Outlined.List
     override val stageCount: Int = 8
@@ -70,7 +71,7 @@ class ColorArrangementTest : VisionTest {
         var colorArray: ArrayList<String> = ArrayList()
         for (i in stages) colorArray.add(i.first)
 
-        var stageColors by remember { mutableStateOf(pickEveryNth(colorArray, difficulty, 10).toList()) }
+        var stageColors by remember { mutableStateOf(prepareArray(colorArray, stageCount - difficulty, 10).toList()) }
         var currentlyDragged by remember { mutableStateOf<Int?>(null) }
         var currentOffset by remember { mutableFloatStateOf(0f) }
 
@@ -173,7 +174,7 @@ class ColorArrangementTest : VisionTest {
                         if (difficulty < stageCount) {
 
                             difficulty++;
-                            stageColors = pickEveryNth(colorArray, difficulty, 10).toList()//stages[stageIterator-1].second.split(" ")
+                            stageColors = prepareArray(colorArray, stageCount - difficulty, 10).toList()//stages[stageIterator-1].second.split(" ")
 
                         }
                         else println("I po tescie")
@@ -238,7 +239,7 @@ class ColorArrangementTest : VisionTest {
     }
 
     @Suppress("UNCHECKED_CAST")
-    fun pickEveryNth(old: List<String>, n: Int, limit: Int): ArrayList<String> {
+    fun prepareArray(old: List<String>, n: Int, limit: Int): ArrayList<String> {
 
         var new = ArrayList<String>()
         var i: Int = 0
@@ -249,8 +250,15 @@ class ColorArrangementTest : VisionTest {
         }
 
         new = ArrayList(new.subList(0, limit))
+        var begin = new.first()
+        var end = new.last()
 
-        println(new)
+        new = ArrayList(new.subList(1, limit - 1))
+
+        new.shuffle()
+        new.add(0, begin)
+        new.add(end)
+
         return new
 
     }
