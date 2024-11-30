@@ -3,6 +3,7 @@ package me.proteus.myeye.visiontests
 import android.graphics.Color.parseColor
 import android.graphics.Color.colorToHSV
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.draggable
 import androidx.compose.foundation.gestures.rememberDraggableState
@@ -21,6 +22,7 @@ import androidx.compose.material.icons.automirrored.outlined.List
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.material3.Button
+import androidx.compose.material3.Shapes
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.getValue
@@ -31,7 +33,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.IntOffset
@@ -63,10 +68,9 @@ class ColorArrangementTest : VisionTest {
         var difficulty: Int by remember { mutableIntStateOf(1) }
 
         var colorArray: ArrayList<String> = ArrayList()
-
         for (i in stages) colorArray.add(i.first)
 
-        var shuffledStageColors by remember { mutableStateOf(pickEveryNth(colorArray, difficulty, 10).toList()) }
+        var stageColors by remember { mutableStateOf(pickEveryNth(colorArray, difficulty, 10).toList()) }
         var currentlyDragged by remember { mutableStateOf<Int?>(null) }
         var currentOffset by remember { mutableFloatStateOf(0f) }
 
@@ -79,7 +83,17 @@ class ColorArrangementTest : VisionTest {
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.SpaceEvenly
             ) {
-                 itemsIndexed(shuffledStageColors) { index, item ->
+                 itemsIndexed(stageColors) { index, item ->
+
+                     var isTopEdge = (index == 0)
+                     var isBottomEdge = (index == 9)
+
+                     var edgeShape: Shape = RoundedCornerShape(
+                         topStart = (if (isTopEdge) 15.dp else 0.dp),
+                         topEnd = (if (isTopEdge) 15.dp else 0.dp),
+                         bottomEnd = (if (isBottomEdge) 15.dp else 0.dp),
+                         bottomStart = (if (isBottomEdge) 15.dp else 0.dp)
+                     )
 
                     Column(
                         modifier = Modifier
@@ -87,14 +101,8 @@ class ColorArrangementTest : VisionTest {
                             .fillMaxHeight(0.1f)
                             .scale(scaleX = (if (index == currentlyDragged) 1.5f else 1f), scaleY = 1f)
                             .zIndex((if (index == currentlyDragged) 1f else 0f))
-                            .clip(RoundedCornerShape(
-                                    topStart = (if (index == 0) 15.dp else 0.dp),
-                                    topEnd = (if (index == 0) 15.dp else 0.dp),
-                                    bottomEnd = (if (index == shuffledStageColors.size - 1) 15.dp else 0.dp),
-                                    bottomStart = (if (index == shuffledStageColors.size - 1) 15.dp else 0.dp)
-                                )
-                            )
                             .draggable(
+                                enabled = (!(isTopEdge || isBottomEdge)),
                                 orientation = Orientation.Vertical,
                                 state = rememberDraggableState { delta ->
 
@@ -110,9 +118,10 @@ class ColorArrangementTest : VisionTest {
                                     }
 
                                     targetIndex?.let { target ->
-                                        if (target in shuffledStageColors.indices) {
+                                        if (targetIndex == 0 || targetIndex == 9) return@rememberDraggableState
+                                        if (target in stageColors.indices) {
 
-                                            shuffledStageColors = shuffledStageColors.toMutableList().apply {
+                                            stageColors = stageColors.toMutableList().apply {
                                                 val draggedItem = removeAt(currentIndex)
                                                 add(target, draggedItem)
                                             }
@@ -131,7 +140,13 @@ class ColorArrangementTest : VisionTest {
                             modifier = Modifier
                                 .fillMaxWidth(0.4f)
                                 .height(60.dp)
-                                .background(Color(parseColor(item))),
+                                .clip(edgeShape)
+                                .background(Color(parseColor(item)))
+                                .border(
+                                    width = (if (isTopEdge || isBottomEdge) 2.dp else 0.dp),
+                                    brush = SolidColor(Color.Black),
+                                    shape = edgeShape
+                                ),
                             contentAlignment = Alignment.Center
                         ) {
                             Text(
@@ -153,7 +168,7 @@ class ColorArrangementTest : VisionTest {
                         if (difficulty < stageCount) {
 
                             difficulty++;
-                            shuffledStageColors = pickEveryNth(colorArray, difficulty, 10).toList()//stages[stageIterator-1].second.split(" ")
+                            stageColors = pickEveryNth(colorArray, difficulty, 10).toList()//stages[stageIterator-1].second.split(" ")
 
                         }
                         else println("I po tescie")
