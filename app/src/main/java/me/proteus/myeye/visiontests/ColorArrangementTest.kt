@@ -142,11 +142,16 @@ class ColorArrangementTest : VisionTest {
                                 .height(60.dp)
                                 .clip(edgeShape)
                                 .background(Color(parseColor(item)))
-                                .border(
-                                    width = (if (isTopEdge || isBottomEdge) 2.dp else 0.dp),
-                                    brush = SolidColor(Color.Black),
-                                    shape = edgeShape
+                                .then(
+                                    if ((isTopEdge) || isBottomEdge) {
+                                        Modifier.border(
+                                            width = (2.dp),
+                                            brush = SolidColor(Color.Black),
+                                            shape = edgeShape
+                                        )
+                                    } else Modifier
                                 ),
+
                             contentAlignment = Alignment.Center
                         ) {
                             Text(
