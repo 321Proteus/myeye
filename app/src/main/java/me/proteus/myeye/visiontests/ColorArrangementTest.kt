@@ -54,8 +54,6 @@ class ColorArrangementTest : VisionTest {
     override val stageCount: Int = 6
     override val resultCollector: ResultDataCollector = ResultDataCollector()
 
-    val measurementMode = "RELATIVE"
-
     val difficultyScale = listOf(8, 7, 5, 4, 3, 2, 1)
 
     var colors: Array<String> = arrayOf()
@@ -178,7 +176,9 @@ class ColorArrangementTest : VisionTest {
                             difficulty++;
 
                             var answer = stageColors.joinToString(" ")
-                            checkAnswer(answer)
+
+                            var a = getScore(answer, "RELATIVE")
+                            var b = getScore(answer, "LEVENSHTEIN")
 
                             stageColors = prepareArray(colorArray, difficultyScale[difficulty], 10).toList()//stages[stageIterator-1].second.split(" ")
 
@@ -232,13 +232,35 @@ class ColorArrangementTest : VisionTest {
 
     override fun checkAnswer(answer: String): Boolean {
 
+        return true
+
+    }
+
+    fun getScore(answer: String, measurementMode: String): Int {
+
         var answeredArray = answer.split(' ').map { getHue(it) }
         var orderedArray = answeredArray.sorted()
         val size = answeredArray.size
 
+        println(answeredArray)
+
         var percent = 0
 
-        if (measurementMode == "RELATIVE") {
+        if (measurementMode == "ABSOLUTE") {
+
+            for (i in 0..<size) {
+                if (i == orderedArray.indexOf(answeredArray[i])) percent += 10
+            }
+
+        } else if (measurementMode == "RELATIVE") {
+
+            for (i in 1..<size) {
+                if (answeredArray[i] > answeredArray[i - 1]) percent += 10
+            }
+
+            percent += 10
+
+        } else if (measurementMode == "LEVENSHTEIN") {
 
             val lengths = MutableList(size) { 0 }
             var i = 0
@@ -246,29 +268,21 @@ class ColorArrangementTest : VisionTest {
             while (i < size - 1) {
 
                 var j = 1
-
-                while (i+j < size &&  isSubArray(orderedArray.slice(i..i+j), answeredArray.slice(i..i+j))) j++
-
+                while (i + j < size && isSubArray(
+                        orderedArray.slice(i..i + j),
+                        answeredArray.slice(i..i + j)
+                    )
+                ) j++
                 lengths[i] = j
                 i += j
-
             }
-
             for (l in lengths) {
-                if (l > 1) percent += 10*l
-            }
-            println(lengths)
-            println(percent)
-
-        } else {
-
-            for (i in 0..<size) {
-                if (i == orderedArray.indexOf(answeredArray[i])) percent += 10
+                if (l > 1) percent += 10 * l
             }
 
         }
 
-        return true
+        return percent
 
     }
 
