@@ -22,7 +22,6 @@ import androidx.compose.material.icons.automirrored.outlined.List
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.material3.Button
-import androidx.compose.material3.Shapes
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.getValue
@@ -33,7 +32,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.SolidColor
@@ -53,8 +51,10 @@ class ColorArrangementTest : VisionTest {
 
     override val testID: String = "COLOR_ARRANGE"
     override val testIcon: ImageVector = Icons.AutoMirrored.Outlined.List
-    override val stageCount: Int = 8
+    override val stageCount: Int = 6
     override val resultCollector: ResultDataCollector = ResultDataCollector()
+
+    val difficultyScale = listOf(8, 7, 5, 4, 3, 2, 1)
 
     var colors: Array<String> = arrayOf()
 
@@ -71,7 +71,7 @@ class ColorArrangementTest : VisionTest {
         var colorArray: ArrayList<String> = ArrayList()
         for (i in stages) colorArray.add(i.first)
 
-        var stageColors by remember { mutableStateOf(prepareArray(colorArray, stageCount - difficulty, 10).toList()) }
+        var stageColors by remember { mutableStateOf(prepareArray(colorArray, difficultyScale[difficulty], 10).toList()) }
         var currentlyDragged by remember { mutableStateOf<Int?>(null) }
         var currentOffset by remember { mutableFloatStateOf(0f) }
 
@@ -174,7 +174,7 @@ class ColorArrangementTest : VisionTest {
                         if (difficulty < stageCount) {
 
                             difficulty++;
-                            stageColors = prepareArray(colorArray, stageCount - difficulty, 10).toList()//stages[stageIterator-1].second.split(" ")
+                            stageColors = prepareArray(colorArray, difficultyScale[difficulty], 10).toList()//stages[stageIterator-1].second.split(" ")
 
                         }
                         else println("I po tescie")
