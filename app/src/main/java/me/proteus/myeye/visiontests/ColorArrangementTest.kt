@@ -60,9 +60,13 @@ class ColorArrangementTest : VisionTest {
         isResult: Boolean
     ) {
 
-        var stageIterator: Int by remember { mutableIntStateOf(1) }
+        var difficulty: Int by remember { mutableIntStateOf(1) }
 
-        var shuffledStageColors by remember { mutableStateOf(stages[stageIterator-1].second.split(" ")) }
+        var colorArray: ArrayList<String> = ArrayList()
+
+        for (i in stages) colorArray.add(i.first)
+
+        var shuffledStageColors by remember { mutableStateOf(pickEveryNth(colorArray, difficulty, 10).toList()) }
         var currentlyDragged by remember { mutableStateOf<Int?>(null) }
         var currentOffset by remember { mutableFloatStateOf(0f) }
 
@@ -80,6 +84,7 @@ class ColorArrangementTest : VisionTest {
                     Column(
                         modifier = Modifier
                             .offset { IntOffset(0, if (currentlyDragged == index) currentOffset.toInt() else 0) }
+                            .fillMaxHeight(0.1f)
                             .scale(scaleX = (if (index == currentlyDragged) 1.5f else 1f), scaleY = 1f)
                             .zIndex((if (index == currentlyDragged) 1f else 0f))
                             .clip(RoundedCornerShape(
@@ -145,10 +150,10 @@ class ColorArrangementTest : VisionTest {
             ) {
                 Button(
                     onClick = {
-                        if (stageIterator < stageCount) {
+                        if (difficulty < stageCount) {
 
-                            stageIterator++;
-                            shuffledStageColors = stages[stageIterator-1].second.split(" ")
+                            difficulty++;
+                            shuffledStageColors = pickEveryNth(colorArray, difficulty, 10).toList()//stages[stageIterator-1].second.split(" ")
 
                         }
                         else println("I po tescie")
@@ -176,13 +181,8 @@ class ColorArrangementTest : VisionTest {
 
             var list: MutableList<SerializablePair> = ArrayList<SerializablePair>(stageCount)
 
-            for (i in 0..<stageCount) {
-
-                var original = colors.copyOfRange(i*10, i*10 + 10).toList()
-                var shuffled = original.shuffled()
-
-                list.add(SerializablePair(original.joinToString(" "), shuffled.joinToString(" ")))
-
+            for (i in colors) {
+                list.add(SerializablePair(i, ""))
             }
 
             DisplayStage(activity, modifier, list, false)
@@ -215,6 +215,24 @@ class ColorArrangementTest : VisionTest {
         colorToHSV(a, hsv)
 
         return hsv[0]
+    }
+
+    @Suppress("UNCHECKED_CAST")
+    fun pickEveryNth(old: List<String>, n: Int, limit: Int): ArrayList<String> {
+
+        var new = ArrayList<String>()
+        var i: Int = 0
+
+        while(i < old.size) {
+            new.add(old[i])
+            i += n
+        }
+
+        new = ArrayList(new.subList(0, limit))
+
+        println(new)
+        return new
+
     }
 
 
