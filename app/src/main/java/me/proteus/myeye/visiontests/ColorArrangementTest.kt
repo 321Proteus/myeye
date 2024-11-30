@@ -55,6 +55,7 @@ class ColorArrangementTest : VisionTest {
     override val resultCollector: ResultDataCollector = ResultDataCollector()
 
     val difficultyScale = listOf(8, 7, 5, 4, 3, 2, 1)
+    var colorOffset = 0
 
     var colors: Array<String> = arrayOf()
 
@@ -71,7 +72,13 @@ class ColorArrangementTest : VisionTest {
         var colorArray: ArrayList<String> = ArrayList()
         for (i in stages) colorArray.add(i.first)
 
-        var stageColors by remember { mutableStateOf(prepareArray(colorArray, difficultyScale[difficulty], 10).toList()) }
+        var stageColors by remember { mutableStateOf(prepareArray(
+            colorArray,
+            difficultyScale[difficulty],
+            10,
+            colorOffset
+        ).toList()) }
+
         var currentlyDragged by remember { mutableStateOf<Int?>(null) }
         var currentOffset by remember { mutableFloatStateOf(0f) }
 
@@ -173,14 +180,23 @@ class ColorArrangementTest : VisionTest {
                     onClick = {
                         if (difficulty < stageCount) {
 
-                            difficulty++;
-
                             var answer = stageColors.joinToString(" ")
 
                             var a = getScore(answer, "RELATIVE")
                             var b = getScore(answer, "LEVENSHTEIN")
 
-                            stageColors = prepareArray(colorArray, difficultyScale[difficulty], 10).toList()//stages[stageIterator-1].second.split(" ")
+                            if ((a+b) / 2 >= 70 && (a+b)/ 2 < 100) {
+                                colorOffset += 20
+                                println("${(a+b) / 2}Bez zmiany trudnosci")
+                            }
+                            else {
+                                colorOffset = 0
+                                difficulty++
+                            }
+
+                            stageColors = prepareArray(colorArray, difficultyScale[difficulty], 10, colorOffset).toList()
+
+                            println()
 
                         }
                         else println("I po tescie")
@@ -304,13 +320,13 @@ class ColorArrangementTest : VisionTest {
         return hsv[0]
     }
 
-    fun prepareArray(old: List<String>, n: Int, limit: Int): ArrayList<String> {
+    fun prepareArray(old: List<String>, n: Int, limit: Int, offset: Int = 0): ArrayList<String> {
 
         var new = ArrayList<String>()
-        var i: Int = 0
+        var i: Int = offset
 
-        while(i < old.size) {
-            new.add(old[i])
+        while(new.size < limit) {
+            new.add(old[i % old.size])
             i += n
         }
 
