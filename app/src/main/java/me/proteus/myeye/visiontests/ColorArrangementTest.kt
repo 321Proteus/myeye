@@ -185,7 +185,7 @@ class ColorArrangementTest : VisionTest {
                             var a = getScore(answer, "RELATIVE")
                             var b = getScore(answer, "LEVENSHTEIN")
 
-                            if ((a+b) / 2 >= 70 && (a+b)/ 2 < 100) {
+                            if ((a+b) / 2 >= 70 && (a+b)/ 2 < 100 && difficulty >= 4) {
                                 colorOffset += 20
                                 println("${(a+b) / 2}Bez zmiany trudnosci")
                             }
@@ -196,7 +196,7 @@ class ColorArrangementTest : VisionTest {
 
                             stageColors = prepareArray(colorArray, difficultyScale[difficulty], 10, colorOffset).toList()
 
-                            println()
+                            println(difficulty)
 
                         }
                         else println("I po tescie")
