@@ -10,6 +10,7 @@ import androidx.compose.foundation.gestures.rememberDraggableState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
@@ -35,11 +36,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.layout.positionInWindow
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
@@ -166,6 +170,35 @@ class ColorArrangementTest : VisionTest {
                                 }
                             }
                         }
+                    }
+
+                    var startX: Float = 0f
+                    var startY: Float = 0f
+
+                    Column (
+                        modifier = Modifier
+                            .weight(1f)
+                            .onGloballyPositioned { lc ->
+                                startX = lc.positionInWindow().x
+                                startY = lc.positionInWindow().y
+                                println("$startX $startY")
+                            }
+                    ) {
+                        var correctnessMap = getCorrectnessMapping(sortedColors!!, stageColors)
+
+                        Canvas(
+                            modifier = Modifier.fillMaxSize()
+                        ) {
+                            for (el in correctnessMap) {
+                                drawLine(
+                                    start = Offset(x = 0f, y = (startY + el.key * 60).dp.toPx()),
+                                    end = Offset(x = size.width, y = (startY + el.value * 60).dp.toPx()),
+                                    color = Color.Black,
+                                    strokeWidth = 4f
+                                )
+                            }
+                        }
+
                     }
                 }
 
@@ -419,6 +452,18 @@ class ColorArrangementTest : VisionTest {
         }
 
         return percent
+
+    }
+
+    fun getCorrectnessMapping(a: List<String>, b: List<String>): Map<Int, Int> {
+
+        var map: MutableMap<Int, Int> = HashMap()
+
+        for (i in 0..<a.size) {
+            map.put(key = i, value = b.indexOf(b.find{ it == a[i] }))
+        }
+
+        return map
 
     }
 
