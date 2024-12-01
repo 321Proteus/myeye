@@ -118,90 +118,6 @@ class ColorArrangementTest : VisionTest {
             ) {
 
 
-                if (isResult) {
-                    Column(
-                        modifier = Modifier
-                            .weight(1f),
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-
-                        Text("Poprawna\nodpowiedź")
-
-                        LazyColumn(
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                            verticalArrangement = Arrangement.SpaceEvenly
-                        ) {
-                            itemsIndexed(sortedColors!!) { index, item ->
-
-                                var isTopEdge = (index == 0)
-                                var isBottomEdge = (index == 9)
-
-                                var edgeShape: Shape = RoundedCornerShape(
-                                    topStart = (if (isTopEdge) 15.dp else 0.dp),
-                                    topEnd = (if (isTopEdge) 15.dp else 0.dp),
-                                    bottomEnd = (if (isBottomEdge) 15.dp else 0.dp),
-                                    bottomStart = (if (isBottomEdge) 15.dp else 0.dp)
-                                )
-
-                                Column(
-                                    modifier = Modifier
-                                        .fillMaxHeight(0.1f)
-                                ) {
-                                    Box(
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .height(60.dp)
-                                            .clip(edgeShape)
-                                            .background(Color(parseColor(item)))
-                                            .then(
-                                                if ((isTopEdge) || isBottomEdge) {
-                                                    Modifier.border(
-                                                        width = (2.dp),
-                                                        brush = SolidColor(Color.Black),
-                                                        shape = edgeShape
-                                                    )
-                                                } else Modifier
-                                            ),
-
-                                        contentAlignment = Alignment.Center
-                                    ) {
-                                        Text("${getHue(item)}")
-                                    }
-                                }
-                            }
-                        }
-                    }
-
-                    var startX: Float = 0f
-                    var startY: Float = 0f
-
-                    Column (
-                        modifier = Modifier
-                            .weight(1f)
-                            .onGloballyPositioned { lc ->
-                                startX = lc.positionInWindow().x
-                                startY = lc.positionInWindow().y
-                                println("$startX $startY")
-                            }
-                    ) {
-                        var correctnessMap = getCorrectnessMapping(sortedColors!!, stageColors)
-
-                        Canvas(
-                            modifier = Modifier.fillMaxSize()
-                        ) {
-                            for (el in correctnessMap) {
-                                drawLine(
-                                    start = Offset(x = 0f, y = (startY + el.key * 60).dp.toPx()),
-                                    end = Offset(x = size.width, y = (startY + el.value * 60).dp.toPx()),
-                                    color = Color.Black,
-                                    strokeWidth = 4f
-                                )
-                            }
-                        }
-
-                    }
-                }
-
                 Column(
                     modifier = Modifier
                         .weight(1f),
@@ -297,6 +213,92 @@ class ColorArrangementTest : VisionTest {
 
                         }
                     }
+                }
+
+                if (isResult) {
+                    var startX: Float = 0f
+                    var startY: Float = 0f
+
+                    Column (
+                        modifier = Modifier
+                            .weight(1f)
+                            .onGloballyPositioned { lc ->
+                                startX = lc.positionInWindow().x
+                                startY = lc.positionInWindow().y
+                                println("$startX $startY")
+                                var k: Int = getScore(stageColors.joinToString(" "), "RELATIVE")
+                            }
+                    ) {
+                        var correctnessMap = getCorrectnessMapping(sortedColors!!, stageColors)
+
+                        Canvas(
+                            modifier = Modifier.fillMaxSize()
+                        ) {
+                            for (el in correctnessMap) {
+                                drawLine(
+                                    start = Offset(x = 0f, y = (startY + el.value * 60).dp.toPx()),
+                                    end = Offset(x = size.width, y = (startY + el.key * 60).dp.toPx()),
+                                    color = Color.Black,
+                                    strokeWidth = 4f
+                                )
+                            }
+                        }
+
+                    }
+
+                    Column(
+                        modifier = Modifier
+                            .weight(1f),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+
+                        Text("Poprawna\nodpowiedź")
+
+                        LazyColumn(
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.SpaceEvenly
+                        ) {
+                            itemsIndexed(sortedColors!!) { index, item ->
+
+                                var isTopEdge = (index == 0)
+                                var isBottomEdge = (index == 9)
+
+                                var edgeShape: Shape = RoundedCornerShape(
+                                    topStart = (if (isTopEdge) 15.dp else 0.dp),
+                                    topEnd = (if (isTopEdge) 15.dp else 0.dp),
+                                    bottomEnd = (if (isBottomEdge) 15.dp else 0.dp),
+                                    bottomStart = (if (isBottomEdge) 15.dp else 0.dp)
+                                )
+
+                                Column(
+                                    modifier = Modifier
+                                        .fillMaxHeight(0.1f)
+                                ) {
+                                    Box(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .height(60.dp)
+                                            .clip(edgeShape)
+                                            .background(Color(parseColor(item)))
+                                            .then(
+                                                if ((isTopEdge) || isBottomEdge) {
+                                                    Modifier.border(
+                                                        width = (2.dp),
+                                                        brush = SolidColor(Color.Black),
+                                                        shape = edgeShape
+                                                    )
+                                                } else Modifier
+                                            ),
+
+                                        contentAlignment = Alignment.Center
+                                    ) {
+                                        Text("${getHue(item)}")
+                                    }
+                                }
+                            }
+                        }
+                    }
+
                 }
 
             }
@@ -458,10 +460,23 @@ class ColorArrangementTest : VisionTest {
     fun getCorrectnessMapping(a: List<String>, b: List<String>): Map<Int, Int> {
 
         var map: MutableMap<Int, Int> = HashMap()
+        var connected = b.joinToString(" ")
 
-        for (i in 0..<a.size) {
-            map.put(key = i, value = b.indexOf(b.find{ it == a[i] }))
+        var i = 1
+        while (i < a.size - 1) {
+
+            var idx = b.indexOf(a[i])
+            var j = 0
+
+            while(connected.indexOf(a.subList(idx, idx+j).joinToString(" ")) != -1) j++
+
+            map[i] = idx
+
+            i += j
+            if (j > 1) i -= 1
+
         }
+//        for (el in map) println("${el.value} ${el.key}")
 
         return map
 
