@@ -16,7 +16,6 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
@@ -30,12 +29,12 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
-import me.proteus.myeye.MenuActivity
 import me.proteus.myeye.R
 import me.proteus.myeye.ScreenScalingUtils.getScreenInfo
+import me.proteus.myeye.SerializablePair
+import me.proteus.myeye.TestResult
 import me.proteus.myeye.VisionTest
 import me.proteus.myeye.io.ResultDataCollector
-import me.proteus.myeye.io.ResultDataSaver
 import me.proteus.myeye.ui.VisionTestLayoutActivity
 import java.util.Random
 import kotlin.math.*
@@ -48,10 +47,6 @@ class SnellenChart : VisionTest {
     private var correctAnswer: String = ""
 
     override val stageCount: Int = 10
-
-    private var currentStageState = mutableIntStateOf(1)
-
-    override val currentStage: Int get() = currentStageState.intValue
 
     override val resultCollector: ResultDataCollector = ResultDataCollector()
 
@@ -67,7 +62,7 @@ class SnellenChart : VisionTest {
     }
 
     @Composable
-    fun LetterContainer(stage: Int, text: String, modifier: Modifier = Modifier) {
+    fun LetterContainer(stage: Int, text: String, key: String?, modifier: Modifier = Modifier) {
 
         val config = LocalConfiguration.current
         val opticianSansFamily = FontFamily(Font(R.font.opticiansans))
@@ -83,11 +78,11 @@ class SnellenChart : VisionTest {
                     .fillMaxWidth(),
                 horizontalArrangement = Arrangement.Center
             ) {
-                for (char in text) {
+                for (i in 0..<text.length) {
                     Text(
-                        text = char.toString(),
-                        color = Color.Black,
-                        fontSize = pixelSize * 20,
+                        text = text[i].toString(),
+                        color = (if (key != null) (if (text[i] == key[i]) Color.Green else Color.Red) else Color.Black),
+                        fontSize = pixelSize * 15,
                         fontFamily = opticianSansFamily,
                         modifier = modifier.padding(8.dp)
                     )
@@ -100,11 +95,11 @@ class SnellenChart : VisionTest {
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                for (char in text) {
+                for (i in 0..<text.length) {
                     Text(
-                        text = char.toString(),
-                        color = Color.Black,
-                        fontSize = pixelSize * 20,
+                        text = text[i].toString(),
+                        color = (if (key != null) (if (text[i] == key[i]) Color.Green else Color.Red) else Color.Black),
+                        fontSize = pixelSize * 15,
                         fontFamily = opticianSansFamily,
                         modifier = modifier.padding(8.dp)
                     )
@@ -137,11 +132,44 @@ class SnellenChart : VisionTest {
     }
 
     @Composable
-    override fun DisplayStage(activity: VisionTestLayoutActivity, modifier: Modifier) {
+    override fun BeginTest(
+        activity: VisionTestLayoutActivity,
+        modifier: Modifier,
+        isResult: Boolean,
+        result: TestResult?
+    ) {
 
-        println("Stage: $currentStage")
+        if (isResult) {
 
-        var question: String by remember { mutableStateOf(this.generateQuestion().toString()) }
+            var resultStages: MutableList<SerializablePair> = ArrayList<SerializablePair>(stageCount)
+
+            val resultData = ResultDataCollector.deserializeResult(result!!.result)
+
+
+            for (i in 0..<stageCount) {
+                resultStages.add(resultData[i])
+            }
+
+            DisplayStage(activity, modifier, resultStages, true)
+
+        } else {
+
+            var testStages: MutableList<SerializablePair> = ArrayList<SerializablePair>(stageCount)
+
+            for (i in 0..<stageCount) {
+                testStages.add(SerializablePair(this.generateQuestion().toString(), randomText(5)))
+            }
+
+            DisplayStage(activity, modifier, testStages, false)
+
+        }
+
+    }
+
+    @Composable
+    override fun DisplayStage(activity: VisionTestLayoutActivity, modifier: Modifier, stages: List<SerializablePair>, isResult: Boolean) {
+
+        var questionIterator: Int by remember { mutableIntStateOf(0) }
 
         Column(
             modifier = Modifier
@@ -157,33 +185,62 @@ class SnellenChart : VisionTest {
                     .padding(bottom = 16.dp),
                 contentAlignment = Alignment.Center,
             ) {
-                LetterContainer(
-                    stage = currentStage,
-                    text = question,
-                    modifier = modifier
-                )
+                Row(
+                    horizontalArrangement = Arrangement.SpaceEvenly
+                ) {
+                    LetterContainer(
+                        stage = questionIterator,
+                        text = stages[questionIterator].first,
+                        key = null,
+                        modifier = modifier
+                    )
+                    if (isResult) {
+                        LetterContainer(
+                            stage = questionIterator,
+                            text = stages[questionIterator].second,
+                            key = stages[questionIterator].first,
+                            modifier = modifier
+                        )
+                    }
+
+                }
+
             }
 
-            ButtonRow(
-                onRegenerate = { question = this@SnellenChart.generateQuestion().toString() },
-                onSizeDecrease = {
+            if (!isResult) {
+                ButtonRow(
+                    onRegenerate = { questionIterator++ },
+                    onSizeDecrease = {
 
-                    if (currentStage < stageCount) {
+                        if (questionIterator < stageCount - 1) {
 
-                        // TODO: Zaimplementowac polecenia glosowe do zbierania odpowiedzi
-                        storeResult(question, randomText(5))
+                            // TODO: Zaimplementowac polecenia glosowe do zbierania odpowiedzi
+                            storeResult(stages[questionIterator].first, randomText(5))
+                            questionIterator++
+                        } else {
+                            storeResult(stages[questionIterator].first, randomText(5))
+                            if (!isResult) endTest(activity)
 
-                        currentStageState.intValue++
-                        question = this@SnellenChart.generateQuestion().toString()
+                        }
+                    }
+                )
+            } else {
 
-                    } else {
-
-                        storeResult(question, randomText(5))
-                        endTest(activity)
-
+                Row(
+                    modifier = modifier
+                        .fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceEvenly,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Button(onClick = { questionIterator-- }) {
+                        Text(text = "Poprzedni etap")
+                    }
+                    Button(onClick = { questionIterator++ }) {
+                        Text(text = "Następny etap")
                     }
                 }
-            )
+            }
+
         }
     }
 
@@ -237,16 +294,6 @@ class SnellenChart : VisionTest {
         }
 
         return text
-    }
-
-    override fun endTest(activity: VisionTestLayoutActivity) {
-
-        var localSaver = ResultDataSaver(activity.applicationContext)
-        localSaver.insert("SNELLEN_CHART", resultCollector.stages)
-
-        val testLeavingIntent = Intent(activity, MenuActivity::class.java)
-        activity.startActivity(testLeavingIntent)
-
     }
 
 }

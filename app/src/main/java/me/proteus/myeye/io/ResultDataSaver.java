@@ -1,5 +1,6 @@
 package me.proteus.myeye.io;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.database.Cursor;
 
@@ -8,8 +9,6 @@ import androidx.sqlite.db.*;
 import androidx.sqlite.db.framework.*;
 
 import java.io.IOException;
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -96,15 +95,49 @@ public class ResultDataSaver {
         }
     }
 
-    public void insert(String testName, List<SerializablePair> result) {
+    @SuppressLint("Range")
+    public TestResult getLastResult() {
+
+        SupportSQLiteDatabase db = this.dbHelper.getWritableDatabase();
+        String testFinderQuery = "SELECT * FROM RESULTS ORDER BY TIMESTAMP DESC LIMIT 1";
+
+        try (Cursor cursor = db.query(testFinderQuery)) {
+
+            if (cursor.moveToFirst()) {
+
+                int id = cursor.getInt(cursor.getColumnIndex("ID"));
+                String testId = cursor.getString(cursor.getColumnIndex("TEST"));
+                long timestamp = cursor.getLong(cursor.getColumnIndex("TIMESTAMP"));
+                byte[] resultData = cursor.getBlob(cursor.getColumnIndex("RESULT"));
+
+                return new TestResult(id, testId, timestamp, resultData);
+
+            } else {
+                System.out.println("Bledna kolumna w tabeli RESULTS");
+            }
+
+        }
+
+        return null;
+    }
+
+    public void insert(String testName, List<SerializablePair> result, long ts) {
 
         SupportSQLiteDatabase db = this.dbHelper.getWritableDatabase();
 
         String ResultInsertionQuery = "INSERT INTO RESULTS (TIMESTAMP, TEST, RESULT) VALUES (?, ?, ?)";
 
-        long ts = LocalDateTime.now().toEpochSecond(ZoneOffset.UTC);
-
         db.execSQL(ResultInsertionQuery, new Object[]{ ts, testName, ResultDataCollector.serializeResult(result) });
+
+    }
+
+    public void delete(int key) {
+
+        SupportSQLiteDatabase db = this.dbHelper.getWritableDatabase();
+
+        String deletionQuery = "DELETE FROM RESULTS WHERE ID = " + key;
+
+        db.execSQL(deletionQuery);
 
     }
 

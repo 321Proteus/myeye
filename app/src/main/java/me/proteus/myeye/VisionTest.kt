@@ -1,10 +1,15 @@
 package me.proteus.myeye
 
+import android.content.Intent
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import me.proteus.myeye.io.ResultDataCollector
+import me.proteus.myeye.io.ResultDataSaver
+import me.proteus.myeye.ui.TestResultActivity
 import me.proteus.myeye.ui.VisionTestLayoutActivity
+import java.time.LocalDateTime
+import java.time.ZoneOffset
 
 interface VisionTest {
 
@@ -12,7 +17,6 @@ interface VisionTest {
     val testIcon: ImageVector
 
     val stageCount: Int
-    val currentStage: Int
 
     val resultCollector: ResultDataCollector
 
@@ -21,7 +25,10 @@ interface VisionTest {
      * @param activity The canvas activity to display the layout
      */
     @Composable
-    fun DisplayStage(activity: VisionTestLayoutActivity, modifier: Modifier)
+    fun DisplayStage(activity: VisionTestLayoutActivity, modifier: Modifier, stages: List<SerializablePair>, isResult: Boolean)
+
+    @Composable
+    fun BeginTest(activity: VisionTestLayoutActivity, modifier: Modifier, isResult: Boolean, result: TestResult?)
 
     fun generateQuestion(): Any
 
@@ -29,8 +36,24 @@ interface VisionTest {
 
     fun checkAnswer(answer: String): Boolean
 
-    fun storeResult(question: String, answer: String)
+    fun storeResult(question: String, answer: String) {
+        resultCollector.addResult(question, answer)
+    }
 
-    fun endTest(activity: VisionTestLayoutActivity)
+
+     fun endTest(activity: VisionTestLayoutActivity) {
+
+         var localSaver = ResultDataSaver(activity.applicationContext)
+
+         var timestamp = LocalDateTime.now().toEpochSecond(ZoneOffset.UTC)
+         localSaver.insert(this.testID, this.resultCollector.stages, timestamp)
+
+         val testLeavingIntent = Intent(activity, TestResultActivity::class.java)
+         testLeavingIntent.putExtra("IS_AFTER", true)
+         testLeavingIntent.putExtra("RESULT_PARCEL", localSaver.lastResult)
+
+         activity.startActivity(testLeavingIntent)
+
+    }
 
 }

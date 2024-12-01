@@ -9,12 +9,20 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -22,7 +30,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import me.proteus.myeye.io.ResultDataSaver
-import me.proteus.myeye.TestResult
 import me.proteus.myeye.ui.theme.MyEyeTheme
 import me.proteus.myeye.visiontests.VisionTestUtils
 
@@ -48,12 +55,9 @@ fun ResultColumn(activity: ResultBrowserActivity, paddingValues: PaddingValues) 
     val dbConnector = ResultDataSaver(activity)
     dbConnector.select("*")
 
-    val data: List<TestResult> = dbConnector.resultData
+    var data by remember { mutableStateOf(dbConnector.resultData) }
 
-    for (i in data) print("$i ")
-    println()
-
-    Column (
+    LazyColumn (
         modifier = Modifier
             .fillMaxWidth()
             .padding(paddingValues),
@@ -61,7 +65,7 @@ fun ResultColumn(activity: ResultBrowserActivity, paddingValues: PaddingValues) 
         verticalArrangement = Arrangement.SpaceEvenly
     ) {
 
-        for (result in data) {
+        items(data) { result ->
 
             Box(
                 modifier = Modifier
@@ -70,40 +74,62 @@ fun ResultColumn(activity: ResultBrowserActivity, paddingValues: PaddingValues) 
                     .background(Color.LightGray)
                     .clickable {
                         val intent: Intent = Intent(activity, TestResultActivity::class.java)
+                        intent.putExtra("IS_AFTER", false)
                         intent.putExtra("RESULT_PARCEL", result)
                         activity.startActivity(intent)
                     }
             ) {
                 Row(
-                    verticalAlignment = Alignment.CenterVertically
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween
                 ) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+
+                        Box(
+                            modifier = Modifier
+                                .padding(vertical = 8.dp, horizontal = 16.dp)
+                                .aspectRatio(1.0f)
+                                .clip(shape = RoundedCornerShape(15.dp))
+                                .background(MaterialTheme.colorScheme.primary),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Icon(
+                                imageVector = VisionTestUtils().getTestByID(result.testID).testIcon,
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.onPrimary
+                            )
+                        }
+                        Column(
+                            verticalArrangement = Arrangement.SpaceEvenly
+                        ) {
+                            Text(
+                                text = result.fullTestName,
+                                fontSize = 18.sp
+                            )
+                            Text(
+                                text = result.formattedTimestamp,
+                                fontSize = 14.sp
+                            )
+                        }
+                    }
+
                     Box(
                         modifier = Modifier
                             .padding(vertical = 8.dp, horizontal = 16.dp)
-                            .aspectRatio(1.0f)
-                            .clip(shape = RoundedCornerShape(15.dp))
-                            .background(MaterialTheme.colorScheme.primary),
-                        contentAlignment = Alignment.Center
+                            .aspectRatio(1.0f),
+                        contentAlignment = Alignment.Center,
                     ) {
                         Icon(
-                            imageVector = VisionTestUtils().getTestByID(result.testID).testIcon,
+                            modifier = Modifier
+                                .clickable {
+                                    dbConnector.delete(result.resultID)
+                                    data = data.filter { it.resultID != result.resultID }
+                                },
+                            imageVector = Icons.Filled.Delete,
                             contentDescription = null,
-                            tint = MaterialTheme.colorScheme.onPrimary
+                            tint = Color.DarkGray
                         )
                     }
-                    Column(
-                        verticalArrangement = Arrangement.SpaceEvenly
-                    ) {
-                        Text(
-                            text = result.fullTestName,
-                            fontSize = 18.sp
-                        )
-                        Text(
-                            text = result.formattedTimestamp,
-                            fontSize = 14.sp
-                        )
-                    }
-
                 }
             }
 

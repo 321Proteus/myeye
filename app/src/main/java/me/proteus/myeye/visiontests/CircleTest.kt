@@ -1,6 +1,5 @@
 package me.proteus.myeye.visiontests
 
-import android.content.Intent
 import android.content.res.Configuration
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -16,7 +15,6 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
@@ -31,12 +29,12 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
-import me.proteus.myeye.MenuActivity
 import me.proteus.myeye.R
 import me.proteus.myeye.ScreenScalingUtils.getScreenInfo
+import me.proteus.myeye.SerializablePair
+import me.proteus.myeye.TestResult
 import me.proteus.myeye.VisionTest
 import me.proteus.myeye.io.ResultDataCollector
-import me.proteus.myeye.io.ResultDataSaver
 import me.proteus.myeye.ui.VisionTestLayoutActivity
 import java.util.Random
 import kotlin.math.*
@@ -46,13 +44,9 @@ class CircleTest : VisionTest {
     override val testID: String = "TEST_CIRCLE"
     override val testIcon: ImageVector = Icons.Outlined.AccountCircle
 
-    private var correctAnswer: String = ""
-
     override val stageCount: Int = 10
 
-    private var currentStageState = mutableIntStateOf(1)
-
-    override val currentStage: Int get() = currentStageState.intValue
+    private var correctAnswer: String = ""
 
     override val resultCollector: ResultDataCollector = ResultDataCollector()
 
@@ -68,7 +62,7 @@ class CircleTest : VisionTest {
     }
 
     @Composable
-    fun LetterContainer(directions: String, modifier: Modifier = Modifier) {
+    fun LetterContainer(currentStage: Int, directions: String, key: String?, modifier: Modifier = Modifier) {
 
         val config = LocalConfiguration.current
         val opticianSansFamily = FontFamily(Font(R.font.opticiansans))
@@ -82,15 +76,17 @@ class CircleTest : VisionTest {
             Row(
                 modifier = Modifier
                     .fillMaxWidth(),
-                horizontalArrangement = Arrangement.Center
+                horizontalArrangement = Arrangement.Center,
+
             ) {
-                for (char in directions) {
+                for (i in 0..<directions.length) {
                     Text(
                         text = "C",
-                        color = Color.Black,
-                        fontSize = pixelSize * 20,
+                        modifier = modifier
+                            .rotate(directions[i].digitToInt().toFloat() * 90f),
+                        color =(if (key != null) (if (directions[i] == key[i]) Color.Green else Color.Red) else Color.Black),
+                        fontSize = pixelSize * 15,
                         fontFamily = opticianSansFamily,
-                        modifier = modifier.padding(8.dp).rotate(char.digitToInt().toFloat() * 90f)
                     )
                 }
             }
@@ -101,13 +97,15 @@ class CircleTest : VisionTest {
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                for (char in directions) {
+                for (i in 0..<directions.length) {
                     Text(
                         text = "C",
-                        color = Color.Black,
-                        fontSize = pixelSize * 20,
+                        modifier = modifier
+                            .rotate(directions[i].digitToInt().toFloat() * 90f),
+                        color =(if (key != null) (if (directions[i] == key[i]) Color.Green else Color.Red) else Color.Black),
+                        fontSize = pixelSize * 15,
                         fontFamily = opticianSansFamily,
-                        modifier = modifier.padding(8.dp).rotate(char.digitToInt().toFloat() * 90f)
+
                     )
                 }
             }
@@ -138,10 +136,38 @@ class CircleTest : VisionTest {
     }
 
     @Composable
-    override fun DisplayStage(activity: VisionTestLayoutActivity, modifier: Modifier) {
+    override fun BeginTest(
+        activity: VisionTestLayoutActivity,
+        modifier: Modifier,
+        isResult: Boolean,
+        result: TestResult?
+    ) {
 
-        var question: String by remember { mutableStateOf(this.generateQuestion().toString()) }
-        var answers: Array<String> by remember { mutableStateOf(this.getExampleAnswers()) }
+        if (isResult) {
+
+            var resultStages = ResultDataCollector.deserializeResult(result!!.result)
+
+            DisplayStage(activity, modifier, resultStages, true)
+
+        } else {
+
+            var testStages: MutableList<SerializablePair> = ArrayList<SerializablePair>()
+
+            for (i in 0..<stageCount) {
+                testStages.add(SerializablePair(this.generateQuestion().toString(), generateDirections()))
+            }
+
+            DisplayStage(activity, modifier, testStages, false)
+
+        }
+
+    }
+
+
+    @Composable
+    override fun DisplayStage(activity: VisionTestLayoutActivity, modifier: Modifier, stages: List<SerializablePair>, isResult: Boolean) {
+
+        var stageIterator: Int by remember { mutableIntStateOf(0) }
 
         Column(
             modifier = Modifier
@@ -157,37 +183,63 @@ class CircleTest : VisionTest {
                     .padding(bottom = 16.dp),
                 contentAlignment = Alignment.Center,
             ) {
-                LetterContainer(
-                    directions = question,
-                    modifier = modifier
-                )
-            }
 
-            ButtonRow(
-                onRegenerate = {
-                    question = this@CircleTest.generateQuestion().toString()
-                    answers = this@CircleTest.getExampleAnswers()
-                },
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
 
-                onSizeDecrease = {
+                    LetterContainer(
+                        directions = stages[stageIterator].first,
+                        key = null,
+                        currentStage = stageIterator,
+                        modifier = modifier
+                    )
 
-                    if (currentStage < stageCount) {
-
-                        // TODO: Zaimplementowac polecenia glosowe do zbierania odpowiedzi
-                        storeResult(question, generateDirections())
-
-                        currentStageState.intValue++
-                        question = this@CircleTest.generateQuestion().toString()
-                        answers = this@CircleTest.getExampleAnswers()
-
-                    } else {
-
-                        storeResult(question, generateDirections())
-                        endTest(activity)
-
+                    if (isResult) {
+                        LetterContainer(
+                            directions = stages[stageIterator].second,
+                            key = stages[stageIterator].first,
+                            currentStage = stageIterator,
+                            modifier = modifier
+                        )
                     }
                 }
-            )
+
+            }
+
+            if (!isResult) {
+                ButtonRow(
+                    onRegenerate = { stageIterator++ },
+
+                    onSizeDecrease = {
+
+                        if (stageIterator < stageCount - 1) {
+
+                            // TODO: Zaimplementowac polecenia glosowe do zbierania odpowiedzi
+                            storeResult(stages[stageIterator].first, generateDirections())
+                            stageIterator++
+                        } else {
+                            storeResult(stages[stageIterator].first, generateDirections())
+                            if (!isResult) endTest(activity)
+                        }
+                    }
+                )
+            } else {
+                Row(
+                    modifier = modifier
+                        .fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceEvenly,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Button(onClick = { stageIterator-- }) {
+                        Text(text = "Poprzedni etap")
+                    }
+                    Button(onClick = { stageIterator++ }) {
+                        Text(text = "Następny etap")
+                    }
+                }
+            }
+
         }
     }
 
@@ -238,16 +290,6 @@ class CircleTest : VisionTest {
     override fun storeResult(question: String, answer: String) {
 
         resultCollector.addResult(question, answer)
-
-    }
-
-    override fun endTest(activity: VisionTestLayoutActivity) {
-
-        var localSaver = ResultDataSaver(activity.applicationContext)
-        localSaver.insert("TEST_CIRCLE", resultCollector.stages)
-
-        val testLeavingIntent = Intent(activity, MenuActivity::class.java)
-        activity.startActivity(testLeavingIntent)
 
     }
 

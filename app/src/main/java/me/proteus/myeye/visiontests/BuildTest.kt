@@ -7,6 +7,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import me.proteus.myeye.MenuActivity
+import me.proteus.myeye.SerializablePair
+import me.proteus.myeye.TestResult
 import me.proteus.myeye.VisionTest
 import me.proteus.myeye.io.ResultDataCollector
 import me.proteus.myeye.io.ResultDataSaver
@@ -20,14 +22,26 @@ class BuildTest : VisionTest {
 
     override val stageCount: Int
         get() = TODO("Not yet implemented")
-    override var currentStage: Int
-        get() = TODO("Not yet implemented")
-        set(value) { currentStage = value }
 
     override val resultCollector: ResultDataCollector = ResultDataCollector()
 
     @Composable
-    override fun DisplayStage(activity: VisionTestLayoutActivity, modifier: Modifier) {
+    override fun DisplayStage(
+        activity: VisionTestLayoutActivity,
+        modifier: Modifier,
+        stages: List<SerializablePair>,
+        isResult: Boolean
+    ) {
+        TODO("Not yet implemented")
+    }
+
+    @Composable
+    override fun BeginTest(
+        activity: VisionTestLayoutActivity,
+        modifier: Modifier,
+        isResult: Boolean,
+        result: TestResult?
+    ) {
         TODO("Not yet implemented")
     }
 
@@ -51,16 +65,6 @@ class BuildTest : VisionTest {
 
         var random = Random()
         return Array<String>(4) { random.nextInt().toString() }
-
-    }
-
-    override fun endTest(activity: VisionTestLayoutActivity) {
-
-        var localSaver = ResultDataSaver(activity.applicationContext)
-        localSaver.insert("TEST_BUILD", resultCollector.stages)
-
-        val testLeavingIntent = Intent(activity, MenuActivity::class.java)
-        activity.startActivity(testLeavingIntent)
 
     }
 

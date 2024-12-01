@@ -14,16 +14,18 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import me.proteus.myeye.MenuActivity
+import me.proteus.myeye.SerializablePair
+import me.proteus.myeye.TestResult
 import me.proteus.myeye.VisionTest
 import me.proteus.myeye.io.ResultDataCollector
 import me.proteus.myeye.io.ResultDataSaver
@@ -41,19 +43,54 @@ class ExampleTest : VisionTest {
 
     override val stageCount: Int = 10
 
-    private var currentStageState = mutableIntStateOf(1)
-
-    override val currentStage: Int get() = currentStageState.intValue
-
     override val resultCollector: ResultDataCollector = ResultDataCollector()
 
+
     @Composable
-    override fun DisplayStage(activity: VisionTestLayoutActivity, modifier: Modifier) {
+    override fun BeginTest(
+        activity: VisionTestLayoutActivity,
+        modifier: Modifier,
+        isResult: Boolean,
+        result: TestResult?
+    ) {
 
-        println("$score $currentStage")
+        if (isResult) {
 
-        var question by remember { mutableStateOf(this.generateQuestion().toString()) }
-        var answers by remember { mutableStateOf(this.getExampleAnswers()) }
+            var resultStages: MutableList<SerializablePair> = ArrayList<SerializablePair>()
+            val resultData = ResultDataCollector.deserializeResult(result!!.result)
+
+            for (i in 0..stageCount-1) {
+                resultStages.add(resultData[i])
+            }
+
+            DisplayStage(activity, modifier, resultStages, true)
+
+        } else {
+
+            var testStages: MutableList<SerializablePair> = ArrayList<SerializablePair>()
+
+            for (i in 0..stageCount-1) {
+
+                correctAnswer = this.generateQuestion().toString()
+
+                var variants = this.getExampleAnswers()
+                var joinedVariants = variants.joinToString(separator = "")
+
+                testStages.add(SerializablePair(correctAnswer, joinedVariants))
+            }
+
+            DisplayStage(activity, modifier, testStages, false)
+
+        }
+
+    }
+
+    @Composable
+    override fun DisplayStage(activity: VisionTestLayoutActivity, modifier: Modifier, stages: List<SerializablePair>, isResult: Boolean) {
+
+        var stageIterator: Int by remember { mutableIntStateOf(0) }
+
+        println("$score $stageIterator")
 
         Column(
             modifier = Modifier
@@ -72,40 +109,73 @@ class ExampleTest : VisionTest {
                     .padding(bottom = 32.dp),
                 contentAlignment = Alignment.Center,
             ) {
-                Text(text = question.toString(), fontSize = 48.sp)
+
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
+                    Text(
+                        text = stages[stageIterator].first,
+                        color = Color.Black,
+                        fontSize = 48.sp
+                    )
+
+                    if (isResult) {
+                        Text(
+                            text = stages[stageIterator].second,
+                            color = (if (stages[stageIterator].first == stages[stageIterator].second) Color.Green else Color.Red),
+                            fontSize = 48.sp
+                        )
+                    }
+                }
+
+
+
             }
 
-            Row(
-                modifier = modifier
-                    .fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceEvenly,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                for (ans in answers) {
-                    Button(onClick = {
+            if (!isResult) {
+                Row(
+                    modifier = modifier
+                        .fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceEvenly,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    for (el in stages[stageIterator].second) {
 
-                        if (this@ExampleTest.checkAnswer(ans)) score++
+                        var ans: String = el.toString()
 
-                        if (currentStage < stageCount) {
+                        Button(onClick = {
 
-                            storeResult(question, ans)
+                            if (ans == stages[stageIterator].first) score++
 
-                            currentStageState.intValue++
-                            question = this@ExampleTest.generateQuestion().toString()
-                            answers = this@ExampleTest.getExampleAnswers()
+                            if (stageIterator < stageCount - 1) {
+                                storeResult(stages[stageIterator].first, ans)
+                                stageIterator++
+                            } else {
+                                storeResult(stages[stageIterator].first, ans)
+                                if (!isResult) endTest(activity)
+                            }
 
-                        } else {
-
-                            storeResult(question, ans)
-                            endTest(activity)
-
+                        }) {
+                            Text(if (isResult) "Dalej" else ans)
                         }
-
-                    }) {
-                        Text(ans)
+                    }
+                }
+            } else {
+                Row(
+                    modifier = modifier
+                        .fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceEvenly,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Button(onClick = { stageIterator-- }) {
+                        Text(text = "Poprzedni etap")
+                    }
+                    Button(onClick = { stageIterator++ }) {
+                        Text(text = "Następny etap")
                     }
                 }
             }
+
         }
 
     }
@@ -149,16 +219,6 @@ class ExampleTest : VisionTest {
 
         var random = Random()
         return ((abs(random.nextInt() % 25)) + 65).toChar()
-    }
-
-    override fun endTest(activity: VisionTestLayoutActivity) {
-
-        var localSaver = ResultDataSaver(activity.applicationContext)
-        localSaver.insert("TEST_INFO", resultCollector.stages)
-
-        val testLeavingIntent = Intent(activity, MenuActivity::class.java)
-        activity.startActivity(testLeavingIntent)
-
     }
 
 }

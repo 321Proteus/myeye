@@ -2,9 +2,10 @@ package me.proteus.myeye.ui
 
 import android.content.Intent
 import android.os.Bundle
-import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.viewModels
+import androidx.biometric.BiometricPrompt
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -14,6 +15,7 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -25,31 +27,55 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.content.ContextCompat
 import androidx.core.content.IntentCompat
+import androidx.fragment.app.FragmentActivity
 import me.proteus.myeye.TestResult
-import me.proteus.myeye.io.ResultDataCollector
 import me.proteus.myeye.ui.theme.MyEyeTheme
 import me.proteus.myeye.visiontests.VisionTestUtils
 
-class TestResultActivity : ComponentActivity() {
+class TestResultActivity : FragmentActivity() {
+
+    private val viewModel: AuthorizationViewModel by viewModels()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
             MyEyeTheme {
-                TestResultScreen(intent)
+                TestResultScreen(
+                    intent,
+                    viewModel,
+                    navigate = { data -> openTest(data) },
+                    this
+                )
             }
         }
     }
+
+    fun openTest(data: TestResult?) {
+
+        val detailsIntent: Intent = Intent(this, VisionTestLayoutActivity::class.java)
+        detailsIntent.putExtra("IS_RESULT", true)
+        detailsIntent.putExtra("RESULT_PARCEL", data)
+        this.startActivity(detailsIntent)
+
+    }
+
 }
 
 @Composable
-fun TestResultScreen(inputIntent: Intent) {
+fun TestResultScreen(
+    inputIntent: Intent,
+    viewModel: AuthorizationViewModel,
+    navigate: (TestResult?) -> Unit,
+    activity: TestResultActivity
+    ) {
 
     val resultData = IntentCompat.getParcelableExtra(inputIntent, "RESULT_PARCEL", TestResult::class.java)
     if (resultData == null) return;
 
-    val isAfterTest = inputIntent.getBooleanExtra("TEST_ENDED", true)
+    val isAfterTest = inputIntent.getBooleanExtra("IS_AFTER", false)
 
     Scaffold(
         content = { innerPadding ->
@@ -98,15 +124,8 @@ fun TestResultScreen(inputIntent: Intent) {
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
 
-                    Box(
-                    ) {
+                    Box() {
                         Text("Data wykonania: " + resultData.formattedTimestamp)
-                    }
-
-                    val stageData = ResultDataCollector.deserializeResult(resultData.result)
-
-                    for (i in 1..stageData.size) {
-                        Text("Etap $i: Pytanie ${stageData[i-1].first}, odpowiedź ${stageData[i-1].second}")
                     }
 
                     if (isAfterTest) {
@@ -118,6 +137,31 @@ fun TestResultScreen(inputIntent: Intent) {
                             fontSize = 24.sp
                         )
                     }
+
+                    Box(
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Button(
+                            modifier = Modifier,
+                            onClick = {
+
+                                if (viewModel.isAuthorized) {
+                                    navigate(resultData)
+                                } else {
+                                    authenticateUser(activity,
+                                        onSuccess = {
+                                            viewModel.authenticate()
+                                            activity.openTest(resultData)
+                                        },
+                                        onFailure = { println("Autoryzacja nieudana") }
+                                    )
+                                }
+
+                            }
+                        ) {
+                            Text(text = "Zobacz wyniki", fontSize = 20.sp)
+                        }
+                    }
                 }
 
 
@@ -127,3 +171,30 @@ fun TestResultScreen(inputIntent: Intent) {
     )
 }
 
+
+fun authenticateUser(activity: FragmentActivity, onSuccess: () -> Unit, onFailure: () -> Unit) {
+
+    val executor = ContextCompat.getMainExecutor(activity)
+
+
+    val prompt = BiometricPrompt(activity, executor,
+        object : BiometricPrompt.AuthenticationCallback() {
+            override fun onAuthenticationSucceeded(result: BiometricPrompt.AuthenticationResult) {
+                onSuccess()
+            }
+
+            override fun onAuthenticationFailed() {
+                onFailure()
+            }
+        }
+    )
+
+    val promptInfo = BiometricPrompt.PromptInfo.Builder()
+        .setTitle("Potwierdź swoją tożsamość")
+        .setDescription("Użyj odcisku palca lub hasła, aby wyświetlić wyniki testu")
+        .setNegativeButtonText("Anuluj")
+        .build()
+
+    prompt.authenticate(promptInfo)
+
+}
