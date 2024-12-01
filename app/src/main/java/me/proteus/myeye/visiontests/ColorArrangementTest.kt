@@ -468,7 +468,7 @@ class ColorArrangementTest : VisionTest {
             var idx = b.indexOf(a[i])
             var j = 0
 
-            while(connected.indexOf(a.subList(idx, idx+j).joinToString(" ")) != -1) j++
+            while(idx + j < a.size && connected.indexOf(a.subList(idx, idx+j).joinToString(" ")) != -1) j++
 
             map[i] = idx
 
