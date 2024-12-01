@@ -36,7 +36,9 @@ interface VisionTest {
 
     fun checkAnswer(answer: String): Boolean
 
-    fun storeResult(question: String, answer: String) {}
+    fun storeResult(question: String, answer: String) {
+        resultCollector.addResult(question, answer)
+    }
 
 
      fun endTest(activity: VisionTestLayoutActivity) {

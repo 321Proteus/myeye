@@ -10,10 +10,13 @@ import androidx.compose.foundation.gestures.rememberDraggableState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -68,109 +71,201 @@ class ColorArrangementTest : VisionTest {
     ) {
 
         var difficulty: Int by remember { mutableIntStateOf(1) }
+        var resultIterator: Int by remember { mutableIntStateOf(0) }
 
         var colorArray: ArrayList<String> = ArrayList()
-        for (i in stages) colorArray.add(i.first)
+        var answerArray: ArrayList<String> = ArrayList()
 
-        var stageColors by remember { mutableStateOf(prepareArray(
-            colorArray,
-            difficultyScale[difficulty],
-            10,
-            colorOffset
-        ).toList()) }
+
+        for (i in stages) {
+            colorArray.add(if (isResult) i.second else i.first)
+            answerArray.add(if (isResult) i.first else i.second)
+        }
+
+        var stageColors by remember { mutableStateOf(
+            (if (isResult) colorArray[resultIterator].split(' ') else
+                prepareArray(
+                colorArray,
+                difficultyScale[difficulty],
+                10,
+                colorOffset
+            ).toList()))
+        }
+
+        var sortedColors by remember { mutableStateOf(
+            if (isResult) answerArray[resultIterator].split(' ') else null
+        ) }
 
         var currentlyDragged by remember { mutableStateOf<Int?>(null) }
         var currentOffset by remember { mutableFloatStateOf(0f) }
 
         Column(
-            horizontalAlignment = Alignment.CenterHorizontally
+            modifier = Modifier
+                .fillMaxSize(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.SpaceBetween
         ) {
-            LazyColumn(
+            Row(
                 modifier = Modifier
-                    .fillMaxHeight(0.9f),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.SpaceEvenly
+                    .fillMaxWidth()
+                    .fillMaxHeight(0.9f)
+                    .padding(horizontal = 16.dp),
+                horizontalArrangement = if (isResult) Arrangement.SpaceBetween else Arrangement.SpaceEvenly
             ) {
-                 itemsIndexed(stageColors) { index, item ->
 
-                     var isTopEdge = (index == 0)
-                     var isBottomEdge = (index == 9)
 
-                     var edgeShape: Shape = RoundedCornerShape(
-                         topStart = (if (isTopEdge) 15.dp else 0.dp),
-                         topEnd = (if (isTopEdge) 15.dp else 0.dp),
-                         bottomEnd = (if (isBottomEdge) 15.dp else 0.dp),
-                         bottomStart = (if (isBottomEdge) 15.dp else 0.dp)
-                     )
-
+                if (isResult) {
                     Column(
                         modifier = Modifier
-                            .offset { IntOffset(0, if (currentlyDragged == index) currentOffset.toInt() else 0) }
-                            .fillMaxHeight(0.1f)
-                            .scale(scaleX = (if (index == currentlyDragged) 1.5f else 1f), scaleY = 1f)
-                            .zIndex((if (index == currentlyDragged) 1f else 0f))
-                            .draggable(
-                                enabled = (!(isTopEdge || isBottomEdge)),
-                                orientation = Orientation.Vertical,
-                                state = rememberDraggableState { delta ->
-
-                                    if (currentlyDragged == null) currentlyDragged = index
-                                    currentOffset += delta
-
-                                    val currentIndex = currentlyDragged ?: return@rememberDraggableState
-
-                                    val targetIndex = when {
-                                        currentOffset > 120 -> currentIndex + 1
-                                        currentOffset < -120 -> currentIndex - 1
-                                        else -> null
-                                    }
-
-                                    targetIndex?.let { target ->
-                                        if (targetIndex == 0 || targetIndex == 9) return@rememberDraggableState
-                                        if (target in stageColors.indices) {
-
-                                            stageColors = stageColors.toMutableList().apply {
-                                                val draggedItem = removeAt(currentIndex)
-                                                add(target, draggedItem)
-                                            }
-                                            currentlyDragged = target
-                                            currentOffset = 0f
-                                        }
-                                    }
-                                },
-                                onDragStopped = {
-                                    currentlyDragged = null
-                                    currentOffset = 0f
-                                }
-                            )
+                            .weight(1f),
+                        horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        Box(
-                            modifier = Modifier
-                                .fillMaxWidth(0.4f)
-                                .height(60.dp)
-                                .clip(edgeShape)
-                                .background(Color(parseColor(item)))
-                                .then(
-                                    if ((isTopEdge) || isBottomEdge) {
-                                        Modifier.border(
-                                            width = (2.dp),
-                                            brush = SolidColor(Color.Black),
-                                            shape = edgeShape
-                                        )
-                                    } else Modifier
-                                ),
 
-                            contentAlignment = Alignment.Center
+                        Text("Poprawna\nodpowiedź")
+
+                        LazyColumn(
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.SpaceEvenly
                         ) {
-                            Text(
-                                modifier = Modifier
-                                    .scale(scaleX = (if (index == currentlyDragged) 0.66f else 1f), scaleY = 1f),
-                                text = "${getHue(item)}"
-                            )
+                            itemsIndexed(sortedColors!!) { index, item ->
+
+                                var isTopEdge = (index == 0)
+                                var isBottomEdge = (index == 9)
+
+                                var edgeShape: Shape = RoundedCornerShape(
+                                    topStart = (if (isTopEdge) 15.dp else 0.dp),
+                                    topEnd = (if (isTopEdge) 15.dp else 0.dp),
+                                    bottomEnd = (if (isBottomEdge) 15.dp else 0.dp),
+                                    bottomStart = (if (isBottomEdge) 15.dp else 0.dp)
+                                )
+
+                                Column(
+                                    modifier = Modifier
+                                        .fillMaxHeight(0.1f)
+                                ) {
+                                    Box(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .height(60.dp)
+                                            .clip(edgeShape)
+                                            .background(Color(parseColor(item)))
+                                            .then(
+                                                if ((isTopEdge) || isBottomEdge) {
+                                                    Modifier.border(
+                                                        width = (2.dp),
+                                                        brush = SolidColor(Color.Black),
+                                                        shape = edgeShape
+                                                    )
+                                                } else Modifier
+                                            ),
+
+                                        contentAlignment = Alignment.Center
+                                    ) {
+                                        Text("${getHue(item)}")
+                                    }
+                                }
+                            }
                         }
                     }
-
                 }
+
+                Column(
+                    modifier = Modifier
+                        .weight(1f),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+
+                    if (isResult) Text("Odpowiedź\nużytkownika")
+
+                    LazyColumn(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.SpaceEvenly
+                    ) {
+                        itemsIndexed(stageColors) { index, item ->
+
+                            var isTopEdge = (index == 0)
+                            var isBottomEdge = (index == 9)
+
+                            var edgeShape: Shape = RoundedCornerShape(
+                                topStart = (if (isTopEdge) 15.dp else 0.dp),
+                                topEnd = (if (isTopEdge) 15.dp else 0.dp),
+                                bottomEnd = (if (isBottomEdge) 15.dp else 0.dp),
+                                bottomStart = (if (isBottomEdge) 15.dp else 0.dp)
+                            )
+
+                            Column(
+                                modifier = Modifier
+                                    .offset { IntOffset(0, if (currentlyDragged == index) currentOffset.toInt() else 0) }
+                                    .fillMaxHeight(0.1f)
+                                    .scale(if (index == currentlyDragged) 1.5f else 1f, 1f)
+                                    .zIndex((if (index == currentlyDragged) 1f else 0f))
+                                    .draggable(
+                                        enabled = (!(isTopEdge || isBottomEdge)),
+                                        orientation = Orientation.Vertical,
+                                        state = rememberDraggableState { delta ->
+
+                                            if (currentlyDragged == null) currentlyDragged = index
+                                            currentOffset += delta
+
+                                            val currentIndex =
+                                                currentlyDragged ?: return@rememberDraggableState
+
+                                            val targetIndex = when {
+                                                currentOffset > 120 -> currentIndex + 1
+                                                currentOffset < -120 -> currentIndex - 1
+                                                else -> null
+                                            }
+
+                                            targetIndex?.let { target ->
+                                                if (targetIndex == 0 || targetIndex == 9) return@rememberDraggableState
+                                                if (target in stageColors.indices) {
+
+                                                    stageColors = stageColors.toMutableList().apply {
+                                                        val draggedItem = removeAt(currentIndex)
+                                                        add(target, draggedItem)
+                                                    }
+                                                    currentlyDragged = target
+                                                    currentOffset = 0f
+                                                }
+                                            }
+                                        },
+                                        onDragStopped = {
+                                            currentlyDragged = null
+                                            currentOffset = 0f
+                                        }
+                                    )
+                            ) {
+                                Box(
+                                    modifier = Modifier
+                                        .fillMaxWidth(if (isResult) 1f else 0.6f)
+                                        .height(60.dp)
+                                        .clip(edgeShape)
+                                        .background(Color(parseColor(item)))
+                                        .then(
+                                            if ((isTopEdge) || isBottomEdge) {
+                                                Modifier.border(
+                                                    width = (2.dp),
+                                                    brush = SolidColor(Color.Black),
+                                                    shape = edgeShape
+                                                )
+                                            } else Modifier
+                                        ),
+
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Text(
+                                        modifier = Modifier
+                                            .scale(if (index == currentlyDragged) 0.66f else 1f, 1f),
+                                        text = "${getHue(item)}"
+                                    )
+                                }
+                            }
+
+
+                        }
+                    }
+                }
+
             }
 
             Box(
@@ -178,6 +273,18 @@ class ColorArrangementTest : VisionTest {
             ) {
                 Button(
                     onClick = {
+
+                        if (isResult) {
+
+                            resultIterator++
+                            stageColors = colorArray[resultIterator].split(' ')
+                            sortedColors = answerArray[resultIterator].split(' ')
+                            return@Button
+
+                        }
+
+                        println("ohioskibidi")
+
                         if (difficulty < stageCount) {
 
                             var answer = stageColors.joinToString(" ")
@@ -185,29 +292,36 @@ class ColorArrangementTest : VisionTest {
                             var a = getScore(answer, "RELATIVE")
                             var b = getScore(answer, "LEVENSHTEIN")
 
-                            if ((a+b) / 2 >= 70 && (a+b)/ 2 < 100 && difficulty >= 4) {
+                            if ((a + b) / 2 >= 70 && (a + b) / 2 < 100 && difficulty >= 4) {
                                 colorOffset += 20
-                                println("${(a+b) / 2}Bez zmiany trudnosci")
-                            }
-                            else {
+                                println("${(a + b) / 2} Bez zmiany trudnosci")
+                            } else {
                                 colorOffset = 0
                                 difficulty++
                             }
 
-                            stageColors = prepareArray(colorArray, difficultyScale[difficulty], 10, colorOffset).toList()
+                            storeResult(stageColors.sortedBy { getHue(it) }.joinToString(" "), answer)
+                            stageColors = prepareArray(
+                                colorArray,
+                                difficultyScale[difficulty],
+                                10,
+                                colorOffset
+                            ).toList()
 
-                            println(difficulty)
-
+                        } else {
+                            storeResult(
+                                stageColors.sortedBy { getHue(it) }.joinToString(" "),
+                                stageColors.joinToString(" ")
+                            )
+                            endTest(activity)
                         }
-                        else println("I po tescie")
                     }
                 ) {
                     Text("Dalej")
                 }
             }
+
         }
-
-
 
     }
 
@@ -232,7 +346,15 @@ class ColorArrangementTest : VisionTest {
 
         } else {
 
-           // var list = ResultDataCollector.deserializeResult(result!!.result)
+            var inputList = ResultDataCollector.deserializeResult(result!!.result)
+
+            var list = ArrayList<SerializablePair>()
+
+            for (el in inputList) {
+                list.add(SerializablePair(el.first, el.second))
+            }
+
+            DisplayStage(activity, modifier, list, true)
 
         }
 
@@ -257,8 +379,6 @@ class ColorArrangementTest : VisionTest {
         var answeredArray = answer.split(' ').map { getHue(it) }
         var orderedArray = answeredArray.sorted()
         val size = answeredArray.size
-
-        println(answeredArray)
 
         var percent = 0
 
