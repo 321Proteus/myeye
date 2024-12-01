@@ -226,7 +226,6 @@ class ColorArrangementTest : VisionTest {
                                 startX = lc.positionInWindow().x
                                 startY = lc.positionInWindow().y
                                 println("$startX $startY")
-                                var k: Int = getScore(stageColors.joinToString(" "), "RELATIVE")
                             }
                     ) {
                         var correctnessMap = getCorrectnessMapping(sortedColors!!, stageColors)
