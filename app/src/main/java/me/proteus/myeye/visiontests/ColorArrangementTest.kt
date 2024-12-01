@@ -470,7 +470,7 @@ class ColorArrangementTest : VisionTest {
 
             while(idx + j < a.size && connected.indexOf(a.subList(idx, idx+j).joinToString(" ")) != -1) j++
 
-            map[i] = idx
+            if (idx != i) map[i] = idx
 
             i += j
             if (j > 1) i -= 1
