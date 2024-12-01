@@ -148,12 +148,7 @@ class CircleTest : VisionTest {
 
         if (isResult) {
 
-            var resultStages: MutableList<SerializablePair> = ArrayList<SerializablePair>()
-            val resultData = ResultDataCollector.deserializeResult(result!!.result)
-
-            for (i in 0..<stageCount) {
-                resultStages.add(resultData[i])
-            }
+            var resultStages = ResultDataCollector.deserializeResult(result!!.result)
 
             DisplayStage(activity, modifier, resultStages, true)
 
