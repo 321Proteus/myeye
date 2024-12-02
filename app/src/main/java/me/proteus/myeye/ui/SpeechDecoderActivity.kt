@@ -10,7 +10,6 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
@@ -21,8 +20,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.unit.sp
 import androidx.core.graphics.ColorUtils
-import androidx.core.graphics.drawable.toDrawable
-import androidx.core.graphics.toColor
+import me.proteus.myeye.io.HTTPDownloader
 import me.proteus.myeye.io.SpeechDecoderResult
 import org.vosk.Model
 import org.vosk.Recognizer
@@ -63,6 +61,9 @@ class SpeechDecoderActivity : ComponentActivity() {
     @OptIn(ExperimentalMaterial3Api::class)
     fun AppContent() {
         var result by remember { mutableStateOf(ArrayList<SpeechDecoderResult>().toList()) }
+
+        var downloader = HTTPDownloader()
+        downloader.download("https://google.com", "Test")
 
         Scaffold(
             topBar = {

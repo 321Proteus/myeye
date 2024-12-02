@@ -38,6 +38,12 @@ android {
         compose = true
     }
 
+    packaging {
+        resources {
+            excludes += arrayOf("META-INF/INDEX.LIST", "META-INF/io.netty.versions.properties")
+        }
+    }
+
     sourceSets["main"].assets.srcDirs("src/main/assets")
 
 }
@@ -58,6 +64,7 @@ dependencies {
     implementation(libs.vosk)
     implementation(libs.androidx.appcompat)
     implementation(libs.gson)
+    implementation(libs.async.http.client)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
