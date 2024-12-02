@@ -3,6 +3,8 @@ package me.proteus.myeye.io;
 import org.asynchttpclient.*;
 
 import java.io.File;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 
 public class HTTPDownloader {
 
@@ -15,15 +17,19 @@ public class HTTPDownloader {
 
     public void download(String url, String path) {
 
-        client.prepareGet(url).execute().toCompletableFuture()
-                .thenAccept(res -> {
-                    System.out.println("Headers:");
-                    System.out.println(res.getHeaders());
-                })
-                .exceptionally(e -> {
-                   System.out.println("Exception: " + e.getMessage());
-                   return null;
-                });
+        Executors.newSingleThreadExecutor().execute(() -> {
+            client.prepareGet(url).execute().toCompletableFuture()
+                    .thenAccept(res -> {
+                        System.out.println("Headers:");
+                        System.out.println(res.getHeaders());
+                    })
+                    .exceptionally(e -> {
+                        System.out.println("Exception: " + e.getMessage());
+                        return null;
+                    });
+
+        });
+
 
     }
 
