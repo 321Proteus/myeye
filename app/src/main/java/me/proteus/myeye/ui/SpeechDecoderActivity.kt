@@ -2,7 +2,6 @@ package me.proteus.myeye.ui
 
 import android.Manifest
 import android.annotation.SuppressLint
-import android.content.Context
 import android.content.pm.PackageManager
 import android.media.AudioFormat
 import android.media.AudioRecord
@@ -80,19 +79,56 @@ class SpeechDecoderActivity : ComponentActivity() {
     }
 
     @SuppressLint("MissingPermission")
+    fun getMaximumSampleRate(): Int {
+
+        val all = listOf(48000, 44100, 22050, 16000, 11025, 8000)
+
+        for (rate in all) {
+            val bufsize = AudioRecord.getMinBufferSize(
+                rate,
+                AudioFormat.CHANNEL_IN_MONO,
+                AudioFormat.ENCODING_PCM_16BIT
+            )
+
+            if (bufsize != AudioRecord.ERROR && bufsize != AudioRecord.ERROR_BAD_VALUE) {
+                val audioRecord = AudioRecord(
+                    MediaRecorder.AudioSource.MIC,
+                    rate,
+                    AudioFormat.CHANNEL_IN_MONO,
+                    AudioFormat.ENCODING_PCM_16BIT,
+                    bufsize
+                )
+
+                if (audioRecord.state == AudioRecord.STATE_INITIALIZED) {
+                    audioRecord.release()
+                    return rate
+                }
+
+                audioRecord.release()
+            }
+        }
+
+        return 0
+
+    }
+
+    @SuppressLint("MissingPermission")
     private fun initializeVosk() {
 
         executor.execute {
 
+            val samplerate = getMaximumSampleRate()
+            println(samplerate)
+
             val bufferSize = AudioRecord.getMinBufferSize(
-                16000,
+                samplerate,
                 AudioFormat.CHANNEL_IN_MONO,
                 AudioFormat.ENCODING_PCM_16BIT
             )
 
             audioRecord = AudioRecord(
                 MediaRecorder.AudioSource.MIC,
-                16000,
+                samplerate,
                 AudioFormat.CHANNEL_IN_MONO,
                 AudioFormat.ENCODING_PCM_16BIT,
                 bufferSize
@@ -103,7 +139,7 @@ class SpeechDecoderActivity : ComponentActivity() {
             println(modelPath)
 
             model = Model(modelPath)
-            recognizer = Recognizer(model, 16000.0f)
+            recognizer = Recognizer(model, samplerate.toFloat())
             recognizer.setWords(true)
             recognizer.setPartialWords(true)
 
