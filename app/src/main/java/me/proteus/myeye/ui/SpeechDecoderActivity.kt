@@ -18,7 +18,11 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.unit.sp
+import androidx.core.graphics.ColorUtils
+import androidx.core.graphics.drawable.toDrawable
+import androidx.core.graphics.toColor
 import me.proteus.myeye.io.SpeechDecoderResult
 import org.vosk.Model
 import org.vosk.Recognizer
@@ -69,7 +73,6 @@ class SpeechDecoderActivity : ComponentActivity() {
                 LazyColumn(
                     modifier = Modifier
                         .fillMaxSize()
-                        .background(Color.Gray)
                         .padding(innerPadding)
                 ) {
                     itemsIndexed(result) { index, item ->
@@ -77,10 +80,13 @@ class SpeechDecoderActivity : ComponentActivity() {
                         Box() {
 
                             val line = "${item.word}"
+                            val probabilityColor = Color(ColorUtils.blendARGB(Color.Red.toArgb(), Color.Green.toArgb(), item.confidence))
+
                             Text(
                                 text = line,
                                 fontSize = 24.sp,
-                                lineHeight = 24.sp
+                                lineHeight = 24.sp,
+                                color = probabilityColor
                             )
 
                         }
