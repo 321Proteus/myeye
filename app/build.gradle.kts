@@ -37,6 +37,9 @@ android {
     buildFeatures {
         compose = true
     }
+
+    sourceSets["main"].assets.srcDirs("src/main/assets")
+
 }
 
 dependencies {
@@ -52,6 +55,8 @@ dependencies {
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
     implementation(libs.androidx.biometric)
+    implementation(libs.vosk)
+    implementation(libs.androidx.appcompat)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
