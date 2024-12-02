@@ -23,24 +23,24 @@ public class SpeechDecoderResult {
     public static ArrayList<SpeechDecoderResult> deserialize(String json) {
 
         ArrayList<SpeechDecoderResult> list = new ArrayList<>();
-
         JsonObject obj = JsonParser.parseString(json).getAsJsonObject();
 
-        JsonArray resultArray = obj.getAsJsonArray("result");
+        if (obj.has("result")) {
 
-        for (JsonElement el : resultArray) {
+            JsonArray resultArray = obj.getAsJsonArray("result");
+            for (JsonElement el : resultArray) {
 
-            JsonObject result = el.getAsJsonObject();
+                JsonObject result = el.getAsJsonObject();
+                System.out.println(result);
 
-            System.out.println(el);
+                list.add(new SpeechDecoderResult(
+                        result.get("conf").getAsFloat(),
+                        result.get("start").getAsFloat(),
+                        result.get("end").getAsFloat(),
+                        result.get("word").getAsString()
+                ));
 
-            list.add(new SpeechDecoderResult(
-                    result.get("conf").getAsFloat(),
-                    result.get("start").getAsFloat(),
-                    result.get("end").getAsFloat(),
-                    result.get("word").getAsString()
-            ));
-
+            }
         }
 
         return list;
