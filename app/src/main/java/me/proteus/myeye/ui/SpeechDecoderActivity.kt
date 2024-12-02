@@ -10,11 +10,16 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.sp
+import me.proteus.myeye.io.SpeechDecoderResult
 import org.vosk.Model
 import org.vosk.Recognizer
 import java.util.concurrent.ExecutorService
@@ -53,27 +58,45 @@ class SpeechDecoderActivity : ComponentActivity() {
     @Composable
     @OptIn(ExperimentalMaterial3Api::class)
     fun AppContent() {
-        var result by remember { mutableStateOf("Nasłuchuję...") }
+        var result by remember { mutableStateOf(ArrayList<SpeechDecoderResult>().toList()) }
 
         Scaffold(
             topBar = {
                 TopAppBar(title = { Text("Rozpoznawanie Mowy") })
             },
-            content = {
-                Box(
+            content = { innerPadding ->
+
+                LazyColumn(
                     modifier = Modifier
                         .fillMaxSize()
-                        .padding(it),
-                    contentAlignment = Alignment.Center
+                        .background(Color.Gray)
+                        .padding(innerPadding)
                 ) {
-                    Text(text = result, style = MaterialTheme.typography.bodyLarge)
+                    itemsIndexed(result) { index, item ->
+
+                        Box() {
+
+                            val line = "${item.word}"
+                            Text(
+                                text = line,
+                                fontSize = 24.sp,
+                                lineHeight = 24.sp
+                            )
+
+                        }
+
+                    }
                 }
             }
+
         )
 
         LaunchedEffect(Unit) {
             startRecognition { newResult ->
-                result = newResult
+                val words = SpeechDecoderResult.deserialize(newResult)
+                for (el in words) {
+                    result = result + el
+                }
             }
         }
     }

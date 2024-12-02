@@ -57,6 +57,7 @@ dependencies {
     implementation(libs.androidx.biometric)
     implementation(libs.vosk)
     implementation(libs.androidx.appcompat)
+    implementation(libs.gson)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
