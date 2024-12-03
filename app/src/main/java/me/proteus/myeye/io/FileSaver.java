@@ -2,6 +2,8 @@ package me.proteus.myeye.io;
 
 import android.content.Context;
 
+import net.lingala.zip4j.ZipFile;
+
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -27,6 +29,12 @@ public class FileSaver {
         this.fileDirectory = context.getFilesDir();
     }
 
+    public FileSaver(String path) {
+
+        this.testType = "";
+        this.fileDirectory = new File(path);
+    }
+
     private static List<File> scanDirectory(File path, boolean filesOnly) {
 
         return Arrays.stream(Objects.requireNonNull(path
@@ -36,7 +44,7 @@ public class FileSaver {
 
     }
 
-    public void getDirectoryTree(File path, int depth) {
+    public static void getDirectoryTree(File path, int depth) {
 
         List<File> tree = scanDirectory(path, false);
 
@@ -149,6 +157,22 @@ public class FileSaver {
 
         fw.close();
 
+    }
+
+    public static void unzip(File zip) {
+
+        String outputDirName = zip.getName().substring(0, zip.getName().length() - 4);
+
+        String path = zip.getParent();
+        System.out.println(path);
+
+        try (ZipFile extractor = new ZipFile(zip)) {
+            extractor.extractAll(path);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        boolean isDeleted = zip.delete();
     }
 
 }
