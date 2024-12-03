@@ -45,7 +45,7 @@ public class FileSaver {
 
     }
 
-    public void getDirectoryTree(File path, int depth) {
+    public static void getDirectoryTree(File path, int depth) {
 
         List<File> tree = scanDirectory(path, false);
 
