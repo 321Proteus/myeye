@@ -167,13 +167,13 @@ public class FileSaver {
         String path = zip.getParent();
         System.out.println(path);
 
-        try {
-            new ZipFile(zip).extractAll(path);
-        } catch (ZipException e) {
+        try (ZipFile extractor = new ZipFile(zip)) {
+            extractor.extractAll(path);
+        } catch (IOException e) {
             throw new RuntimeException(e);
         }
 
-        zip.delete();
+        boolean isDeleted = zip.delete();
     }
 
 }
