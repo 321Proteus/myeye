@@ -1,13 +1,12 @@
 package me.proteus.myeye.io;
 
-import net.lingala.zip4j.ZipFile;
-
 import org.asynchttpclient.*;
-
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.IOException;
-import java.util.concurrent.Executors;
+import java.util.concurrent.CompletableFuture;
+
+import io.netty.handler.codec.http.HttpHeaders;
 
 public class HTTPDownloader {
 
@@ -18,45 +17,66 @@ public class HTTPDownloader {
                 .setFollowRedirect(true));
     }
 
-    public void download(String url, String path, String name) {
+    public CompletableFuture<Void> download(String url, File output) {
 
-        Executors.newSingleThreadExecutor().execute(() -> client
-                .prepareGet(url).execute().toCompletableFuture()
-                .thenAccept(res -> {
-                    System.out.println(res.getStatusCode() + " " + res.getStatusText());
+        CompletableFuture<Void> promise = new CompletableFuture<>();
 
-                    new File(path).mkdirs();
+        File path = new File(output.getParent());
 
-//                    new FileSaver(path).getDirectoryTree(new File(path), 1);
+        if (!path.mkdirs() && !path.exists()) {
+            throw new RuntimeException("Sciezka do katalogu nie istnieje i nie mogla zostac utworzona");
+        }
 
-                    File zip = new File(path, name + ".zip");
+        FileOutputStream fos;
 
-                    try (FileOutputStream fos = new FileOutputStream(zip)) {
+        try {
+            fos = new FileOutputStream(output);
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
+        }
 
-                        fos.write(res.getResponseBodyAsBytes());
+        client.prepareGet(url).execute(new AsyncHandler<Void>() {
+                    private long total = 0;
+                    private long downloaded = 0;
 
-                        try {
-                            new ZipFile(zip).extractAll(path + "/" + name);
+                    @Override
+                            public State onStatusReceived(HttpResponseStatus responseStatus) throws Exception {
+                                System.out.println("Status: " + responseStatus.getStatusCode());
+                                return State.CONTINUE;
+                            }
 
-                            zip.delete();
+                            @Override
+                            public State onHeadersReceived(HttpHeaders headers) throws Exception {
+                                if (headers.contains("Content-Length")) {
+                                    total = Long.parseLong(headers.get("Content-Length"));
+                                    System.out.println("Do pobrania: " + total);
+                                }
+                                return State.CONTINUE;
+                            }
 
-                        } catch (IOException e) {
-                            System.out.println("beta");
-                            throw new RuntimeException(e);
-                        }
+                            @Override
+                            public State onBodyPartReceived(HttpResponseBodyPart bodyPart) throws Exception {
+                                fos.write(bodyPart.getBodyPartBytes());
+                                downloaded = bodyPart.length();
+                                System.out.println("Pobrano: " + fos.getChannel().size() + " bajtow");
+                                return State.CONTINUE;
+                            }
 
+                            @Override
+                            public void onThrowable(Throwable t) {
+                                promise.completeExceptionally(t);
+                            }
 
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
-                    }
+                            @Override
+                            public Void onCompleted() throws Exception {
+                                fos.close();
+                                promise.complete(null);
+                                return null;
+                            }
 
+                });
 
-                })
-                .exceptionally(e -> {
-                    System.out.println("Exception: " + e.getMessage());
-                    return null;
-                }));
-
+        return promise;
 
     }
 

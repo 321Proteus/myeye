@@ -18,12 +18,15 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.graphics.ColorUtils
+import me.proteus.myeye.io.FileSaver
 import me.proteus.myeye.io.HTTPDownloader
 import me.proteus.myeye.io.SpeechDecoderResult
 import org.vosk.Model
 import org.vosk.Recognizer
+import java.io.File
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
@@ -33,6 +36,7 @@ class SpeechDecoderActivity : ComponentActivity() {
     private lateinit var model: Model
     private lateinit var audioRecord: AudioRecord
     private var executor: ExecutorService = Executors.newSingleThreadExecutor()
+    private var modelName: String = "vosk-model-small-pl-0.22"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -42,6 +46,7 @@ class SpeechDecoderActivity : ComponentActivity() {
                 if (isGranted) {
                     initializeVosk()
                 } else {
+                    println("Brak uprawnien")
                 }
             }
 
@@ -61,9 +66,6 @@ class SpeechDecoderActivity : ComponentActivity() {
     @OptIn(ExperimentalMaterial3Api::class)
     fun AppContent() {
         var result by remember { mutableStateOf(ArrayList<SpeechDecoderResult>().toList()) }
-
-        var downloader = HTTPDownloader()
-        downloader.download("https://google.com", "Test")
 
         Scaffold(
             topBar = {
@@ -99,12 +101,15 @@ class SpeechDecoderActivity : ComponentActivity() {
         )
 
         LaunchedEffect(Unit) {
-            startRecognition { newResult ->
-                val words = SpeechDecoderResult.deserialize(newResult)
-                for (el in words) {
-                    result = result + el
+            if (::recognizer.isInitialized) {
+                startRecognition { newResult ->
+                    val words = SpeechDecoderResult.deserialize(newResult)
+                    for (el in words) {
+                        result = result + el
+                    }
                 }
             }
+
         }
     }
 
@@ -164,14 +169,35 @@ class SpeechDecoderActivity : ComponentActivity() {
                 bufferSize
             )
 
-            var modelPath: String = this.filesDir.path + "/model"
+            var modelDir: File = File(this.filesDir.path + "/models/" + modelName)
 
-            println(modelPath)
+            if (!modelDir.exists()) {
 
-            model = Model(modelPath)
-            recognizer = Recognizer(model, samplerate.toFloat())
-            recognizer.setWords(true)
-            recognizer.setPartialWords(true)
+                var rootUrl = "https://alphacephei.com/vosk/models/"
+                var downloaderPromise = HTTPDownloader().download(
+                    "$rootUrl$modelName.zip",
+                    File(modelDir.path + ".zip")
+                )
+
+                downloaderPromise.thenRun {
+                    FileSaver.unzip(File(modelDir.path + ".zip"))
+                    model = Model(modelDir.path)
+                    recognizer = Recognizer(model, samplerate.toFloat()).apply {
+                        setWords(true)
+                        setPartialWords(true)
+                    }
+
+                } .exceptionally { e ->
+                    println("Error: $e")
+                    return@exceptionally null
+                }
+
+            } else {
+                model = Model(modelDir.path)
+                recognizer = Recognizer(model, samplerate.toFloat())
+                recognizer.setWords(true)
+                recognizer.setPartialWords(true)
+            }
 
         }
     }
@@ -193,9 +219,9 @@ class SpeechDecoderActivity : ComponentActivity() {
     }
 
     override fun onDestroy() {
-        super.onDestroy()
+          super.onDestroy()
         audioRecord.stop()
         audioRecord.release()
-        executor.shutdown()
+          executor.shutdown()
     }
 }
