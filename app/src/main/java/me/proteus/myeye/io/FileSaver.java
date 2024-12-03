@@ -2,6 +2,9 @@ package me.proteus.myeye.io;
 
 import android.content.Context;
 
+import net.lingala.zip4j.ZipFile;
+import net.lingala.zip4j.exception.ZipException;
+
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -155,6 +158,22 @@ public class FileSaver {
 
         fw.close();
 
+    }
+
+    public static void unzip(File zip) {
+
+        String outputDirName = zip.getName().substring(0, zip.getName().length() - 4);
+
+        String path = zip.getParent();
+        System.out.println(path);
+
+        try {
+            new ZipFile(zip).extractAll(path);
+        } catch (ZipException e) {
+            throw new RuntimeException(e);
+        }
+
+        zip.delete();
     }
 
 }
