@@ -1,5 +1,7 @@
 package me.proteus.myeye.io;
 
+import net.lingala.zip4j.ZipFile;
+
 import org.asynchttpclient.*;
 
 import java.io.File;
@@ -18,28 +20,42 @@ public class HTTPDownloader {
 
     public void download(String url, String path, String name) {
 
-        Executors.newSingleThreadExecutor().execute(() -> {
-            client.prepareGet(url).execute().toCompletableFuture()
-                    .thenAccept(res -> {
-                        System.out.println(res.getStatusCode() + " " + res.getStatusText());
+        Executors.newSingleThreadExecutor().execute(() -> client
+                .prepareGet(url).execute().toCompletableFuture()
+                .thenAccept(res -> {
+                    System.out.println(res.getStatusCode() + " " + res.getStatusText());
 
-                        File f = new File(path, name);
-                        try (FileOutputStream fos = new FileOutputStream(f)) {
+                    new File(path).mkdirs();
 
-                            fos.write(res.getResponseBodyAsBytes());
+//                    new FileSaver(path).getDirectoryTree(new File(path), 1);
+
+                    File zip = new File(path, name + ".zip");
+
+                    try (FileOutputStream fos = new FileOutputStream(zip)) {
+
+                        fos.write(res.getResponseBodyAsBytes());
+
+                        try {
+                            new ZipFile(zip).extractAll(path + "/" + name);
+
+                            zip.delete();
 
                         } catch (IOException e) {
-                            e.printStackTrace();
+                            System.out.println("beta");
+                            throw new RuntimeException(e);
                         }
 
 
-                    })
-                    .exceptionally(e -> {
-                        System.out.println("Exception: " + e.getMessage());
-                        return null;
-                    });
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
 
-        });
+
+                })
+                .exceptionally(e -> {
+                    System.out.println("Exception: " + e.getMessage());
+                    return null;
+                }));
 
 
     }
