@@ -27,6 +27,12 @@ public class FileSaver {
         this.fileDirectory = context.getFilesDir();
     }
 
+    public FileSaver(String path) {
+
+        this.testType = "";
+        this.fileDirectory = new File(path);
+    }
+
     private static List<File> scanDirectory(File path, boolean filesOnly) {
 
         return Arrays.stream(Objects.requireNonNull(path
