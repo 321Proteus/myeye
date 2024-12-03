@@ -3,7 +3,6 @@ package me.proteus.myeye.io;
 import android.content.Context;
 
 import net.lingala.zip4j.ZipFile;
-import net.lingala.zip4j.exception.ZipException;
 
 import java.io.File;
 import java.io.FileWriter;

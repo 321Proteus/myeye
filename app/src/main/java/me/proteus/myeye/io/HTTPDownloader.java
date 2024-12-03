@@ -35,13 +35,13 @@ public class HTTPDownloader {
                 private long downloaded = 0;
 
                 @Override
-                public State onStatusReceived(HttpResponseStatus responseStatus) throws Exception {
+                public State onStatusReceived(HttpResponseStatus responseStatus) {
                     System.out.println("Status: " + responseStatus.getStatusCode());
                     return State.CONTINUE;
                 }
 
                 @Override
-                public State onHeadersReceived(HttpHeaders headers) throws Exception {
+                public State onHeadersReceived(HttpHeaders headers) {
                     if (headers.contains("Content-Length")) {
                         total = Long.parseLong(headers.get("Content-Length"));
                         System.out.println("Do pobrania: " + total);
