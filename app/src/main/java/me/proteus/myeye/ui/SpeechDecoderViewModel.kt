@@ -12,9 +12,7 @@ class SpeechDecoderViewModel : ViewModel() {
     var result: List<SpeechDecoderResult> by mutableStateOf(listOf())
 
     fun addWord(word: SpeechDecoderResult) {
-        result.toMutableList().apply {
-            add(word)
-        }
+        result = result + word
     }
 
 }
