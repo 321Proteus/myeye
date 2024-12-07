@@ -27,7 +27,6 @@ class SpeechDecoderViewModel(application: Application) : AndroidViewModel(applic
     private lateinit var audioRecord: AudioRecord
     private var executor: ExecutorService = Executors.newSingleThreadExecutor()
     private var modelName: String = "vosk-model-small-pl-0.22"
-    private var context = getApplication<Application>().applicationContext
 
     val modelGrammar = listOf<String>("a", "a", "a", "a", "be", "ce", "de", "e", "f",
         "gdzie", "ha", "i", "jod", "ka", "el", "m", "n", "o", "p", "q", "r", "er",
@@ -77,6 +76,9 @@ class SpeechDecoderViewModel(application: Application) : AndroidViewModel(applic
 
     @SuppressLint("MissingPermission")
     fun initialize() {
+
+        val context = getApplication<Application>().applicationContext
+
         executor.execute {
 
             val samplerate = getMaximumSampleRate()
