@@ -17,10 +17,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.unit.sp
 import androidx.core.graphics.ColorUtils
+import me.proteus.myeye.io.ASRViewModel
 
 class SpeechDecoderActivity : ComponentActivity() {
 
-    private val viewModel: SpeechDecoderViewModel by viewModels()
+    private val viewModel: ASRViewModel by viewModels()
 
 
     override fun onCreate(savedInstanceState: Bundle?) {

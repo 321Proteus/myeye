@@ -1,4 +1,4 @@
-package me.proteus.myeye.ui
+package me.proteus.myeye.io
 
 import android.annotation.SuppressLint
 import android.app.Application
@@ -6,21 +6,16 @@ import android.media.AudioFormat
 import android.media.AudioRecord
 import android.media.MediaRecorder
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.ViewModel
-import me.proteus.myeye.io.FileSaver
-import me.proteus.myeye.io.HTTPDownloader
-import me.proteus.myeye.io.SpeechDecoderResult
 import org.vosk.Model
 import org.vosk.Recognizer
 import java.io.File
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
-class SpeechDecoderViewModel(application: Application) : AndroidViewModel(application) {
+class ASRViewModel(application: Application) : AndroidViewModel(application) {
 
     private lateinit var recognizer: Recognizer
     private lateinit var model: Model
@@ -144,7 +139,6 @@ class SpeechDecoderViewModel(application: Application) : AndroidViewModel(applic
 
         }
     }
-
 
      fun startRecognition(onResult: (String) -> Unit) {
         executor.execute {
