@@ -42,8 +42,8 @@ class SpeechDecoderActivity : ComponentActivity() {
 
     private val viewModel: SpeechDecoderViewModel by viewModels()
 
-    val modelGrammar = listOf<String>("a", "a", "a", "a", "b", "c", "d", "e", "f",
-        "gdzie", "hak", "i", "jod", "ka", "el", "m", "n", "o", "p", "q", "r", "er",
+    val modelGrammar = listOf<String>("a", "a", "a", "a", "be", "ce", "de", "e", "f",
+        "gdzie", "ha", "i", "jod", "ka", "el", "m", "n", "o", "p", "q", "r", "er",
         "es", "te", "u", "wał", "wu", "ix", "igrek", "zet",
         "jeden", "dwa", "trzy", "cztery", "pięć", "sześć", "siedem", "osiem", "dziewięć", "zero"
     )
@@ -76,7 +76,7 @@ class SpeechDecoderActivity : ComponentActivity() {
     @OptIn(ExperimentalMaterial3Api::class)
     fun AppContent() {
 
-        var result = viewModel.result
+        val result = viewModel.result
 
         Scaffold(
             topBar = {
@@ -149,7 +149,6 @@ class SpeechDecoderActivity : ComponentActivity() {
 
     @SuppressLint("MissingPermission")
     private fun initializeVosk() {
-
         executor.execute {
 
             val samplerate = getMaximumSampleRate()
@@ -182,10 +181,8 @@ class SpeechDecoderActivity : ComponentActivity() {
                 downloaderPromise.thenRun {
                     FileSaver.unzip(File(modelDir.path + ".zip"))
                     model = Model(modelDir.path)
-                    recognizer = Recognizer(model, samplerate.toFloat()).apply {
-                        setWords(true)
-                        setPartialWords(true)
-                    }
+
+                    initRecognizer(samplerate)
 
                 } .exceptionally { e ->
                     println("Error: $e")
@@ -194,21 +191,27 @@ class SpeechDecoderActivity : ComponentActivity() {
 
             } else {
                 model = Model(modelDir.path)
-                recognizer = Recognizer(model, samplerate.toFloat()).apply {
-                    setWords(true)
-                    setPartialWords(true)
-                }
-//                recognizer.setGrammar('[' + modelGrammar.joinToString(",") + ']')
+                initRecognizer(samplerate)
+            }
+        }
+    }
+
+    fun initRecognizer(samplerate: Int) {
+
+        recognizer = Recognizer(model, samplerate.toFloat()).apply {
+            setWords(true)
+            setPartialWords(true)
+            setGrammar("[\"" + modelGrammar.joinToString(
+                separator = "\",\"",
+            ) + "\"]")
+        }
+
+        startRecognition { newResult ->
+            val words = SpeechDecoderResult.deserialize(newResult)
+            for (el in words) {
+                viewModel.addWord(el)
             }
 
-            startRecognition { newResult ->
-
-                val words = SpeechDecoderResult.deserialize(newResult)
-                for (el in words) {
-                    viewModel.addWord(el)
-                }
-
-            }
         }
     }
 
