@@ -7,9 +7,11 @@ import android.media.AudioFormat
 import android.media.AudioRecord
 import android.media.MediaRecorder
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.viewModels
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
@@ -28,6 +30,7 @@ import org.vosk.Recognizer
 import java.io.File
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
+import kotlin.collections.plus
 
 class SpeechDecoderActivity : ComponentActivity() {
 
@@ -36,6 +39,14 @@ class SpeechDecoderActivity : ComponentActivity() {
     private lateinit var audioRecord: AudioRecord
     private var executor: ExecutorService = Executors.newSingleThreadExecutor()
     private var modelName: String = "vosk-model-small-pl-0.22"
+
+    private val viewModel: SpeechDecoderViewModel by viewModels()
+
+    val modelGrammar = listOf<String>("a", "a", "a", "a", "b", "c", "d", "e", "f",
+        "gdzie", "hak", "i", "jod", "ka", "el", "m", "n", "o", "p", "q", "r", "er",
+        "es", "te", "u", "wał", "wu", "ix", "igrek", "zet",
+        "jeden", "dwa", "trzy", "cztery", "pięć", "sześć", "siedem", "osiem", "dziewięć", "zero"
+    )
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -64,7 +75,8 @@ class SpeechDecoderActivity : ComponentActivity() {
     @Composable
     @OptIn(ExperimentalMaterial3Api::class)
     fun AppContent() {
-        var result by remember { mutableStateOf(ArrayList<SpeechDecoderResult>().toList()) }
+
+        var result = viewModel.result
 
         Scaffold(
             topBar = {
@@ -99,17 +111,6 @@ class SpeechDecoderActivity : ComponentActivity() {
 
         )
 
-        LaunchedEffect(Unit) {
-            if (::recognizer.isInitialized) {
-                startRecognition { newResult ->
-                    val words = SpeechDecoderResult.deserialize(newResult)
-                    for (el in words) {
-                        result = result + el
-                    }
-                }
-            }
-
-        }
     }
 
     @SuppressLint("MissingPermission")
@@ -193,13 +194,24 @@ class SpeechDecoderActivity : ComponentActivity() {
 
             } else {
                 model = Model(modelDir.path)
-                recognizer = Recognizer(model, samplerate.toFloat())
-                recognizer.setWords(true)
-                recognizer.setPartialWords(true)
+                recognizer = Recognizer(model, samplerate.toFloat()).apply {
+                    setWords(true)
+                    setPartialWords(true)
+                }
+//                recognizer.setGrammar('[' + modelGrammar.joinToString(",") + ']')
             }
 
+            startRecognition { newResult ->
+
+                val words = SpeechDecoderResult.deserialize(newResult)
+                for (el in words) {
+                    viewModel.addWord(el)
+                }
+
+            }
         }
     }
+
 
     private fun startRecognition(onResult: (String) -> Unit) {
         executor.execute {
@@ -218,9 +230,9 @@ class SpeechDecoderActivity : ComponentActivity() {
     }
 
     override fun onDestroy() {
-          super.onDestroy()
+        super.onDestroy()
         audioRecord.stop()
         audioRecord.release()
-          executor.shutdown()
+        executor.shutdown()
     }
 }
