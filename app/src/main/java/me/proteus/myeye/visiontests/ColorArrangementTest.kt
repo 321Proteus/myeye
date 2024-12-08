@@ -26,6 +26,8 @@ import androidx.compose.material.icons.automirrored.outlined.List
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.material3.Button
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.getValue
@@ -49,6 +51,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import me.proteus.myeye.R
 import me.proteus.myeye.SerializablePair
+import me.proteus.myeye.TestResult
 import me.proteus.myeye.VisionTest
 import me.proteus.myeye.io.ResultDataCollector
 import me.proteus.myeye.ui.VisionTestLayoutActivity
@@ -73,30 +76,27 @@ class ColorArrangementTest : VisionTest {
         onUpdate: (String) -> Unit
     ) {
 
-        var difficulty: Int by remember { mutableIntStateOf(1) }
-        var resultIterator: Int by remember { mutableIntStateOf(0) }
+        println(stage.first)
 
-        var colorArray: ArrayList<String> = ArrayList()
-        var answerArray: ArrayList<String> = ArrayList()
+        val inputColors: List<String>
+        val sortedColors: List<String>
 
-//        for (i in stages) {
-//            colorArray.add(if (isResult) i.second else i.first)
-//            answerArray.add(if (isResult) i.first else i.second)
-//        }
-
-        var stageColors by remember { mutableStateOf(
-            (if (isResult) colorArray[resultIterator].split(' ') else
-                prepareArray(
-                colorArray,
-                difficultyScale[difficulty],
-                10,
-                colorOffset
-            ).toList()))
+        if (isResult) {
+            inputColors = stage.second.split(' ')
+            sortedColors = stage.first.split(' ')
+        } else {
+            inputColors = stage.first.split(' ')
+            sortedColors = inputColors.sortedBy { getHue(it) }
         }
 
-        var sortedColors by remember { mutableStateOf(
-            if (isResult) answerArray[resultIterator].split(' ') else null
-        ) }
+
+        var stageColors by remember {
+            mutableStateOf(inputColors)
+        }
+
+        LaunchedEffect(inputColors) {
+            stageColors = inputColors
+        }
 
         var currentlyDragged by remember { mutableStateOf<Int?>(null) }
         var currentOffset by remember { mutableFloatStateOf(0f) }
@@ -114,7 +114,6 @@ class ColorArrangementTest : VisionTest {
                     .padding(horizontal = 16.dp),
                 horizontalArrangement = if (isResult) Arrangement.SpaceBetween else Arrangement.SpaceEvenly
             ) {
-
 
                 Column(
                     modifier = Modifier
@@ -304,48 +303,7 @@ class ColorArrangementTest : VisionTest {
                 contentAlignment = Alignment.Center
             ) {
                 Button(
-                    onClick = {
-
-                        if (isResult) {
-
-                            resultIterator++
-                            stageColors = colorArray[resultIterator].split(' ')
-                            sortedColors = answerArray[resultIterator].split(' ')
-                            return@Button
-
-                        }
-
-                        if (difficulty < stageCount) {
-
-                            var answer = stageColors.joinToString(" ")
-
-                            var a = getScore(answer, "RELATIVE")
-                            var b = getScore(answer, "LEVENSHTEIN")
-
-                            if ((a + b) / 2 >= 70 && (a + b) / 2 < 100 && difficulty >= 4) {
-                                colorOffset += 20
-                                println("${(a + b) / 2} Bez zmiany trudnosci")
-                            } else {
-                                colorOffset = 0
-                                difficulty++
-                            }
-
-                            storeResult(stageColors.sortedBy { getHue(it) }.joinToString(" "), answer)
-                            stageColors = prepareArray(
-                                colorArray,
-                                difficultyScale[difficulty],
-                                10,
-                                colorOffset
-                            ).toList()
-
-                        } else {
-                            storeResult(
-                                stageColors.sortedBy { getHue(it) }.joinToString(" "),
-                                stageColors.joinToString(" ")
-                            )
-                            endTest(activity)
-                        }
-                    }
+                    onClick = { onUpdate(stageColors.joinToString(" ")) }
                 ) {
                     Text("Dalej")
                 }
@@ -355,12 +313,80 @@ class ColorArrangementTest : VisionTest {
 
     }
 
-    override fun generateQuestion(): String {
-        TODO("Not yet implemented")
+
+    @Composable
+    override fun BeginTest(
+        activity: VisionTestLayoutActivity,
+        isResult: Boolean,
+        result: TestResult?
+    ) {
+        colors = activity.resources.getStringArray(R.array.farnsworth_colors)
+        var startDifficulty = 1
+
+        var stageList = remember {
+            mutableListOf<SerializablePair>().apply {
+                if (isResult) {
+                    val resultData = ResultDataCollector.deserializeResult(result!!.result)
+                    for (i in 0..<resultData.size) {
+                        add(resultData[i])
+                    }
+                } else {
+                    for (i in 0..<stageCount) {
+                        var pair = SerializablePair(
+                            generateQuestion(startDifficulty).toString(),
+                            getExampleAnswers().joinToString(" ")
+                        )
+                        add(pair)
+                        startDifficulty++
+                    }
+                }
+            }
+
+        }
+
+        var stageIterator by remember { mutableIntStateOf(0) }
+        var currentStage = stageList[stageIterator]
+
+        DisplayStage(activity, currentStage, isResult) { answer ->
+
+            //println("Answer: $answer")
+            storeResult(currentStage.first, answer)
+            stageIterator++
+            println(stageIterator)
+
+//            var a = getScore(answer, "RELATIVE")
+//            var b = getScore(answer, "LEVENSHTEIN")
+//
+//            var srednia = (a + b) / 2
+//
+//            if (srednia >= 70 && srednia < 100 && difficulty >= 4) {
+//                colorOffset += 20
+//                println("${(a + b) / 2} Bez zmiany trudnosci")
+//            } else {
+//                colorOffset = 0
+//                difficulty++
+//            }
+//            var correct = answer.split(" ").sortedBy { getHue(it) }.joinToString(" ")
+//
+//            storeResult(correct, answer)
+
+            // zwieksz colorOffset gdy wynik jest bliski 100
+
+        }
+
+    }
+
+    override fun generateQuestion(stage: Int?): String {
+        return prepareArray(
+            old = colors.toList(),
+            freq = (if (stage != null) difficultyScale[stage] else 7),
+            count = 10,
+            offset = colorOffset
+        ).joinToString(" ")
     }
 
     override fun getExampleAnswers(): Array<String> {
-        TODO("Not yet implemented")
+        return arrayOf()
     }
 
     override fun checkAnswer(answer: String): Boolean {
@@ -460,21 +486,21 @@ class ColorArrangementTest : VisionTest {
         return hsv[0]
     }
 
-    fun prepareArray(old: List<String>, n: Int, limit: Int, offset: Int = 0): ArrayList<String> {
+    fun prepareArray(old: List<String>, freq: Int, count: Int, offset: Int = 0): ArrayList<String> {
 
         var new = ArrayList<String>()
         var i: Int = offset
 
-        while(new.size < limit) {
+        while(new.size < count) {
             new.add(old[i % old.size])
-            i += n
+            i += freq
         }
 
-        new = ArrayList(new.subList(0, limit))
+        new = ArrayList(new.subList(0, count))
         var begin = new.first()
         var end = new.last()
 
-        new = ArrayList(new.subList(1, limit - 1))
+        new = ArrayList(new.subList(1, count - 1))
 
         new.shuffle()
         new.add(0, begin)
