@@ -34,6 +34,8 @@ interface VisionTest {
     @Composable
     fun BeginTest(activity: VisionTestLayoutActivity, isResult: Boolean, result: TestResult?) {
 
+        var stageIterator by remember { mutableIntStateOf(0) }
+
         var stageList = remember {
             mutableListOf<SerializablePair>().apply {
                 if (isResult) {
@@ -44,16 +46,17 @@ interface VisionTest {
                 } else {
                     for (i in 0..<stageCount) {
                         var pair = SerializablePair(
-                            generateQuestion().toString(),
+                            generateQuestion(stageIterator).toString(),
                             getExampleAnswers().joinToString(" ")
                         )
                         add(pair)
+                        stageIterator++
                     }
                 }
             }
         }
 
-        var stageIterator by remember { mutableIntStateOf(0) }
+        stageIterator = 0
         var currentStage by remember { mutableStateOf(stageList[stageIterator]) }
 
         DisplayStage(activity, currentStage, isResult) { answer ->
@@ -61,7 +64,7 @@ interface VisionTest {
             if (answer == "REGENERATE") {
 
                 currentStage = SerializablePair(
-                    generateQuestion().toString(),
+                    generateQuestion(stageIterator).toString(),
                     getExampleAnswers().joinToString(" ")
                 )
                 println("Regenerate")
@@ -78,7 +81,7 @@ interface VisionTest {
 
     }
 
-    fun generateQuestion(): String
+    fun generateQuestion(stage: Int?): String
 
     fun getExampleAnswers(): Array<String>
 

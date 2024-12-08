@@ -210,7 +210,7 @@ class CircleTest : VisionTest {
         }
     }
 
-    override fun generateQuestion(): String {
+    override fun generateQuestion(stage: Int?): String {
 
         var question: String = generateDirections()
 

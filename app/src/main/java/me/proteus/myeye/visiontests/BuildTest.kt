@@ -30,7 +30,7 @@ class BuildTest : VisionTest {
         TODO("Not yet implemented")
     }
 
-    override fun generateQuestion(): String {
+    override fun generateQuestion(stage: Int?): String {
 
         return "Testowy test wzroku #2 (TEST_BUILD)"
 

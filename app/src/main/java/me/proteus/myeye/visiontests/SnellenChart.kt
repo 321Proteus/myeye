@@ -209,7 +209,7 @@ class SnellenChart : VisionTest {
 
     }
 
-    override fun generateQuestion(): String {
+    override fun generateQuestion(stage: Int?): String {
 
         var question: String = randomText(5)
 

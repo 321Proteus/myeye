@@ -119,7 +119,7 @@ class ExampleTest : VisionTest {
 
     }
 
-    override fun generateQuestion(): String {
+    override fun generateQuestion(stage: Int?): String {
 
         var question = randomChar().toString()
 
