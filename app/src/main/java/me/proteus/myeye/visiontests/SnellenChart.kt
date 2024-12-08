@@ -177,7 +177,7 @@ class SnellenChart : VisionTest {
 
             if (!isResult) {
                 ButtonRow(
-                    onRegenerate = { },
+                    onRegenerate = { onUpdate("REGENERATE") },
                     onSizeDecrease = {
                         onUpdate(randomText(5))
                         difficulty++

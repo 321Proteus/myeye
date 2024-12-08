@@ -5,6 +5,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.vector.ImageVector
 import me.proteus.myeye.io.ResultDataCollector
@@ -53,14 +54,25 @@ interface VisionTest {
         }
 
         var stageIterator by remember { mutableIntStateOf(0) }
-        var currentStage: SerializablePair = stageList[stageIterator]
+        var currentStage by remember { mutableStateOf(stageList[stageIterator]) }
 
         DisplayStage(activity, currentStage, isResult) { answer ->
 
-            println("Answer: $answer")
-            storeResult(currentStage.first, answer)
-            stageIterator++
-            println(stageIterator)
+            if (answer == "REGENERATE") {
+
+                currentStage = SerializablePair(
+                    generateQuestion().toString(),
+                    getExampleAnswers().joinToString(" ")
+                )
+                println("Regenerate")
+
+            } else {
+                println("Answer: $answer")
+                storeResult(currentStage.first, answer)
+                stageIterator++
+                println(stageIterator)
+            }
+
 
         }
 
@@ -75,7 +87,6 @@ interface VisionTest {
     fun storeResult(question: String, answer: String) {
         resultCollector.addResult(question, answer)
     }
-
 
      fun endTest(activity: VisionTestLayoutActivity) {
 
