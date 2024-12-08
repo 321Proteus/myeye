@@ -43,11 +43,9 @@ class ExampleTest : VisionTest {
     override val resultCollector: ResultDataCollector = ResultDataCollector()
 
     @Composable
-    override fun DisplayStage(activity: VisionTestLayoutActivity, stages: List<SerializablePair>, isResult: Boolean) {
+    override fun DisplayStage(activity: VisionTestLayoutActivity, stage: SerializablePair, isResult: Boolean, onUpdate: (String) -> Unit) {
 
-        var stageIterator: Int by remember { mutableIntStateOf(0) }
-
-        println("$score $stageIterator")
+        println("$score")
 
         Column(
             modifier = Modifier
@@ -71,15 +69,15 @@ class ExampleTest : VisionTest {
                     horizontalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
                     Text(
-                        text = stages[stageIterator].first,
+                        text = stage.first,
                         color = Color.Black,
                         fontSize = 48.sp
                     )
 
                     if (isResult) {
                         Text(
-                            text = stages[stageIterator].second,
-                            color = (if (stages[stageIterator].first == stages[stageIterator].second) Color.Green else Color.Red),
+                            text = stage.second,
+                            color = (if (stage.first == stage.second) Color.Green else Color.Red),
                             fontSize = 48.sp
                         )
                     }
@@ -96,24 +94,12 @@ class ExampleTest : VisionTest {
                     horizontalArrangement = Arrangement.SpaceEvenly,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    var buttons = stages[stageIterator].second.filter { it != ' ' }
+                    var buttons = stage.second.filter { it != ' ' }
                     for (el in buttons) {
 
                         var ans: String = el.toString()
 
-                        Button(onClick = {
-
-                            if (ans == stages[stageIterator].first) score++
-
-                            if (stageIterator < stageCount - 1) {
-                                storeResult(stages[stageIterator].first, ans)
-                                stageIterator++
-                            } else {
-                                storeResult(stages[stageIterator].first, ans)
-                                if (!isResult) endTest(activity)
-                            }
-
-                        }) {
+                        Button(onClick = { onUpdate(ans) }) {
                             Text(if (isResult) "Dalej" else ans)
                         }
                     }
@@ -125,12 +111,12 @@ class ExampleTest : VisionTest {
                     horizontalArrangement = Arrangement.SpaceEvenly,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Button(onClick = { stageIterator-- }) {
-                        Text(text = "Poprzedni etap")
-                    }
-                    Button(onClick = { stageIterator++ }) {
-                        Text(text = "Następny etap")
-                    }
+//                    Button(onClick = { stageIterator-- }) {
+//                        Text(text = "Poprzedni etap")
+//                    }
+//                    Button(onClick = { stageIterator++ }) {
+//                        Text(text = "Następny etap")
+//                    }
                 }
             }
 

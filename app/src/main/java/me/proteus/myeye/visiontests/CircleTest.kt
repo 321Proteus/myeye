@@ -136,9 +136,14 @@ class CircleTest : VisionTest {
     }
 
     @Composable
-    override fun DisplayStage(activity: VisionTestLayoutActivity, stages: List<SerializablePair>, isResult: Boolean) {
+    override fun DisplayStage(
+        activity: VisionTestLayoutActivity,
+        stage: SerializablePair,
+        isResult: Boolean,
+        onUpdate: (String) -> Unit
+    ) {
 
-        var stageIterator: Int by remember { mutableIntStateOf(0) }
+        var difficulty: Int by remember { mutableIntStateOf(0) }
 
         Column(
             modifier = Modifier
@@ -160,17 +165,17 @@ class CircleTest : VisionTest {
                 ) {
 
                     LetterContainer(
-                        directions = stages[stageIterator].first,
+                        directions = stage.first,
                         key = null,
-                        currentStage = stageIterator,
+                        currentStage = difficulty,
                         modifier = Modifier
                     )
 
                     if (isResult) {
                         LetterContainer(
-                            directions = stages[stageIterator].second,
-                            key = stages[stageIterator].first,
-                            currentStage = stageIterator,
+                            directions = stage.second,
+                            key = stage.first,
+                            currentStage = difficulty,
                             modifier = Modifier
                         )
                     }
@@ -180,19 +185,11 @@ class CircleTest : VisionTest {
 
             if (!isResult) {
                 ButtonRow(
-                    onRegenerate = { stageIterator++ },
+                    onRegenerate = { },
 
                     onSizeDecrease = {
-
-                        if (stageIterator < stageCount - 1) {
-
-                            // TODO: Zaimplementowac polecenia glosowe do zbierania odpowiedzi
-                            storeResult(stages[stageIterator].first, generateDirections())
-                            stageIterator++
-                        } else {
-                            storeResult(stages[stageIterator].first, generateDirections())
-                            if (!isResult) endTest(activity)
-                        }
+                        onUpdate(generateDirections())
+                        difficulty++
                     }
                 )
             } else {
@@ -202,12 +199,12 @@ class CircleTest : VisionTest {
                     horizontalArrangement = Arrangement.SpaceEvenly,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Button(onClick = { stageIterator-- }) {
-                        Text(text = "Poprzedni etap")
-                    }
-                    Button(onClick = { stageIterator++ }) {
-                        Text(text = "Następny etap")
-                    }
+//                    Button(onClick = { stageIterator-- }) {
+//                        Text(text = "Poprzedni etap")
+//                    }
+//                    Button(onClick = { stageIterator++ }) {
+//                        Text(text = "Następny etap")
+//                    }
                 }
             }
 

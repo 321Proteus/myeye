@@ -69,8 +69,9 @@ class ColorArrangementTest : VisionTest {
     @Composable
     override fun DisplayStage(
         activity: VisionTestLayoutActivity,
-        stages: List<SerializablePair>,
-        isResult: Boolean
+        stage: SerializablePair,
+        isResult: Boolean,
+        onUpdate: (String) -> Unit
     ) {
 
         var difficulty: Int by remember { mutableIntStateOf(1) }
@@ -79,11 +80,10 @@ class ColorArrangementTest : VisionTest {
         var colorArray: ArrayList<String> = ArrayList()
         var answerArray: ArrayList<String> = ArrayList()
 
-
-        for (i in stages) {
-            colorArray.add(if (isResult) i.second else i.first)
-            answerArray.add(if (isResult) i.first else i.second)
-        }
+//        for (i in stages) {
+//            colorArray.add(if (isResult) i.second else i.first)
+//            answerArray.add(if (isResult) i.first else i.second)
+//        }
 
         var stageColors by remember { mutableStateOf(
             (if (isResult) colorArray[resultIterator].split(' ') else
@@ -315,8 +315,6 @@ class ColorArrangementTest : VisionTest {
                             return@Button
 
                         }
-
-                        println("ohioskibidi")
 
                         if (difficulty < stageCount) {
 

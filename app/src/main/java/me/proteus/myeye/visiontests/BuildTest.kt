@@ -25,8 +25,9 @@ class BuildTest : VisionTest {
     @Composable
     override fun DisplayStage(
         activity: VisionTestLayoutActivity,
-        stages: List<SerializablePair>,
-        isResult: Boolean
+        stage: SerializablePair,
+        isResult: Boolean,
+        onUpdate: (String) -> Unit
     ) {
         TODO("Not yet implemented")
     }

@@ -130,9 +130,14 @@ class SnellenChart : VisionTest {
     }
 
     @Composable
-    override fun DisplayStage(activity: VisionTestLayoutActivity, stages: List<SerializablePair>, isResult: Boolean) {
+    override fun DisplayStage(
+        activity: VisionTestLayoutActivity,
+        stage: SerializablePair,
+        isResult: Boolean,
+        onUpdate: (String) -> Unit
+    ) {
 
-        var questionIterator: Int by remember { mutableIntStateOf(0) }
+        var difficulty by remember { mutableIntStateOf(0) }
 
         Column(
             modifier = Modifier
@@ -152,16 +157,16 @@ class SnellenChart : VisionTest {
                     horizontalArrangement = Arrangement.SpaceEvenly
                 ) {
                     LetterContainer(
-                        stage = questionIterator,
-                        text = stages[questionIterator].first,
+                        stage = difficulty,
+                        text = stage.first,
                         key = null,
                         modifier = Modifier
                     )
                     if (isResult) {
                         LetterContainer(
-                            stage = questionIterator,
-                            text = stages[questionIterator].second,
-                            key = stages[questionIterator].first,
+                            stage = difficulty,
+                            text = stage.second,
+                            key = stage.first,
                             modifier = Modifier
                         )
                     }
@@ -172,19 +177,10 @@ class SnellenChart : VisionTest {
 
             if (!isResult) {
                 ButtonRow(
-                    onRegenerate = { questionIterator++ },
+                    onRegenerate = { },
                     onSizeDecrease = {
-
-                        if (questionIterator < stageCount - 1) {
-
-                            // TODO: Zaimplementowac polecenia glosowe do zbierania odpowiedzi
-                            storeResult(stages[questionIterator].first, randomText(5))
-                            questionIterator++
-                        } else {
-                            storeResult(stages[questionIterator].first, randomText(5))
-                            if (!isResult) endTest(activity)
-
-                        }
+                        onUpdate(randomText(5))
+                        difficulty++
                     }
                 )
             } else {
@@ -195,12 +191,12 @@ class SnellenChart : VisionTest {
                     horizontalArrangement = Arrangement.SpaceEvenly,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Button(onClick = { questionIterator-- }) {
-                        Text(text = "Poprzedni etap")
-                    }
-                    Button(onClick = { questionIterator++ }) {
-                        Text(text = "Następny etap")
-                    }
+//                    Button(onClick = { questionIterator-- }) {
+//                        Text(text = "Poprzedni etap")
+//                    }
+//                    Button(onClick = { questionIterator++ }) {
+//                        Text(text = "Następny etap")
+//                    }
                 }
             }
 

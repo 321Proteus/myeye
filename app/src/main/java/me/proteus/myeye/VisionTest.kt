@@ -2,7 +2,10 @@ package me.proteus.myeye
 
 import android.content.Intent
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.vector.ImageVector
 import me.proteus.myeye.io.ResultDataCollector
 import me.proteus.myeye.io.ResultDataSaver
@@ -25,27 +28,41 @@ interface VisionTest {
      * @param activity The canvas activity to display the layout
      */
     @Composable
-    fun DisplayStage(activity: VisionTestLayoutActivity, stages: List<SerializablePair>, isResult: Boolean)
+    fun DisplayStage(activity: VisionTestLayoutActivity, stage: SerializablePair, isResult: Boolean, onUpdate: (String) -> Unit)
 
     @Composable
     fun BeginTest(activity: VisionTestLayoutActivity, isResult: Boolean, result: TestResult?) {
 
-        var stageList: MutableList<SerializablePair> = ArrayList<SerializablePair>()
-
-        if (isResult) {
-            val resultData = ResultDataCollector.deserializeResult(result!!.result)
-            for (i in 0..<resultData.size) {
-                stageList.add(resultData[i])
-            }
-        } else {
-            for (i in 0..<stageCount) {
-                var pair = SerializablePair(this.generateQuestion().toString(), this.getExampleAnswers().joinToString(" "))
-                println(pair.first + " " + pair.second)
-                stageList.add(pair)
+        var stageList = remember {
+            mutableListOf<SerializablePair>().apply {
+                if (isResult) {
+                    val resultData = ResultDataCollector.deserializeResult(result!!.result)
+                    for (i in 0..<resultData.size) {
+                        add(resultData[i])
+                    }
+                } else {
+                    for (i in 0..<stageCount) {
+                        var pair = SerializablePair(
+                            generateQuestion().toString(),
+                            getExampleAnswers().joinToString(" ")
+                        )
+                        add(pair)
+                    }
+                }
             }
         }
 
-        DisplayStage(activity, stageList, isResult)
+        var stageIterator by remember { mutableIntStateOf(0) }
+        var currentStage: SerializablePair = stageList[stageIterator]
+
+        DisplayStage(activity, currentStage, isResult) { answer ->
+
+            println("Answer: $answer")
+            storeResult(currentStage.first, answer)
+            stageIterator++
+            println(stageIterator)
+
+        }
 
     }
 
