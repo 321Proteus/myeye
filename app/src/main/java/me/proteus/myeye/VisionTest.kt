@@ -45,7 +45,7 @@ interface VisionTest {
             }
         }
 
-        DisplayStage(activity, stageList, false)
+        DisplayStage(activity, stageList, isResult)
 
     }
 
