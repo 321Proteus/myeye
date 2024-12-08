@@ -25,6 +25,12 @@ public class ResultDataCollector {
 
     }
 
+    public void addResult(SerializablePair p) {
+
+        stages.add(p);
+
+    }
+
 
     public static byte[] serializeResult(List<SerializablePair> input) {
 
