@@ -1,6 +1,5 @@
 package me.proteus.myeye.visiontests
 
-import android.content.Intent
 import android.content.res.Configuration
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -32,7 +31,6 @@ import androidx.compose.ui.unit.dp
 import me.proteus.myeye.R
 import me.proteus.myeye.ScreenScalingUtils.getScreenInfo
 import me.proteus.myeye.SerializablePair
-import me.proteus.myeye.TestResult
 import me.proteus.myeye.VisionTest
 import me.proteus.myeye.io.ResultDataCollector
 import me.proteus.myeye.ui.VisionTestLayoutActivity
@@ -127,41 +125,6 @@ class SnellenChart : VisionTest {
             Button(onClick = { onSizeDecrease() }) {
                 Text(text = "Dalej")
             }
-        }
-
-    }
-
-    @Composable
-    override fun BeginTest(
-        activity: VisionTestLayoutActivity,
-        modifier: Modifier,
-        isResult: Boolean,
-        result: TestResult?
-    ) {
-
-        if (isResult) {
-
-            var resultStages: MutableList<SerializablePair> = ArrayList<SerializablePair>(stageCount)
-
-            val resultData = ResultDataCollector.deserializeResult(result!!.result)
-
-
-            for (i in 0..<stageCount) {
-                resultStages.add(resultData[i])
-            }
-
-            DisplayStage(activity, modifier, resultStages, true)
-
-        } else {
-
-            var testStages: MutableList<SerializablePair> = ArrayList<SerializablePair>(stageCount)
-
-            for (i in 0..<stageCount) {
-                testStages.add(SerializablePair(this.generateQuestion().toString(), randomText(5)))
-            }
-
-            DisplayStage(activity, modifier, testStages, false)
-
         }
 
     }

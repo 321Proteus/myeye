@@ -28,7 +28,26 @@ interface VisionTest {
     fun DisplayStage(activity: VisionTestLayoutActivity, modifier: Modifier, stages: List<SerializablePair>, isResult: Boolean)
 
     @Composable
-    fun BeginTest(activity: VisionTestLayoutActivity, modifier: Modifier, isResult: Boolean, result: TestResult?)
+    fun BeginTest(activity: VisionTestLayoutActivity, modifier: Modifier, isResult: Boolean, result: TestResult?) {
+
+        var stageList: MutableList<SerializablePair> = ArrayList<SerializablePair>()
+
+        if (isResult) {
+            val resultData = ResultDataCollector.deserializeResult(result!!.result)
+            for (i in 0..<resultData.size) {
+                stageList.add(resultData[i])
+            }
+        } else {
+            for (i in 0..<stageCount) {
+                var pair = SerializablePair(this.generateQuestion().toString(), this.getExampleAnswers().joinToString(" "))
+                println(pair.first + " " + pair.second)
+                stageList.add(pair)
+            }
+        }
+
+        DisplayStage(activity, modifier, stageList, false)
+
+    }
 
     fun generateQuestion(): Any
 

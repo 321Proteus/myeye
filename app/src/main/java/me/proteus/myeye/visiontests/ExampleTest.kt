@@ -1,6 +1,5 @@
 package me.proteus.myeye.visiontests
 
-import android.content.Intent
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -23,12 +22,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import me.proteus.myeye.MenuActivity
 import me.proteus.myeye.SerializablePair
 import me.proteus.myeye.TestResult
 import me.proteus.myeye.VisionTest
 import me.proteus.myeye.io.ResultDataCollector
-import me.proteus.myeye.io.ResultDataSaver
 import me.proteus.myeye.ui.VisionTestLayoutActivity
 import java.util.Random
 import kotlin.math.abs
@@ -44,46 +41,6 @@ class ExampleTest : VisionTest {
     override val stageCount: Int = 10
 
     override val resultCollector: ResultDataCollector = ResultDataCollector()
-
-
-    @Composable
-    override fun BeginTest(
-        activity: VisionTestLayoutActivity,
-        modifier: Modifier,
-        isResult: Boolean,
-        result: TestResult?
-    ) {
-
-        if (isResult) {
-
-            var resultStages: MutableList<SerializablePair> = ArrayList<SerializablePair>()
-            val resultData = ResultDataCollector.deserializeResult(result!!.result)
-
-            for (i in 0..stageCount-1) {
-                resultStages.add(resultData[i])
-            }
-
-            DisplayStage(activity, modifier, resultStages, true)
-
-        } else {
-
-            var testStages: MutableList<SerializablePair> = ArrayList<SerializablePair>()
-
-            for (i in 0..stageCount-1) {
-
-                correctAnswer = this.generateQuestion().toString()
-
-                var variants = this.getExampleAnswers()
-                var joinedVariants = variants.joinToString(separator = "")
-
-                testStages.add(SerializablePair(correctAnswer, joinedVariants))
-            }
-
-            DisplayStage(activity, modifier, testStages, false)
-
-        }
-
-    }
 
     @Composable
     override fun DisplayStage(activity: VisionTestLayoutActivity, modifier: Modifier, stages: List<SerializablePair>, isResult: Boolean) {
@@ -182,9 +139,9 @@ class ExampleTest : VisionTest {
 
     override fun generateQuestion(): Any {
 
-        var question = randomChar()
+        var question = randomChar().toString()
 
-        correctAnswer = question.toString()
+        correctAnswer = question
 
         return question
 

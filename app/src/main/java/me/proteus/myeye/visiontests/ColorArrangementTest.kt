@@ -394,7 +394,7 @@ class ColorArrangementTest : VisionTest {
 
     }
 
-    override fun generateQuestion(): Any {
+    override fun generateQuestion(): String {
         TODO("Not yet implemented")
     }
 
