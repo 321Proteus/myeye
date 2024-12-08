@@ -96,7 +96,8 @@ class ExampleTest : VisionTest {
                     horizontalArrangement = Arrangement.SpaceEvenly,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    for (el in stages[stageIterator].second) {
+                    var buttons = stages[stageIterator].second.filter { it != ' ' }
+                    for (el in buttons) {
 
                         var ans: String = el.toString()
 
