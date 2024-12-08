@@ -137,7 +137,7 @@ class ExampleTest : VisionTest {
 
     }
 
-    override fun generateQuestion(): Any {
+    override fun generateQuestion(): String {
 
         var question = randomChar().toString()
 

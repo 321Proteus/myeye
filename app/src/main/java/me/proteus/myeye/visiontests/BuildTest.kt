@@ -32,17 +32,7 @@ class BuildTest : VisionTest {
         TODO("Not yet implemented")
     }
 
-    @Composable
-    override fun BeginTest(
-        activity: VisionTestLayoutActivity,
-        modifier: Modifier,
-        isResult: Boolean,
-        result: TestResult?
-    ) {
-        TODO("Not yet implemented")
-    }
-
-    override fun generateQuestion(): Any {
+    override fun generateQuestion(): String {
 
         return "Testowy test wzroku #2 (TEST_BUILD)"
 

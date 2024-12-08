@@ -359,41 +359,6 @@ class ColorArrangementTest : VisionTest {
 
     }
 
-    @Composable
-    override fun BeginTest(
-        activity: VisionTestLayoutActivity,
-        modifier: Modifier,
-        isResult: Boolean,
-        result: TestResult?
-    ) {
-        colors = activity.resources.getStringArray(R.array.farnsworth_colors)
-
-        if (!isResult) {
-
-            var list: MutableList<SerializablePair> = ArrayList<SerializablePair>(stageCount)
-
-            for (i in colors) {
-                list.add(SerializablePair(i, ""))
-            }
-
-            DisplayStage(activity, modifier, list, false)
-
-        } else {
-
-            var inputList = ResultDataCollector.deserializeResult(result!!.result)
-
-            var list = ArrayList<SerializablePair>()
-
-            for (el in inputList) {
-                list.add(SerializablePair(el.first, el.second))
-            }
-
-            DisplayStage(activity, modifier, list, true)
-
-        }
-
-    }
-
     override fun generateQuestion(): String {
         TODO("Not yet implemented")
     }

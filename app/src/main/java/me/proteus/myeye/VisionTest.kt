@@ -49,7 +49,7 @@ interface VisionTest {
 
     }
 
-    fun generateQuestion(): Any
+    fun generateQuestion(): String
 
     fun getExampleAnswers(): Array<String>
 

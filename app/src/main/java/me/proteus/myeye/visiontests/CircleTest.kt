@@ -136,35 +136,6 @@ class CircleTest : VisionTest {
     }
 
     @Composable
-    override fun BeginTest(
-        activity: VisionTestLayoutActivity,
-        modifier: Modifier,
-        isResult: Boolean,
-        result: TestResult?
-    ) {
-
-        if (isResult) {
-
-            var resultStages = ResultDataCollector.deserializeResult(result!!.result)
-
-            DisplayStage(activity, modifier, resultStages, true)
-
-        } else {
-
-            var testStages: MutableList<SerializablePair> = ArrayList<SerializablePair>()
-
-            for (i in 0..<stageCount) {
-                testStages.add(SerializablePair(this.generateQuestion().toString(), generateDirections()))
-            }
-
-            DisplayStage(activity, modifier, testStages, false)
-
-        }
-
-    }
-
-
-    @Composable
     override fun DisplayStage(activity: VisionTestLayoutActivity, modifier: Modifier, stages: List<SerializablePair>, isResult: Boolean) {
 
         var stageIterator: Int by remember { mutableIntStateOf(0) }
@@ -243,7 +214,7 @@ class CircleTest : VisionTest {
         }
     }
 
-    override fun generateQuestion(): Any {
+    override fun generateQuestion(): String {
 
         var question: String = generateDirections()
 
