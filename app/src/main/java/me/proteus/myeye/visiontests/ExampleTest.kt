@@ -12,10 +12,6 @@ import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -23,7 +19,6 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import me.proteus.myeye.SerializablePair
-import me.proteus.myeye.TestResult
 import me.proteus.myeye.VisionTest
 import me.proteus.myeye.io.ResultDataCollector
 import me.proteus.myeye.ui.VisionTestLayoutActivity

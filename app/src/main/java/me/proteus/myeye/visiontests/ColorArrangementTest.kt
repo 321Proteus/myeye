@@ -49,7 +49,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import me.proteus.myeye.R
 import me.proteus.myeye.SerializablePair
-import me.proteus.myeye.TestResult
 import me.proteus.myeye.VisionTest
 import me.proteus.myeye.io.ResultDataCollector
 import me.proteus.myeye.ui.VisionTestLayoutActivity
