@@ -43,7 +43,7 @@ class ExampleTest : VisionTest {
     override val resultCollector: ResultDataCollector = ResultDataCollector()
 
     @Composable
-    override fun DisplayStage(activity: VisionTestLayoutActivity, modifier: Modifier, stages: List<SerializablePair>, isResult: Boolean) {
+    override fun DisplayStage(activity: VisionTestLayoutActivity, stages: List<SerializablePair>, isResult: Boolean) {
 
         var stageIterator: Int by remember { mutableIntStateOf(0) }
 
@@ -61,7 +61,7 @@ class ExampleTest : VisionTest {
                 Text(text = score.toString())
             }
             Box (
-                modifier = modifier
+                modifier = Modifier
                     .weight(1f)
                     .padding(bottom = 32.dp),
                 contentAlignment = Alignment.Center,
@@ -91,7 +91,7 @@ class ExampleTest : VisionTest {
 
             if (!isResult) {
                 Row(
-                    modifier = modifier
+                    modifier = Modifier
                         .fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceEvenly,
                     verticalAlignment = Alignment.CenterVertically
@@ -119,7 +119,7 @@ class ExampleTest : VisionTest {
                 }
             } else {
                 Row(
-                    modifier = modifier
+                    modifier = Modifier
                         .fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceEvenly,
                     verticalAlignment = Alignment.CenterVertically

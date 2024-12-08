@@ -136,7 +136,7 @@ class CircleTest : VisionTest {
     }
 
     @Composable
-    override fun DisplayStage(activity: VisionTestLayoutActivity, modifier: Modifier, stages: List<SerializablePair>, isResult: Boolean) {
+    override fun DisplayStage(activity: VisionTestLayoutActivity, stages: List<SerializablePair>, isResult: Boolean) {
 
         var stageIterator: Int by remember { mutableIntStateOf(0) }
 
@@ -149,7 +149,7 @@ class CircleTest : VisionTest {
         ) {
 
             Box (
-                modifier = modifier
+                modifier = Modifier
                     .weight(1f)
                     .padding(bottom = 16.dp),
                 contentAlignment = Alignment.Center,
@@ -163,7 +163,7 @@ class CircleTest : VisionTest {
                         directions = stages[stageIterator].first,
                         key = null,
                         currentStage = stageIterator,
-                        modifier = modifier
+                        modifier = Modifier
                     )
 
                     if (isResult) {
@@ -171,7 +171,7 @@ class CircleTest : VisionTest {
                             directions = stages[stageIterator].second,
                             key = stages[stageIterator].first,
                             currentStage = stageIterator,
-                            modifier = modifier
+                            modifier = Modifier
                         )
                     }
                 }
@@ -197,7 +197,7 @@ class CircleTest : VisionTest {
                 )
             } else {
                 Row(
-                    modifier = modifier
+                    modifier = Modifier
                         .fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceEvenly,
                     verticalAlignment = Alignment.CenterVertically

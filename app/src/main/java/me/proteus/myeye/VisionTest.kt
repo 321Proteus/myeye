@@ -25,10 +25,10 @@ interface VisionTest {
      * @param activity The canvas activity to display the layout
      */
     @Composable
-    fun DisplayStage(activity: VisionTestLayoutActivity, modifier: Modifier, stages: List<SerializablePair>, isResult: Boolean)
+    fun DisplayStage(activity: VisionTestLayoutActivity, stages: List<SerializablePair>, isResult: Boolean)
 
     @Composable
-    fun BeginTest(activity: VisionTestLayoutActivity, modifier: Modifier, isResult: Boolean, result: TestResult?) {
+    fun BeginTest(activity: VisionTestLayoutActivity, isResult: Boolean, result: TestResult?) {
 
         var stageList: MutableList<SerializablePair> = ArrayList<SerializablePair>()
 
@@ -45,7 +45,7 @@ interface VisionTest {
             }
         }
 
-        DisplayStage(activity, modifier, stageList, false)
+        DisplayStage(activity, stageList, false)
 
     }
 

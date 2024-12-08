@@ -69,7 +69,6 @@ class ColorArrangementTest : VisionTest {
     @Composable
     override fun DisplayStage(
         activity: VisionTestLayoutActivity,
-        modifier: Modifier,
         stages: List<SerializablePair>,
         isResult: Boolean
     ) {

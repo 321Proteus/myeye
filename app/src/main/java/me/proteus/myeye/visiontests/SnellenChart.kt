@@ -130,7 +130,7 @@ class SnellenChart : VisionTest {
     }
 
     @Composable
-    override fun DisplayStage(activity: VisionTestLayoutActivity, modifier: Modifier, stages: List<SerializablePair>, isResult: Boolean) {
+    override fun DisplayStage(activity: VisionTestLayoutActivity, stages: List<SerializablePair>, isResult: Boolean) {
 
         var questionIterator: Int by remember { mutableIntStateOf(0) }
 
@@ -143,7 +143,7 @@ class SnellenChart : VisionTest {
         ) {
 
             Box (
-                modifier = modifier
+                modifier = Modifier
                     .weight(1f)
                     .padding(bottom = 16.dp),
                 contentAlignment = Alignment.Center,
@@ -155,14 +155,14 @@ class SnellenChart : VisionTest {
                         stage = questionIterator,
                         text = stages[questionIterator].first,
                         key = null,
-                        modifier = modifier
+                        modifier = Modifier
                     )
                     if (isResult) {
                         LetterContainer(
                             stage = questionIterator,
                             text = stages[questionIterator].second,
                             key = stages[questionIterator].first,
-                            modifier = modifier
+                            modifier = Modifier
                         )
                     }
 
@@ -190,7 +190,7 @@ class SnellenChart : VisionTest {
             } else {
 
                 Row(
-                    modifier = modifier
+                    modifier = Modifier
                         .fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceEvenly,
                     verticalAlignment = Alignment.CenterVertically
