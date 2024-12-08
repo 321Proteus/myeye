@@ -145,16 +145,22 @@ fun TestResultScreen(
                             modifier = Modifier,
                             onClick = {
 
-                                if (viewModel.isAuthorized) {
-                                    navigate(resultData)
+                                val debug_auth = false
+
+                                if (debug_auth == true) {
+                                    if (viewModel.isAuthorized) {
+                                        navigate(resultData)
+                                    } else {
+                                        authenticateUser(activity,
+                                            onSuccess = {
+                                                viewModel.authenticate()
+                                                activity.openTest(resultData)
+                                            },
+                                            onFailure = { println("Autoryzacja nieudana") }
+                                        )
+                                    }
                                 } else {
-                                    authenticateUser(activity,
-                                        onSuccess = {
-                                            viewModel.authenticate()
-                                            activity.openTest(resultData)
-                                        },
-                                        onFailure = { println("Autoryzacja nieudana") }
-                                    )
+                                    navigate(resultData)
                                 }
 
                             }
