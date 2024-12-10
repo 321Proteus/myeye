@@ -30,7 +30,7 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import me.proteus.myeye.R
 import me.proteus.myeye.ScreenScalingUtils.getScreenInfo
-import me.proteus.myeye.SerializablePair
+import me.proteus.myeye.SerializableStage
 import me.proteus.myeye.VisionTest
 import me.proteus.myeye.io.ResultDataCollector
 import me.proteus.myeye.ui.VisionTestLayoutActivity
@@ -132,12 +132,11 @@ class SnellenChart : VisionTest {
     @Composable
     override fun DisplayStage(
         activity: VisionTestLayoutActivity,
-        stage: SerializablePair,
+        stage: SerializableStage,
         isResult: Boolean,
+        difficulty: Int,
         onUpdate: (String) -> Unit
     ) {
-
-        var difficulty by remember { mutableIntStateOf(0) }
 
         Column(
             modifier = Modifier
@@ -180,7 +179,6 @@ class SnellenChart : VisionTest {
                     onRegenerate = { onUpdate("REGENERATE") },
                     onSizeDecrease = {
                         onUpdate(randomText(5))
-                        difficulty++
                     }
                 )
             } else {
@@ -191,22 +189,16 @@ class SnellenChart : VisionTest {
                     horizontalArrangement = Arrangement.SpaceEvenly,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-//                    Button(onClick = { questionIterator-- }) {
-//                        Text(text = "Poprzedni etap")
-//                    }
-//                    Button(onClick = { questionIterator++ }) {
-//                        Text(text = "Następny etap")
-//                    }
+                    Button(onClick = { onUpdate("PREV") }) {
+                        Text(text = "Poprzedni etap")
+                    }
+                    Button(onClick = { onUpdate("NEXT") }) {
+                        Text(text = "Następny etap")
+                    }
                 }
             }
 
         }
-    }
-
-    override fun storeResult(question: String, answer: String) {
-
-        resultCollector.addResult(question, answer)
-
     }
 
     override fun generateQuestion(stage: Int?): String {

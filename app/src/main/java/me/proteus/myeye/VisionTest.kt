@@ -5,7 +5,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.vector.ImageVector
 import me.proteus.myeye.io.ResultDataCollector
@@ -29,55 +28,89 @@ interface VisionTest {
      * @param activity The canvas activity to display the layout
      */
     @Composable
-    fun DisplayStage(activity: VisionTestLayoutActivity, stage: SerializablePair, isResult: Boolean, onUpdate: (String) -> Unit)
+    fun DisplayStage(
+        activity: VisionTestLayoutActivity,
+        stage: SerializableStage,
+        isResult: Boolean,
+        difficulty: Int,
+        onUpdate: (String) -> Unit
+    )
 
     @Composable
     fun BeginTest(activity: VisionTestLayoutActivity, isResult: Boolean, result: TestResult?) {
 
-        var stageIterator by remember { mutableIntStateOf(0) }
+        if (isResult) {
+            var i by remember { mutableIntStateOf(0) }
 
-        var stageList = remember {
-            mutableListOf<SerializablePair>().apply {
-                if (isResult) {
-                    val resultData = ResultDataCollector.deserializeResult(result!!.result)
-                    for (i in 0..<resultData.size) {
-                        add(resultData[i])
-                    }
-                } else {
-                    for (i in 0..<stageCount) {
-                        var pair = SerializablePair(
-                            generateQuestion(stageIterator).toString(),
-                            getExampleAnswers().joinToString(" ")
-                        )
-                        add(pair)
-                        stageIterator++
-                    }
+            val resultData = ResultDataCollector.deserializeResult(result!!.result)
+            var stageList = remember { resultData }
+
+            var currentResultStage = stageList[i]
+            var stageDifficulty = currentResultStage.difficulty
+
+            DisplayStage(activity, currentResultStage, true, stageDifficulty) { answer ->
+                if (answer == "PREV") {
+                    if (i > 0) i--
+                } else if (answer == "NEXT") {
+                    if (i < stageList.size - 1) i++
+                    // else powrot do menu
                 }
             }
-        }
 
-        stageIterator = 0
-        var currentStage by remember { mutableStateOf(stageList[stageIterator]) }
+        } else {
 
-        DisplayStage(activity, currentStage, isResult) { answer ->
+            var currentDifficulty by remember { mutableIntStateOf(1) }
 
-            if (answer == "REGENERATE") {
+            var currentStage = SerializableStage(
+                generateQuestion(currentDifficulty).toString(),
+                getExampleAnswers().joinToString(" "),
+                currentDifficulty
+            )
 
-                currentStage = SerializablePair(
-                    generateQuestion(stageIterator).toString(),
-                    getExampleAnswers().joinToString(" ")
-                )
-                println("Regenerate")
+            DisplayStage(activity, currentStage, false, currentDifficulty) { answer ->
 
-            } else {
-                println("Answer: $answer")
-                storeResult(currentStage.first, answer)
-                stageIterator++
-                println(stageIterator)
+                if (answer == "REGENERATE") {
+
+                    currentStage = SerializableStage(
+                        generateQuestion(currentDifficulty).toString(),
+                        getExampleAnswers().joinToString(" "),
+                        currentDifficulty
+                    )
+                    println("Regenerate")
+
+                } else if (currentDifficulty == stageCount) {
+
+                    storeResult(currentStage.first, answer, currentDifficulty)
+                    endTest(activity)
+
+                } else {
+                    println("Answer: $answer")
+                    storeResult(currentStage.first, answer, currentDifficulty)
+                    currentDifficulty++
+                }
+
+
             }
 
-
         }
+//
+//        var stageList = remember {
+//            mutableListOf<SerializablePair>().apply {
+//                if (isResult) {
+//
+//                } else {
+//                    for (i in 0..<stageCount) {
+//                        var pair = SerializablePair(
+//                            generateQuestion(stageIterator).toString(),
+//                            getExampleAnswers().joinToString(" ")
+//                        )
+//                        add(pair)
+//                        stageIterator++
+//                    }
+//                }
+//            }
+//        }
+
 
     }
 
@@ -87,8 +120,8 @@ interface VisionTest {
 
     fun checkAnswer(answer: String): Boolean
 
-    fun storeResult(question: String, answer: String) {
-        resultCollector.addResult(question, answer)
+    fun storeResult(question: String, answer: String, difficulty: Int) {
+        resultCollector.addResult(question, answer, difficulty)
     }
 
      fun endTest(activity: VisionTestLayoutActivity) {

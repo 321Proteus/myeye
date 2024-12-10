@@ -38,7 +38,13 @@ class ExampleTest : VisionTest {
     override val resultCollector: ResultDataCollector = ResultDataCollector()
 
     @Composable
-    override fun DisplayStage(activity: VisionTestLayoutActivity, stage: SerializableStage, isResult: Boolean, onUpdate: (String) -> Unit) {
+    override fun DisplayStage(
+        activity: VisionTestLayoutActivity,
+        stage: SerializableStage,
+        isResult: Boolean,
+        difficulty: Int,
+        onUpdate: (String) -> Unit
+    ) {
 
         println("$score")
 

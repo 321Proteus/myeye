@@ -14,10 +14,6 @@ import androidx.compose.material.icons.outlined.AccountCircle
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
@@ -67,7 +63,7 @@ class CircleTest : VisionTest {
         val opticianSansFamily = FontFamily(Font(R.font.opticiansans))
 
         var screenDensity = getScreenInfo(LocalContext.current).densityDpi / 2.54f
-        var calculatedSize = stageToCentimeters(currentStage, 100f)
+        var calculatedSize = stageToCentimeters(currentStage - 1, 100f)
         println(calculatedSize)
         var pixelSize = with(LocalDensity.current) { (screenDensity * calculatedSize).toSp() }
 
@@ -139,10 +135,9 @@ class CircleTest : VisionTest {
         activity: VisionTestLayoutActivity,
         stage: SerializableStage,
         isResult: Boolean,
+        difficulty: Int,
         onUpdate: (String) -> Unit
     ) {
-
-        var difficulty: Int by remember { mutableIntStateOf(0) }
 
         Column(
             modifier = Modifier
@@ -188,7 +183,6 @@ class CircleTest : VisionTest {
 
                     onSizeDecrease = {
                         onUpdate(generateDirections())
-                        difficulty++
                     }
                 )
             } else {
