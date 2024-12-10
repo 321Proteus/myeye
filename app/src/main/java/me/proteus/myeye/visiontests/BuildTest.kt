@@ -4,7 +4,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Build
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.vector.ImageVector
-import me.proteus.myeye.SerializablePair
+import me.proteus.myeye.SerializableStage
 import me.proteus.myeye.VisionTest
 import me.proteus.myeye.io.ResultDataCollector
 import me.proteus.myeye.ui.VisionTestLayoutActivity
@@ -23,7 +23,7 @@ class BuildTest : VisionTest {
     @Composable
     override fun DisplayStage(
         activity: VisionTestLayoutActivity,
-        stage: SerializablePair,
+        stage: SerializableStage,
         isResult: Boolean,
         onUpdate: (String) -> Unit
     ) {
@@ -38,12 +38,6 @@ class BuildTest : VisionTest {
 
     override fun checkAnswer(answer: String): Boolean {
         return true
-    }
-
-    override fun storeResult(question: String, answer: String) {
-
-        resultCollector.addResult(question, answer)
-
     }
 
     override fun getExampleAnswers(): Array<String> {

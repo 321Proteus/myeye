@@ -31,7 +31,7 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import me.proteus.myeye.R
 import me.proteus.myeye.ScreenScalingUtils.getScreenInfo
-import me.proteus.myeye.SerializablePair
+import me.proteus.myeye.SerializableStage
 import me.proteus.myeye.VisionTest
 import me.proteus.myeye.io.ResultDataCollector
 import me.proteus.myeye.ui.VisionTestLayoutActivity
@@ -137,7 +137,7 @@ class CircleTest : VisionTest {
     @Composable
     override fun DisplayStage(
         activity: VisionTestLayoutActivity,
-        stage: SerializablePair,
+        stage: SerializableStage,
         isResult: Boolean,
         onUpdate: (String) -> Unit
     ) {
@@ -198,12 +198,12 @@ class CircleTest : VisionTest {
                     horizontalArrangement = Arrangement.SpaceEvenly,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-//                    Button(onClick = { stageIterator-- }) {
-//                        Text(text = "Poprzedni etap")
-//                    }
-//                    Button(onClick = { stageIterator++ }) {
-//                        Text(text = "Następny etap")
-//                    }
+                    Button(onClick = { onUpdate("PREV") }) {
+                        Text(text = "Poprzedni etap")
+                    }
+                    Button(onClick = { onUpdate("NEXT") }) {
+                        Text(text = "Następny etap")
+                    }
                 }
             }
 
@@ -251,12 +251,6 @@ class CircleTest : VisionTest {
         arr[abs(random.nextInt()) % 4] = correctAnswer
 
         return arr
-
-    }
-
-    override fun storeResult(question: String, answer: String) {
-
-        resultCollector.addResult(question, answer)
 
     }
 

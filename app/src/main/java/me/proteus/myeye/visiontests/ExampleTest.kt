@@ -18,7 +18,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import me.proteus.myeye.SerializablePair
+import me.proteus.myeye.SerializableStage
 import me.proteus.myeye.VisionTest
 import me.proteus.myeye.io.ResultDataCollector
 import me.proteus.myeye.ui.VisionTestLayoutActivity
@@ -38,7 +38,7 @@ class ExampleTest : VisionTest {
     override val resultCollector: ResultDataCollector = ResultDataCollector()
 
     @Composable
-    override fun DisplayStage(activity: VisionTestLayoutActivity, stage: SerializablePair, isResult: Boolean, onUpdate: (String) -> Unit) {
+    override fun DisplayStage(activity: VisionTestLayoutActivity, stage: SerializableStage, isResult: Boolean, onUpdate: (String) -> Unit) {
 
         println("$score")
 
@@ -106,12 +106,12 @@ class ExampleTest : VisionTest {
                     horizontalArrangement = Arrangement.SpaceEvenly,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-//                    Button(onClick = { stageIterator-- }) {
-//                        Text(text = "Poprzedni etap")
-//                    }
-//                    Button(onClick = { stageIterator++ }) {
-//                        Text(text = "Następny etap")
-//                    }
+                    Button(onClick = { onUpdate("PREV") }) {
+                        Text(text = "Poprzedni etap")
+                    }
+                    Button(onClick = { onUpdate("NEXT") }) {
+                        Text(text = "Następny etap")
+                    }
                 }
             }
 
@@ -131,12 +131,6 @@ class ExampleTest : VisionTest {
 
     override fun checkAnswer(answer: String): Boolean {
         return answer == correctAnswer
-    }
-
-    override fun storeResult(question: String, answer: String) {
-
-        resultCollector.addResult(question, answer)
-
     }
 
     override fun getExampleAnswers(): Array<String> {

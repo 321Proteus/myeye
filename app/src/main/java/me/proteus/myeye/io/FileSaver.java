@@ -16,7 +16,7 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.regex.*;
 
-import me.proteus.myeye.SerializablePair;
+import me.proteus.myeye.SerializableStage;
 
 public class FileSaver {
 
@@ -148,7 +148,7 @@ public class FileSaver {
 
         for (int i=0;i<data.stages.size();i++) {
 
-            SerializablePair p = data.stages.get(i);
+            SerializableStage p = data.stages.get(i);
 
             fw.write(System.lineSeparator());
             fw.write(i + " " + p.getFirst() + " " + p.getSecond());
