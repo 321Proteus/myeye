@@ -62,7 +62,7 @@ class ColorArrangementTest : VisionTest {
     override val stageCount: Int = 6
     override val resultCollector: ResultDataCollector = ResultDataCollector()
 
-    val difficultyScale = listOf(8, 7, 5, 4, 3, 2, 1)
+    val difficultyScale = listOf(7, 6, 5, 4, 3, 2, 1)
     var colorOffset = 0
 
     var colors: Array<String> = arrayOf()
@@ -92,7 +92,7 @@ class ColorArrangementTest : VisionTest {
         }
 
         LaunchedEffect(inputColors) {
-            stageColors = inputColors.shuffled()
+            stageColors = inputColors
         }
 
         var currentlyDragged by remember { mutableStateOf<Int?>(null) }
@@ -301,7 +301,10 @@ class ColorArrangementTest : VisionTest {
                     contentAlignment = Alignment.Center
                 ) {
                     Button(
-                        onClick = { onUpdate(stageColors.joinToString(" ")) }
+                        onClick = {
+                            println(stageColors)
+                            onUpdate(stageColors.joinToString(" "))
+                        }
                     ) {
                         Text("Dalej")
                     }
@@ -373,10 +376,13 @@ class ColorArrangementTest : VisionTest {
 
                 } else {
                     println("Answer: $answer")
-                    storeResult(currentStage.first, answer, currentDifficulty)
+
+                    var correct = answer.split(' ').sortedBy { getHue(it) }.joinToString(" ")
+
+                    storeResult(correct, answer, currentDifficulty)
                     if (currentDifficulty < stageCount) currentDifficulty++
                     else {
-                        storeResult(currentStage.first, answer, currentDifficulty)
+                        storeResult(correct, answer, currentDifficulty)
                         endTest(activity)
                     }
                 }
@@ -477,9 +483,6 @@ class ColorArrangementTest : VisionTest {
 
         var map: MutableMap<Int, Int> = HashMap()
         var connected = b.joinToString(" ")
-
-        println(a)
-        println(b)
 
         var i = 1
         while (i < a.size - 1) {
