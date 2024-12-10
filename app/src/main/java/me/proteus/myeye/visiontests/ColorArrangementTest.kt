@@ -27,6 +27,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.material3.Button
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.getValue
@@ -76,23 +77,40 @@ class ColorArrangementTest : VisionTest {
         onUpdate: (String) -> Unit
     ) {
 
-        val inputColors: List<String>
-        val sortedColors: List<String>
+//        if (isResult) {
+//            inputColors = stage.second.split(' ')
+//            sortedColors = stage.first.split(' ')
+//        } else {
+//            inputColors = stage.first.split(' ')
+//            sortedColors = inputColors.sortedBy { getHue(it) }
+//        }
+//
 
-        if (isResult) {
-            inputColors = stage.second.split(' ')
-            sortedColors = stage.first.split(' ')
-        } else {
-            inputColors = stage.first.split(' ')
-            sortedColors = inputColors.sortedBy { getHue(it) }
+
+        val inputColors by remember(stage) {
+            derivedStateOf {
+                if (isResult) stage.second.split(' ')
+                else stage.first.split(' ')
+            }
         }
 
-        var stageColors by remember {
-            mutableStateOf(inputColors)
+        val sortedColors by remember(stage) {
+            derivedStateOf {
+                if (isResult) stage.first.split(' ')
+                else inputColors.sortedBy { getHue(it) }
+            }
         }
+
+        var stageColors by remember { mutableStateOf(inputColors) }
+
+        var correctnessMap by remember { mutableStateOf<Map<Int, Int>>(emptyMap()) }
 
         LaunchedEffect(inputColors) {
             stageColors = inputColors
+            if (isResult) {
+                correctnessMap = getCorrectnessMapping(sortedColors, stageColors)
+            }
+
         }
 
         var currentlyDragged by remember { mutableStateOf<Int?>(null) }
@@ -222,7 +240,6 @@ class ColorArrangementTest : VisionTest {
                                 println("$startX $startY")
                             }
                     ) {
-                        var correctnessMap = getCorrectnessMapping(sortedColors, stageColors)
 
                         Canvas(
                             modifier = Modifier.fillMaxSize()
@@ -302,7 +319,6 @@ class ColorArrangementTest : VisionTest {
                 ) {
                     Button(
                         onClick = {
-                            println(stageColors)
                             onUpdate(stageColors.joinToString(" "))
                         }
                     ) {
@@ -488,7 +504,6 @@ class ColorArrangementTest : VisionTest {
         while (i < a.size - 1) {
 
             var idx = b.indexOf(a[i])
-            println("index $idx")
             var j = 0
 
             while(idx + j < a.size && connected.indexOf(a.subList(idx, idx+j).joinToString(" ")) != -1) j++
