@@ -27,7 +27,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.material3.Button
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.getValue
@@ -50,7 +49,7 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import me.proteus.myeye.R
-import me.proteus.myeye.SerializablePair
+import me.proteus.myeye.SerializableStage
 import me.proteus.myeye.TestResult
 import me.proteus.myeye.VisionTest
 import me.proteus.myeye.io.ResultDataCollector
@@ -71,12 +70,11 @@ class ColorArrangementTest : VisionTest {
     @Composable
     override fun DisplayStage(
         activity: VisionTestLayoutActivity,
-        stage: SerializablePair,
+        stage: SerializableStage,
         isResult: Boolean,
+        difficulty: Int,
         onUpdate: (String) -> Unit
     ) {
-
-        println(stage.first)
 
         val inputColors: List<String>
         val sortedColors: List<String>
@@ -89,13 +87,12 @@ class ColorArrangementTest : VisionTest {
             sortedColors = inputColors.sortedBy { getHue(it) }
         }
 
-
         var stageColors by remember {
             mutableStateOf(inputColors)
         }
 
         LaunchedEffect(inputColors) {
-            stageColors = inputColors
+            stageColors = inputColors.shuffled()
         }
 
         var currentlyDragged by remember { mutableStateOf<Int?>(null) }
@@ -225,7 +222,7 @@ class ColorArrangementTest : VisionTest {
                                 println("$startX $startY")
                             }
                     ) {
-                        var correctnessMap = getCorrectnessMapping(sortedColors!!, stageColors)
+                        var correctnessMap = getCorrectnessMapping(sortedColors, stageColors)
 
                         Canvas(
                             modifier = Modifier.fillMaxSize()
@@ -254,7 +251,7 @@ class ColorArrangementTest : VisionTest {
                             horizontalAlignment = Alignment.CenterHorizontally,
                             verticalArrangement = Arrangement.SpaceEvenly
                         ) {
-                            itemsIndexed(sortedColors!!) { index, item ->
+                            itemsIndexed(sortedColors) { index, item ->
 
                                 var isTopEdge = (index == 0)
                                 var isBottomEdge = (index == 9)
@@ -299,14 +296,31 @@ class ColorArrangementTest : VisionTest {
 
             }
 
-            Box(
-                contentAlignment = Alignment.Center
-            ) {
-                Button(
-                    onClick = { onUpdate(stageColors.joinToString(" ")) }
+            if (!isResult) {
+                Box(
+                    contentAlignment = Alignment.Center
                 ) {
-                    Text("Dalej")
+                    Button(
+                        onClick = { onUpdate(stageColors.joinToString(" ")) }
+                    ) {
+                        Text("Dalej")
+                    }
                 }
+            } else {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceEvenly,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Button(onClick = { onUpdate("PREV") }) {
+                        Text(text = "Poprzedni etap")
+                    }
+                    Button(onClick = { onUpdate("NEXT") }) {
+                        Text(text = "Następny etap")
+                    }
+                }
+
             }
 
         }
@@ -321,38 +335,54 @@ class ColorArrangementTest : VisionTest {
         result: TestResult?
     ) {
         colors = activity.resources.getStringArray(R.array.farnsworth_colors)
-        var startDifficulty = 1
 
-        var stageList = remember {
-            mutableListOf<SerializablePair>().apply {
-                if (isResult) {
-                    val resultData = ResultDataCollector.deserializeResult(result!!.result)
-                    for (i in 0..<resultData.size) {
-                        add(resultData[i])
-                    }
-                } else {
-                    for (i in 0..<stageCount) {
-                        var pair = SerializablePair(
-                            generateQuestion(startDifficulty).toString(),
-                            getExampleAnswers().joinToString(" ")
-                        )
-                        add(pair)
-                        startDifficulty++
-                    }
+        if (isResult) {
+            var i by remember { mutableIntStateOf(0) }
+
+            val resultData = ResultDataCollector.deserializeResult(result!!.result)
+            var stageList = remember { resultData }
+
+            var currentResultStage = stageList[i]
+            var stageDifficuly = currentResultStage.difficulty
+
+            DisplayStage(activity, currentResultStage, true, stageDifficuly) { answer ->
+                if (answer == "PREV") {
+                    if (i > 0) i--
+                } else if (answer == "NEXT") {
+                    if (i < stageList.size - 1) i++
+                    // else powrot do menu
                 }
             }
 
-        }
+        } else {
 
-        var stageIterator by remember { mutableIntStateOf(0) }
-        var currentStage = stageList[stageIterator]
+            var currentDifficulty by remember { mutableIntStateOf(0) }
+            var currentStage = SerializableStage(
+                generateQuestion(currentDifficulty).toString(),
+                getExampleAnswers().joinToString(" "), currentDifficulty
+            )
+            DisplayStage(activity, currentStage, false, currentDifficulty) { answer ->
 
-        DisplayStage(activity, currentStage, isResult) { answer ->
+                if (answer == "REGENERATE") {
 
-            //println("Answer: $answer")
-            storeResult(currentStage.first, answer)
-            stageIterator++
-            println(stageIterator)
+                    currentStage = SerializableStage(
+                        generateQuestion(currentDifficulty).toString(),
+                        getExampleAnswers().joinToString(" "), currentDifficulty
+                    )
+                    println("Regenerate")
+
+                } else {
+                    println("Answer: $answer")
+                    storeResult(currentStage.first, answer, currentDifficulty)
+                    if (currentDifficulty < stageCount) currentDifficulty++
+                    else {
+                        storeResult(currentStage.first, answer, currentDifficulty)
+                        endTest(activity)
+                    }
+                }
+
+
+            }
 
 //            var a = getScore(answer, "RELATIVE")
 //            var b = getScore(answer, "LEVENSHTEIN")
@@ -448,10 +478,14 @@ class ColorArrangementTest : VisionTest {
         var map: MutableMap<Int, Int> = HashMap()
         var connected = b.joinToString(" ")
 
+        println(a)
+        println(b)
+
         var i = 1
         while (i < a.size - 1) {
 
             var idx = b.indexOf(a[i])
+            println("index $idx")
             var j = 0
 
             while(idx + j < a.size && connected.indexOf(a.subList(idx, idx+j).joinToString(" ")) != -1) j++

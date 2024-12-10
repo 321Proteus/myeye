@@ -59,7 +59,7 @@ interface VisionTest {
 
         } else {
 
-            var currentDifficulty by remember { mutableIntStateOf(1) }
+            var currentDifficulty by remember { mutableIntStateOf(0) }
 
             var currentStage = SerializableStage(
                 generateQuestion(currentDifficulty).toString(),

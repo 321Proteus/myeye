@@ -63,7 +63,7 @@ class CircleTest : VisionTest {
         val opticianSansFamily = FontFamily(Font(R.font.opticiansans))
 
         var screenDensity = getScreenInfo(LocalContext.current).densityDpi / 2.54f
-        var calculatedSize = stageToCentimeters(currentStage - 1, 100f)
+        var calculatedSize = stageToCentimeters(currentStage, 100f)
         println(calculatedSize)
         var pixelSize = with(LocalDensity.current) { (screenDensity * calculatedSize).toSp() }
 
