@@ -5,6 +5,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.vector.ImageVector
 import me.proteus.myeye.io.ResultDataCollector
@@ -61,11 +62,13 @@ interface VisionTest {
 
             var currentDifficulty by remember { mutableIntStateOf(0) }
 
-            var currentStage = SerializableStage(
-                generateQuestion(currentDifficulty).toString(),
-                getExampleAnswers().joinToString(" "),
-                currentDifficulty
-            )
+            var currentStage by remember { mutableStateOf(
+                SerializableStage(
+                    generateQuestion(currentDifficulty).toString(),
+                    getExampleAnswers().joinToString(" "),
+                    currentDifficulty
+                )
+            ) }
 
             DisplayStage(activity, currentStage, false, currentDifficulty) { answer ->
 
@@ -88,7 +91,6 @@ interface VisionTest {
                     storeResult(currentStage.first, answer, currentDifficulty)
                     currentDifficulty++
                 }
-
 
             }
 
