@@ -59,7 +59,11 @@ interface VisionTest {
                     if (i > 0) i--
                 } else if (answer == "NEXT") {
                     if (i < stageList.size - 1) i++
-                    // else powrot do menu
+                    else {
+                        var exitIntent = Intent(activity, MenuActivity::class.java)
+                        // TODO: Dodac podsumowanie testu
+                        activity.startActivity(exitIntent)
+                    }
                 }
             }
 
