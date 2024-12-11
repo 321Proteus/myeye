@@ -187,7 +187,7 @@ class ColorArrangementTest : VisionTest {
                                 .scale(if (index == currentlyDragged) 1.5f else 1f, 1f)
                                 .zIndex((if (index == currentlyDragged) 1f else 0f))
                                 .draggable(
-                                    enabled = (!(isTopEdge || isBottomEdge)),
+                                    enabled = (!(isTopEdge || isBottomEdge || isResult)),
                                     orientation = Orientation.Vertical,
                                     state = rememberDraggableState { delta ->
 
