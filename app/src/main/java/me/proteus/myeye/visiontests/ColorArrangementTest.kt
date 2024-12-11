@@ -286,7 +286,9 @@ class ColorArrangementTest : VisionTest {
                 ) {
                     Button(
                         onClick = {
-                            onUpdate(stageColors.joinToString(" "))
+                            var ans = stageColors.joinToString(" ")
+                            println(getScore(ans, "RELATIVE"))
+                            onUpdate(ans)
                         }
                     ) {
                         Text("Dalej")
@@ -323,22 +325,6 @@ class ColorArrangementTest : VisionTest {
         colors = activity.resources.getStringArray(R.array.farnsworth_colors)
 
         BeginTestImpl(activity, isResult, result)
-
-//            var a = getScore(answer, "RELATIVE")
-//            var b = getScore(answer, "LEVENSHTEIN")
-//
-//            var srednia = (a + b) / 2
-//
-//            if (srednia >= 70 && srednia < 100 && difficulty >= 4) {
-//                colorOffset += 20
-//                println("${(a + b) / 2} Bez zmiany trudnosci")
-//            } else {
-//                colorOffset = 0
-//                difficulty++
-//            }
-//            var correct = answer.split(" ").sortedBy { getHue(it) }.joinToString(" ")
-//
-//            storeResult(correct, answer)
 
             // zwieksz colorOffset gdy wynik jest bliski 100
 

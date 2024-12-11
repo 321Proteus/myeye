@@ -104,24 +104,6 @@ interface VisionTest {
             }
 
         }
-//
-//        var stageList = remember {
-//            mutableListOf<SerializablePair>().apply {
-//                if (isResult) {
-//
-//                } else {
-//                    for (i in 0..<stageCount) {
-//                        var pair = SerializablePair(
-//                            generateQuestion(stageIterator).toString(),
-//                            getExampleAnswers().joinToString(" ")
-//                        )
-//                        add(pair)
-//                        stageIterator++
-//                    }
-//                }
-//            }
-//        }
-
 
     }
 
