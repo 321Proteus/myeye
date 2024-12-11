@@ -39,6 +39,11 @@ interface VisionTest {
 
     @Composable
     fun BeginTest(activity: VisionTestLayoutActivity, isResult: Boolean, result: TestResult?) {
+        BeginTestImpl(activity, isResult, result)
+    }
+
+    @Composable
+    fun BeginTestImpl(activity: VisionTestLayoutActivity, isResult: Boolean, result: TestResult?) {
 
         if (isResult) {
             var i by remember { mutableIntStateOf(0) }

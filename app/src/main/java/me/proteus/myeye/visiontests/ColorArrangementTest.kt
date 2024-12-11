@@ -355,56 +355,7 @@ class ColorArrangementTest : VisionTest {
     ) {
         colors = activity.resources.getStringArray(R.array.farnsworth_colors)
 
-        if (isResult) {
-            var i by remember { mutableIntStateOf(0) }
-
-            val resultData = ResultDataCollector.deserializeResult(result!!.result)
-            var stageList = remember { resultData }
-
-            var currentResultStage = stageList[i]
-            var stageDifficuly = currentResultStage.difficulty
-
-            DisplayStage(activity, currentResultStage, true, stageDifficuly) { answer ->
-                if (answer == "PREV") {
-                    if (i > 0) i--
-                } else if (answer == "NEXT") {
-                    if (i < stageList.size - 1) i++
-                    // else powrot do menu
-                }
-            }
-
-        } else {
-
-            var currentDifficulty by remember { mutableIntStateOf(0) }
-            var currentStage = SerializableStage(
-                generateQuestion(currentDifficulty).toString(),
-                getExampleAnswers().joinToString(" "), currentDifficulty
-            )
-            DisplayStage(activity, currentStage, false, currentDifficulty) { answer ->
-
-                if (answer == "REGENERATE") {
-
-                    currentStage = SerializableStage(
-                        generateQuestion(currentDifficulty).toString(),
-                        getExampleAnswers().joinToString(" "), currentDifficulty
-                    )
-                    println("Regenerate")
-
-                } else {
-                    println("Answer: $answer")
-
-                    var correct = answer.split(' ').sortedBy { getHue(it) }.joinToString(" ")
-
-                    storeResult(correct, answer, currentDifficulty)
-                    if (currentDifficulty < stageCount) currentDifficulty++
-                    else {
-                        storeResult(correct, answer, currentDifficulty)
-                        endTest(activity)
-                    }
-                }
-
-
-            }
+        BeginTestImpl(activity, isResult, result)
 
 //            var a = getScore(answer, "RELATIVE")
 //            var b = getScore(answer, "LEVENSHTEIN")
