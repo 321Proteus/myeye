@@ -28,7 +28,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.material3.Button
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
@@ -69,6 +68,52 @@ class ColorArrangementTest : VisionTest {
     var colors: Array<String> = arrayOf()
 
     @Composable
+    fun FarnsworthItem(modifier: Modifier, item: String, index: Int, cd: Int?) {
+
+        var isTopEdge = (index == 0)
+        var isBottomEdge = (index == 9)
+
+        var edgeShape: Shape = RoundedCornerShape(
+            topStart = (if (isTopEdge) 15.dp else 0.dp),
+            topEnd = (if (isTopEdge) 15.dp else 0.dp),
+            bottomEnd = (if (isBottomEdge) 15.dp else 0.dp),
+            bottomStart = (if (isBottomEdge) 15.dp else 0.dp)
+        )
+
+        Column(
+            modifier = Modifier
+                .fillMaxHeight(0.1f)
+                .then(modifier)
+        ) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(60.dp)
+                    .clip(edgeShape)
+                    .background(Color(parseColor(item)))
+                    .then(
+                        if (isTopEdge || isBottomEdge) {
+                            Modifier.border(
+                                width = (2.dp),
+                                brush = SolidColor(Color.Black),
+                                shape = edgeShape
+                            )
+                        } else Modifier
+                    ),
+
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    modifier = Modifier
+                        .scale(if (index == cd) 0.66f else 1f, 1f),
+                    text = "${getHue(item)}"
+                )
+            }
+        }
+
+    }
+
+    @Composable
     override fun DisplayStage(
         activity: VisionTestLayoutActivity,
         stage: SerializableStage,
@@ -76,16 +121,6 @@ class ColorArrangementTest : VisionTest {
         difficulty: Int,
         onUpdate: (String) -> Unit
     ) {
-
-//        if (isResult) {
-//            inputColors = stage.second.split(' ')
-//            sortedColors = stage.first.split(' ')
-//        } else {
-//            inputColors = stage.first.split(' ')
-//            sortedColors = inputColors.sortedBy { getHue(it) }
-//        }
-//
-
 
         val inputColors by remember(stage) {
             derivedStateOf {
@@ -147,81 +182,46 @@ class ColorArrangementTest : VisionTest {
                             var isTopEdge = (index == 0)
                             var isBottomEdge = (index == 9)
 
-                            var edgeShape: Shape = RoundedCornerShape(
-                                topStart = (if (isTopEdge) 15.dp else 0.dp),
-                                topEnd = (if (isTopEdge) 15.dp else 0.dp),
-                                bottomEnd = (if (isBottomEdge) 15.dp else 0.dp),
-                                bottomStart = (if (isBottomEdge) 15.dp else 0.dp)
-                            )
+                            var movableModifier: Modifier = Modifier
+                                .offset { IntOffset(0, if (currentlyDragged == index) currentOffset.toInt() else 0) }
+                                .scale(if (index == currentlyDragged) 1.5f else 1f, 1f)
+                                .zIndex((if (index == currentlyDragged) 1f else 0f))
+                                .draggable(
+                                    enabled = (!(isTopEdge || isBottomEdge)),
+                                    orientation = Orientation.Vertical,
+                                    state = rememberDraggableState { delta ->
 
-                            Column(
-                                modifier = Modifier
-                                    .offset { IntOffset(0, if (currentlyDragged == index) currentOffset.toInt() else 0) }
-                                    .fillMaxHeight(0.1f)
-                                    .scale(if (index == currentlyDragged) 1.5f else 1f, 1f)
-                                    .zIndex((if (index == currentlyDragged) 1f else 0f))
-                                    .draggable(
-                                        enabled = (!(isTopEdge || isBottomEdge)),
-                                        orientation = Orientation.Vertical,
-                                        state = rememberDraggableState { delta ->
+                                        if (currentlyDragged == null) currentlyDragged = index
+                                        currentOffset += delta
 
-                                            if (currentlyDragged == null) currentlyDragged = index
-                                            currentOffset += delta
+                                        val currentIndex = currentlyDragged ?: return@rememberDraggableState
 
-                                            val currentIndex =
-                                                currentlyDragged ?: return@rememberDraggableState
-
-                                            val targetIndex = when {
-                                                currentOffset > 120 -> currentIndex + 1
-                                                currentOffset < -120 -> currentIndex - 1
-                                                else -> null
-                                            }
-
-                                            targetIndex?.let { target ->
-                                                if (targetIndex == 0 || targetIndex == 9) return@rememberDraggableState
-                                                if (target in stageColors.indices) {
-
-                                                    stageColors = stageColors.toMutableList().apply {
-                                                        val draggedItem = removeAt(currentIndex)
-                                                        add(target, draggedItem)
-                                                    }
-                                                    currentlyDragged = target
-                                                    currentOffset = 0f
-                                                }
-                                            }
-                                        },
-                                        onDragStopped = {
-                                            currentlyDragged = null
-                                            currentOffset = 0f
+                                        val targetIndex = when {
+                                            currentOffset > 120 -> currentIndex + 1
+                                            currentOffset < -120 -> currentIndex - 1
+                                            else -> null
                                         }
-                                    )
-                            ) {
-                                Box(
-                                    modifier = Modifier
-                                        .fillMaxWidth(if (isResult) 1f else 0.6f)
-                                        .height(60.dp)
-                                        .clip(edgeShape)
-                                        .background(Color(parseColor(item)))
-                                        .then(
-                                            if ((isTopEdge) || isBottomEdge) {
-                                                Modifier.border(
-                                                    width = (2.dp),
-                                                    brush = SolidColor(Color.Black),
-                                                    shape = edgeShape
-                                                )
-                                            } else Modifier
-                                        ),
 
-                                    contentAlignment = Alignment.Center
-                                ) {
-                                    Text(
-                                        modifier = Modifier
-                                            .scale(if (index == currentlyDragged) 0.66f else 1f, 1f),
-                                        text = "${getHue(item)}"
-                                    )
-                                }
-                            }
+                                        targetIndex?.let { target ->
+                                            if (targetIndex == 0 || targetIndex == 9) return@rememberDraggableState
+                                            if (target in stageColors.indices) {
 
+                                                stageColors = stageColors.toMutableList().apply {
+                                                    val draggedItem = removeAt(currentIndex)
+                                                    add(target, draggedItem)
+                                                }
+                                                currentlyDragged = target
+                                                currentOffset = 0f
+                                            }
+                                        }
+                                    },
+                                    onDragStopped = {
+                                        currentlyDragged = null
+                                        currentOffset = 0f
+                                    }
+                                )
+
+                            FarnsworthItem(movableModifier, item, index, currentlyDragged)
 
                         }
                     }
@@ -270,41 +270,8 @@ class ColorArrangementTest : VisionTest {
                         ) {
                             itemsIndexed(sortedColors) { index, item ->
 
-                                var isTopEdge = (index == 0)
-                                var isBottomEdge = (index == 9)
+                                FarnsworthItem(Modifier, item, index, currentlyDragged)
 
-                                var edgeShape: Shape = RoundedCornerShape(
-                                    topStart = (if (isTopEdge) 15.dp else 0.dp),
-                                    topEnd = (if (isTopEdge) 15.dp else 0.dp),
-                                    bottomEnd = (if (isBottomEdge) 15.dp else 0.dp),
-                                    bottomStart = (if (isBottomEdge) 15.dp else 0.dp)
-                                )
-
-                                Column(
-                                    modifier = Modifier
-                                        .fillMaxHeight(0.1f)
-                                ) {
-                                    Box(
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .height(60.dp)
-                                            .clip(edgeShape)
-                                            .background(Color(parseColor(item)))
-                                            .then(
-                                                if ((isTopEdge) || isBottomEdge) {
-                                                    Modifier.border(
-                                                        width = (2.dp),
-                                                        brush = SolidColor(Color.Black),
-                                                        shape = edgeShape
-                                                    )
-                                                } else Modifier
-                                            ),
-
-                                        contentAlignment = Alignment.Center
-                                    ) {
-                                        Text("${getHue(item)}")
-                                    }
-                                }
                             }
                         }
                     }
@@ -374,8 +341,6 @@ class ColorArrangementTest : VisionTest {
 //            storeResult(correct, answer)
 
             // zwieksz colorOffset gdy wynik jest bliski 100
-
-        }
 
     }
 
@@ -465,7 +430,6 @@ class ColorArrangementTest : VisionTest {
             if (j > 1) i -= 1
 
         }
-//        for (el in map) println("${el.value} ${el.key}")
 
         return map
 
