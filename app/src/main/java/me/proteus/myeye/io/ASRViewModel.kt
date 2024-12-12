@@ -12,6 +12,7 @@ import androidx.lifecycle.AndroidViewModel
 import org.vosk.Model
 import org.vosk.Recognizer
 import java.io.File
+import java.io.IOException
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
@@ -23,16 +24,25 @@ class ASRViewModel(application: Application) : AndroidViewModel(application) {
     private var executor: ExecutorService = Executors.newSingleThreadExecutor()
     private var modelName: String = "vosk-model-small-pl-0.22"
 
+    var wordBuffer: List<SpeechDecoderResult> by mutableStateOf(listOf())
+
     val modelGrammar = listOf<String>("a", "a", "a", "a", "be", "ce", "de", "e", "f",
-        "gdzie", "ha", "i", "jod", "ka", "el", "m", "n", "o", "p", "q", "r", "er",
+        "gdzie", "ha", "i", "ił", "jod", "ka", "el", "m", "n", "o", "p", "q", "r", "er",
         "es", "te", "u", "wał", "wu", "ix", "igrek", "zet",
         "jeden", "dwa", "trzy", "cztery", "pięć", "sześć", "siedem", "osiem", "dziewięć", "zero"
     )
+    // Info: w jezyku polskim Vosk niezbyt dobrze odroznia e od i, nie uzywac razem
 
-    var result: List<SpeechDecoderResult> by mutableStateOf(listOf())
-
-    fun addWord(word: SpeechDecoderResult) {
-        result = result + word
+    @Throws(IOException::class)
+    fun getNextWord(): SpeechDecoderResult {
+        if (wordBuffer.isEmpty()) throw IOException("Word buffer is empty")
+        else {
+            var word = wordBuffer.last()
+            wordBuffer = wordBuffer.toMutableList().apply {
+                removeAt(lastIndex)
+            }
+            return word
+        }
     }
 
     @SuppressLint("MissingPermission")
@@ -126,21 +136,16 @@ class ASRViewModel(application: Application) : AndroidViewModel(application) {
         recognizer = Recognizer(model, samplerate.toFloat()).apply {
             setWords(true)
             setPartialWords(true)
+            setMaxAlternatives(2)
             setGrammar("[\"" + modelGrammar.joinToString(
                 separator = "\",\"",
             ) + "\"]")
         }
 
-        startRecognition { newResult ->
-            val words = SpeechDecoderResult.deserialize(newResult)
-            for (el in words) {
-                addWord(el)
-            }
-
-        }
+        startRecognition()
     }
 
-     fun startRecognition(onResult: (String) -> Unit) {
+     fun startRecognition() {
         executor.execute {
             audioRecord.startRecording()
             val buffer = ByteArray(4096)
@@ -149,7 +154,10 @@ class ASRViewModel(application: Application) : AndroidViewModel(application) {
                 val bytesRead = audioRecord.read(buffer, 0, buffer.size)
                 if (bytesRead > 0) {
                     if (recognizer.acceptWaveForm(buffer, bytesRead)) {
-                        onResult(recognizer.result)
+                        val words = SpeechDecoderResult.deserialize(recognizer.result)
+                        for (el in words) {
+                            wordBuffer = wordBuffer + el
+                        }
                     }
                 }
             }

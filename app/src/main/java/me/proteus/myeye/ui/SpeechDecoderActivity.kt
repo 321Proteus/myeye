@@ -52,7 +52,7 @@ class SpeechDecoderActivity : ComponentActivity() {
     @OptIn(ExperimentalMaterial3Api::class)
     fun AppContent() {
 
-        val result = viewModel.result
+        val result = viewModel.wordBuffer
 
         Scaffold(
             topBar = {
