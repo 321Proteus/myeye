@@ -25,7 +25,6 @@ class BuildTest : VisionTest {
         activity: VisionTestLayoutActivity,
         stage: SerializableStage,
         isResult: Boolean,
-        difficulty: Int,
         onUpdate: (String) -> Unit
     ) {
         TODO("Not yet implemented")

@@ -135,7 +135,6 @@ class CircleTest : VisionTest {
         activity: VisionTestLayoutActivity,
         stage: SerializableStage,
         isResult: Boolean,
-        difficulty: Int,
         onUpdate: (String) -> Unit
     ) {
 
@@ -161,7 +160,7 @@ class CircleTest : VisionTest {
                     LetterContainer(
                         directions = stage.first,
                         key = null,
-                        currentStage = difficulty,
+                        currentStage = stage.difficulty,
                         modifier = Modifier
                     )
 
@@ -169,7 +168,7 @@ class CircleTest : VisionTest {
                         LetterContainer(
                             directions = stage.second,
                             key = stage.first,
-                            currentStage = difficulty,
+                            currentStage = stage.difficulty,
                             modifier = Modifier
                         )
                     }

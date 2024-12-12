@@ -14,9 +14,9 @@ import androidx.compose.material.icons.twotone.Face
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -134,7 +134,6 @@ class SnellenChart : VisionTest {
         activity: VisionTestLayoutActivity,
         stage: SerializableStage,
         isResult: Boolean,
-        difficulty: Int,
         onUpdate: (String) -> Unit
     ) {
 
@@ -156,14 +155,14 @@ class SnellenChart : VisionTest {
                     horizontalArrangement = Arrangement.SpaceEvenly
                 ) {
                     LetterContainer(
-                        stage = difficulty,
+                        stage = stage.difficulty,
                         text = stage.first,
                         key = null,
                         modifier = Modifier
                     )
                     if (isResult) {
                         LetterContainer(
-                            stage = difficulty,
+                            stage = stage.difficulty,
                             text = stage.second,
                             key = stage.first,
                             modifier = Modifier

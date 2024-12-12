@@ -118,7 +118,6 @@ class ColorArrangementTest : VisionTest {
         activity: VisionTestLayoutActivity,
         stage: SerializableStage,
         isResult: Boolean,
-        difficulty: Int,
         onUpdate: (String) -> Unit
     ) {
 
