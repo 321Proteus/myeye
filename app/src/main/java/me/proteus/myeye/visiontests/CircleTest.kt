@@ -14,10 +14,6 @@ import androidx.compose.material.icons.outlined.AccountCircle
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
@@ -31,8 +27,7 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import me.proteus.myeye.R
 import me.proteus.myeye.ScreenScalingUtils.getScreenInfo
-import me.proteus.myeye.SerializablePair
-import me.proteus.myeye.TestResult
+import me.proteus.myeye.SerializableStage
 import me.proteus.myeye.VisionTest
 import me.proteus.myeye.io.ResultDataCollector
 import me.proteus.myeye.ui.VisionTestLayoutActivity
@@ -136,38 +131,13 @@ class CircleTest : VisionTest {
     }
 
     @Composable
-    override fun BeginTest(
+    override fun DisplayStage(
         activity: VisionTestLayoutActivity,
-        modifier: Modifier,
+        stage: SerializableStage,
         isResult: Boolean,
-        result: TestResult?
+        difficulty: Int,
+        onUpdate: (String) -> Unit
     ) {
-
-        if (isResult) {
-
-            var resultStages = ResultDataCollector.deserializeResult(result!!.result)
-
-            DisplayStage(activity, modifier, resultStages, true)
-
-        } else {
-
-            var testStages: MutableList<SerializablePair> = ArrayList<SerializablePair>()
-
-            for (i in 0..<stageCount) {
-                testStages.add(SerializablePair(this.generateQuestion().toString(), generateDirections()))
-            }
-
-            DisplayStage(activity, modifier, testStages, false)
-
-        }
-
-    }
-
-
-    @Composable
-    override fun DisplayStage(activity: VisionTestLayoutActivity, modifier: Modifier, stages: List<SerializablePair>, isResult: Boolean) {
-
-        var stageIterator: Int by remember { mutableIntStateOf(0) }
 
         Column(
             modifier = Modifier
@@ -178,7 +148,7 @@ class CircleTest : VisionTest {
         ) {
 
             Box (
-                modifier = modifier
+                modifier = Modifier
                     .weight(1f)
                     .padding(bottom = 16.dp),
                 contentAlignment = Alignment.Center,
@@ -189,18 +159,18 @@ class CircleTest : VisionTest {
                 ) {
 
                     LetterContainer(
-                        directions = stages[stageIterator].first,
+                        directions = stage.first,
                         key = null,
-                        currentStage = stageIterator,
-                        modifier = modifier
+                        currentStage = difficulty,
+                        modifier = Modifier
                     )
 
                     if (isResult) {
                         LetterContainer(
-                            directions = stages[stageIterator].second,
-                            key = stages[stageIterator].first,
-                            currentStage = stageIterator,
-                            modifier = modifier
+                            directions = stage.second,
+                            key = stage.first,
+                            currentStage = difficulty,
+                            modifier = Modifier
                         )
                     }
                 }
@@ -209,32 +179,23 @@ class CircleTest : VisionTest {
 
             if (!isResult) {
                 ButtonRow(
-                    onRegenerate = { stageIterator++ },
+                    onRegenerate = { onUpdate("REGENERATE") },
 
                     onSizeDecrease = {
-
-                        if (stageIterator < stageCount - 1) {
-
-                            // TODO: Zaimplementowac polecenia glosowe do zbierania odpowiedzi
-                            storeResult(stages[stageIterator].first, generateDirections())
-                            stageIterator++
-                        } else {
-                            storeResult(stages[stageIterator].first, generateDirections())
-                            if (!isResult) endTest(activity)
-                        }
+                        onUpdate(generateDirections())
                     }
                 )
             } else {
                 Row(
-                    modifier = modifier
+                    modifier = Modifier
                         .fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceEvenly,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Button(onClick = { stageIterator-- }) {
+                    Button(onClick = { onUpdate("PREV") }) {
                         Text(text = "Poprzedni etap")
                     }
-                    Button(onClick = { stageIterator++ }) {
+                    Button(onClick = { onUpdate("NEXT") }) {
                         Text(text = "Następny etap")
                     }
                 }
@@ -243,7 +204,7 @@ class CircleTest : VisionTest {
         }
     }
 
-    override fun generateQuestion(): Any {
+    override fun generateQuestion(stage: Int?): String {
 
         var question: String = generateDirections()
 
@@ -284,12 +245,6 @@ class CircleTest : VisionTest {
         arr[abs(random.nextInt()) % 4] = correctAnswer
 
         return arr
-
-    }
-
-    override fun storeResult(question: String, answer: String) {
-
-        resultCollector.addResult(question, answer)
 
     }
 

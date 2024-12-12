@@ -2,13 +2,15 @@ package me.proteus.myeye;
 
 import java.io.Serializable;
 
-public class SerializablePair implements Serializable {
+public class SerializableStage implements Serializable {
     private final String first;
     private final String second;
+    private final int difficulty;
 
-    public SerializablePair(String first, String second) {
+    public SerializableStage(String first, String second, int difficulty) {
         this.first = first;
         this.second = second;
+        this.difficulty = difficulty;
     }
 
     public String getFirst() {
@@ -19,4 +21,7 @@ public class SerializablePair implements Serializable {
         return second;
     }
 
+    public int getDifficulty() {
+        return difficulty;
+    }
 }

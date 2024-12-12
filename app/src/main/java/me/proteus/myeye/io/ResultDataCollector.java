@@ -8,25 +8,31 @@ import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-import me.proteus.myeye.SerializablePair;
+import me.proteus.myeye.SerializableStage;
 
 public class ResultDataCollector {
-    public final List<SerializablePair> stages = new ArrayList<>();
+    public final List<SerializableStage> stages = new ArrayList<>();
 
 
     public ResultDataCollector() {
 
     }
 
-    public void addResult(String q, String a) {
+    public void addResult(String q, String a, int d) {
 
-        SerializablePair p = new SerializablePair(q, a);
+        SerializableStage p = new SerializableStage(q, a, d);
+        stages.add(p);
+
+    }
+
+    public void addResult(SerializableStage p) {
+
         stages.add(p);
 
     }
 
 
-    public static byte[] serializeResult(List<SerializablePair> input) {
+    public static byte[] serializeResult(List<SerializableStage> input) {
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         ObjectOutputStream oos;
@@ -47,7 +53,7 @@ public class ResultDataCollector {
 
     }
 
-    public static List<SerializablePair> deserializeResult(byte[] object) {
+    public static List<SerializableStage> deserializeResult(byte[] object) {
 
         ByteArrayInputStream bais = new ByteArrayInputStream(object);
 
@@ -55,7 +61,7 @@ public class ResultDataCollector {
 
             ObjectInputStream ois = new ObjectInputStream(bais);
             @SuppressWarnings("unchecked")
-            List<SerializablePair> output = (List<SerializablePair>) ois.readObject();
+            List<SerializableStage> output = (List<SerializableStage>) ois.readObject();
             ois.close();
 
             return output;

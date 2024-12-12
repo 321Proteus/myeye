@@ -12,7 +12,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import me.proteus.myeye.SerializablePair;
+import me.proteus.myeye.SerializableStage;
 import me.proteus.myeye.TestResult;
 
 public class ResultDataSaver {
@@ -121,7 +121,7 @@ public class ResultDataSaver {
         return null;
     }
 
-    public void insert(String testName, List<SerializablePair> result, long ts) {
+    public void insert(String testName, List<SerializableStage> result, long ts) {
 
         SupportSQLiteDatabase db = this.dbHelper.getWritableDatabase();
 

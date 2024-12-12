@@ -26,7 +26,8 @@ import androidx.compose.material.icons.automirrored.outlined.List
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.material3.Button
-import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
@@ -48,7 +49,7 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import me.proteus.myeye.R
-import me.proteus.myeye.SerializablePair
+import me.proteus.myeye.SerializableStage
 import me.proteus.myeye.TestResult
 import me.proteus.myeye.VisionTest
 import me.proteus.myeye.io.ResultDataCollector
@@ -61,44 +62,91 @@ class ColorArrangementTest : VisionTest {
     override val stageCount: Int = 6
     override val resultCollector: ResultDataCollector = ResultDataCollector()
 
-    val difficultyScale = listOf(8, 7, 5, 4, 3, 2, 1)
+    val difficultyScale = listOf(7, 6, 5, 4, 3, 2, 1)
     var colorOffset = 0
 
     var colors: Array<String> = arrayOf()
 
     @Composable
+    fun FarnsworthItem(modifier: Modifier, item: String, index: Int, cd: Int?) {
+
+        var isTopEdge = (index == 0)
+        var isBottomEdge = (index == 9)
+
+        var edgeShape: Shape = RoundedCornerShape(
+            topStart = (if (isTopEdge) 15.dp else 0.dp),
+            topEnd = (if (isTopEdge) 15.dp else 0.dp),
+            bottomEnd = (if (isBottomEdge) 15.dp else 0.dp),
+            bottomStart = (if (isBottomEdge) 15.dp else 0.dp)
+        )
+
+        Column(
+            modifier = Modifier
+                .fillMaxHeight(0.1f)
+                .then(modifier)
+        ) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(60.dp)
+                    .clip(edgeShape)
+                    .background(Color(parseColor(item)))
+                    .then(
+                        if (isTopEdge || isBottomEdge) {
+                            Modifier.border(
+                                width = (2.dp),
+                                brush = SolidColor(Color.Black),
+                                shape = edgeShape
+                            )
+                        } else Modifier
+                    ),
+
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    modifier = Modifier
+                        .scale(if (index == cd) 0.66f else 1f, 1f),
+                    text = "${getHue(item)}"
+                )
+            }
+        }
+
+    }
+
+    @Composable
     override fun DisplayStage(
         activity: VisionTestLayoutActivity,
-        modifier: Modifier,
-        stages: List<SerializablePair>,
-        isResult: Boolean
+        stage: SerializableStage,
+        isResult: Boolean,
+        difficulty: Int,
+        onUpdate: (String) -> Unit
     ) {
 
-        var difficulty: Int by remember { mutableIntStateOf(1) }
-        var resultIterator: Int by remember { mutableIntStateOf(0) }
-
-        var colorArray: ArrayList<String> = ArrayList()
-        var answerArray: ArrayList<String> = ArrayList()
-
-
-        for (i in stages) {
-            colorArray.add(if (isResult) i.second else i.first)
-            answerArray.add(if (isResult) i.first else i.second)
+        val inputColors by remember(stage) {
+            derivedStateOf {
+                if (isResult) stage.second.split(' ')
+                else stage.first.split(' ')
+            }
         }
 
-        var stageColors by remember { mutableStateOf(
-            (if (isResult) colorArray[resultIterator].split(' ') else
-                prepareArray(
-                colorArray,
-                difficultyScale[difficulty],
-                10,
-                colorOffset
-            ).toList()))
+        val sortedColors by remember(stage) {
+            derivedStateOf {
+                if (isResult) stage.first.split(' ')
+                else inputColors.sortedBy { getHue(it) }
+            }
         }
 
-        var sortedColors by remember { mutableStateOf(
-            if (isResult) answerArray[resultIterator].split(' ') else null
-        ) }
+        var stageColors by remember { mutableStateOf(inputColors) }
+
+        var correctnessMap by remember { mutableStateOf<Map<Int, Int>>(emptyMap()) }
+
+        LaunchedEffect(inputColors) {
+            stageColors = inputColors
+            if (isResult) {
+                correctnessMap = getCorrectnessMapping(sortedColors, stageColors)
+            }
+
+        }
 
         var currentlyDragged by remember { mutableStateOf<Int?>(null) }
         var currentOffset by remember { mutableFloatStateOf(0f) }
@@ -117,7 +165,6 @@ class ColorArrangementTest : VisionTest {
                 horizontalArrangement = if (isResult) Arrangement.SpaceBetween else Arrangement.SpaceEvenly
             ) {
 
-
                 Column(
                     modifier = Modifier
                         .weight(1f),
@@ -135,81 +182,46 @@ class ColorArrangementTest : VisionTest {
                             var isTopEdge = (index == 0)
                             var isBottomEdge = (index == 9)
 
-                            var edgeShape: Shape = RoundedCornerShape(
-                                topStart = (if (isTopEdge) 15.dp else 0.dp),
-                                topEnd = (if (isTopEdge) 15.dp else 0.dp),
-                                bottomEnd = (if (isBottomEdge) 15.dp else 0.dp),
-                                bottomStart = (if (isBottomEdge) 15.dp else 0.dp)
-                            )
+                            var movableModifier: Modifier = Modifier
+                                .offset { IntOffset(0, if (currentlyDragged == index) currentOffset.toInt() else 0) }
+                                .scale(if (index == currentlyDragged) 1.5f else 1f, 1f)
+                                .zIndex((if (index == currentlyDragged) 1f else 0f))
+                                .draggable(
+                                    enabled = (!(isTopEdge || isBottomEdge || isResult)),
+                                    orientation = Orientation.Vertical,
+                                    state = rememberDraggableState { delta ->
 
-                            Column(
-                                modifier = Modifier
-                                    .offset { IntOffset(0, if (currentlyDragged == index) currentOffset.toInt() else 0) }
-                                    .fillMaxHeight(0.1f)
-                                    .scale(if (index == currentlyDragged) 1.5f else 1f, 1f)
-                                    .zIndex((if (index == currentlyDragged) 1f else 0f))
-                                    .draggable(
-                                        enabled = (!(isTopEdge || isBottomEdge)),
-                                        orientation = Orientation.Vertical,
-                                        state = rememberDraggableState { delta ->
+                                        if (currentlyDragged == null) currentlyDragged = index
+                                        currentOffset += delta
 
-                                            if (currentlyDragged == null) currentlyDragged = index
-                                            currentOffset += delta
+                                        val currentIndex = currentlyDragged ?: return@rememberDraggableState
 
-                                            val currentIndex =
-                                                currentlyDragged ?: return@rememberDraggableState
-
-                                            val targetIndex = when {
-                                                currentOffset > 120 -> currentIndex + 1
-                                                currentOffset < -120 -> currentIndex - 1
-                                                else -> null
-                                            }
-
-                                            targetIndex?.let { target ->
-                                                if (targetIndex == 0 || targetIndex == 9) return@rememberDraggableState
-                                                if (target in stageColors.indices) {
-
-                                                    stageColors = stageColors.toMutableList().apply {
-                                                        val draggedItem = removeAt(currentIndex)
-                                                        add(target, draggedItem)
-                                                    }
-                                                    currentlyDragged = target
-                                                    currentOffset = 0f
-                                                }
-                                            }
-                                        },
-                                        onDragStopped = {
-                                            currentlyDragged = null
-                                            currentOffset = 0f
+                                        val targetIndex = when {
+                                            currentOffset > 120 -> currentIndex + 1
+                                            currentOffset < -120 -> currentIndex - 1
+                                            else -> null
                                         }
-                                    )
-                            ) {
-                                Box(
-                                    modifier = Modifier
-                                        .fillMaxWidth(if (isResult) 1f else 0.6f)
-                                        .height(60.dp)
-                                        .clip(edgeShape)
-                                        .background(Color(parseColor(item)))
-                                        .then(
-                                            if ((isTopEdge) || isBottomEdge) {
-                                                Modifier.border(
-                                                    width = (2.dp),
-                                                    brush = SolidColor(Color.Black),
-                                                    shape = edgeShape
-                                                )
-                                            } else Modifier
-                                        ),
 
-                                    contentAlignment = Alignment.Center
-                                ) {
-                                    Text(
-                                        modifier = Modifier
-                                            .scale(if (index == currentlyDragged) 0.66f else 1f, 1f),
-                                        text = "${getHue(item)}"
-                                    )
-                                }
-                            }
+                                        targetIndex?.let { target ->
+                                            if (targetIndex == 0 || targetIndex == 9) return@rememberDraggableState
+                                            if (target in stageColors.indices) {
 
+                                                stageColors = stageColors.toMutableList().apply {
+                                                    val draggedItem = removeAt(currentIndex)
+                                                    add(target, draggedItem)
+                                                }
+                                                currentlyDragged = target
+                                                currentOffset = 0f
+                                            }
+                                        }
+                                    },
+                                    onDragStopped = {
+                                        currentlyDragged = null
+                                        currentOffset = 0f
+                                    }
+                                )
+
+                            FarnsworthItem(movableModifier, item, index, currentlyDragged)
 
                         }
                     }
@@ -228,7 +240,6 @@ class ColorArrangementTest : VisionTest {
                                 println("$startX $startY")
                             }
                     ) {
-                        var correctnessMap = getCorrectnessMapping(sortedColors!!, stageColors)
 
                         Canvas(
                             modifier = Modifier.fillMaxSize()
@@ -257,43 +268,10 @@ class ColorArrangementTest : VisionTest {
                             horizontalAlignment = Alignment.CenterHorizontally,
                             verticalArrangement = Arrangement.SpaceEvenly
                         ) {
-                            itemsIndexed(sortedColors!!) { index, item ->
+                            itemsIndexed(sortedColors) { index, item ->
 
-                                var isTopEdge = (index == 0)
-                                var isBottomEdge = (index == 9)
+                                FarnsworthItem(Modifier, item, index, currentlyDragged)
 
-                                var edgeShape: Shape = RoundedCornerShape(
-                                    topStart = (if (isTopEdge) 15.dp else 0.dp),
-                                    topEnd = (if (isTopEdge) 15.dp else 0.dp),
-                                    bottomEnd = (if (isBottomEdge) 15.dp else 0.dp),
-                                    bottomStart = (if (isBottomEdge) 15.dp else 0.dp)
-                                )
-
-                                Column(
-                                    modifier = Modifier
-                                        .fillMaxHeight(0.1f)
-                                ) {
-                                    Box(
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .height(60.dp)
-                                            .clip(edgeShape)
-                                            .background(Color(parseColor(item)))
-                                            .then(
-                                                if ((isTopEdge) || isBottomEdge) {
-                                                    Modifier.border(
-                                                        width = (2.dp),
-                                                        brush = SolidColor(Color.Black),
-                                                        shape = edgeShape
-                                                    )
-                                                } else Modifier
-                                            ),
-
-                                        contentAlignment = Alignment.Center
-                                    ) {
-                                        Text("${getHue(item)}")
-                                    }
-                                }
                             }
                         }
                     }
@@ -302,104 +280,67 @@ class ColorArrangementTest : VisionTest {
 
             }
 
-            Box(
-                contentAlignment = Alignment.Center
-            ) {
-                Button(
-                    onClick = {
-
-                        if (isResult) {
-
-                            resultIterator++
-                            stageColors = colorArray[resultIterator].split(' ')
-                            sortedColors = answerArray[resultIterator].split(' ')
-                            return@Button
-
-                        }
-
-                        println("ohioskibidi")
-
-                        if (difficulty < stageCount) {
-
-                            var answer = stageColors.joinToString(" ")
-
-                            var a = getScore(answer, "RELATIVE")
-                            var b = getScore(answer, "LEVENSHTEIN")
-
-                            if ((a + b) / 2 >= 70 && (a + b) / 2 < 100 && difficulty >= 4) {
-                                colorOffset += 20
-                                println("${(a + b) / 2} Bez zmiany trudnosci")
-                            } else {
-                                colorOffset = 0
-                                difficulty++
-                            }
-
-                            storeResult(stageColors.sortedBy { getHue(it) }.joinToString(" "), answer)
-                            stageColors = prepareArray(
-                                colorArray,
-                                difficultyScale[difficulty],
-                                10,
-                                colorOffset
-                            ).toList()
-
-                        } else {
-                            storeResult(
-                                stageColors.sortedBy { getHue(it) }.joinToString(" "),
-                                stageColors.joinToString(" ")
-                            )
-                            endTest(activity)
-                        }
-                    }
+            if (!isResult) {
+                Box(
+                    contentAlignment = Alignment.Center
                 ) {
-                    Text("Dalej")
+                    Button(
+                        onClick = {
+                            var ans = stageColors.joinToString(" ")
+                            println(getScore(ans, "RELATIVE"))
+                            onUpdate(ans)
+                        }
+                    ) {
+                        Text("Dalej")
+                    }
                 }
+            } else {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceEvenly,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Button(onClick = { onUpdate("PREV") }) {
+                        Text(text = "Poprzedni etap")
+                    }
+                    Button(onClick = { onUpdate("NEXT") }) {
+                        Text(text = "Następny etap")
+                    }
+                }
+
             }
 
         }
 
     }
 
+
     @Composable
     override fun BeginTest(
         activity: VisionTestLayoutActivity,
-        modifier: Modifier,
         isResult: Boolean,
         result: TestResult?
     ) {
         colors = activity.resources.getStringArray(R.array.farnsworth_colors)
 
-        if (!isResult) {
+        BeginTestImpl(activity, isResult, result)
 
-            var list: MutableList<SerializablePair> = ArrayList<SerializablePair>(stageCount)
-
-            for (i in colors) {
-                list.add(SerializablePair(i, ""))
-            }
-
-            DisplayStage(activity, modifier, list, false)
-
-        } else {
-
-            var inputList = ResultDataCollector.deserializeResult(result!!.result)
-
-            var list = ArrayList<SerializablePair>()
-
-            for (el in inputList) {
-                list.add(SerializablePair(el.first, el.second))
-            }
-
-            DisplayStage(activity, modifier, list, true)
-
-        }
+            // zwieksz colorOffset gdy wynik jest bliski 100
 
     }
 
-    override fun generateQuestion(): Any {
-        TODO("Not yet implemented")
+    override fun generateQuestion(stage: Int?): String {
+        return prepareArray(
+            old = colors.toList(),
+            freq = (if (stage != null) difficultyScale[stage] else 7),
+            count = 10,
+            offset = colorOffset
+        ).joinToString(" ")
     }
 
     override fun getExampleAnswers(): Array<String> {
-        TODO("Not yet implemented")
+        return arrayOf()
     }
 
     override fun checkAnswer(answer: String): Boolean {
@@ -475,7 +416,6 @@ class ColorArrangementTest : VisionTest {
             if (j > 1) i -= 1
 
         }
-//        for (el in map) println("${el.value} ${el.key}")
 
         return map
 
@@ -499,21 +439,21 @@ class ColorArrangementTest : VisionTest {
         return hsv[0]
     }
 
-    fun prepareArray(old: List<String>, n: Int, limit: Int, offset: Int = 0): ArrayList<String> {
+    fun prepareArray(old: List<String>, freq: Int, count: Int, offset: Int = 0): ArrayList<String> {
 
         var new = ArrayList<String>()
         var i: Int = offset
 
-        while(new.size < limit) {
+        while(new.size < count) {
             new.add(old[i % old.size])
-            i += n
+            i += freq
         }
 
-        new = ArrayList(new.subList(0, limit))
+        new = ArrayList(new.subList(0, count))
         var begin = new.first()
         var end = new.last()
 
-        new = ArrayList(new.subList(1, limit - 1))
+        new = ArrayList(new.subList(1, count - 1))
 
         new.shuffle()
         new.add(0, begin)

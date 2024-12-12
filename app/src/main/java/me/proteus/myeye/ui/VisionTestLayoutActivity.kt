@@ -46,7 +46,7 @@ class VisionTestLayoutActivity : ComponentActivity() {
 
                         val testObject: VisionTest = VisionTestUtils().getTestByID(testID)
 
-                        testObject.BeginTest(activity = this@VisionTestLayoutActivity, modifier = Modifier, isResult = isResult, result = resultData)
+                        testObject.BeginTest(activity = this@VisionTestLayoutActivity, isResult = isResult, result = resultData)
 
                     }
 

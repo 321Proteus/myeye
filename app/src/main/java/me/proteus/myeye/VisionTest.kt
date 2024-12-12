@@ -2,7 +2,11 @@ package me.proteus.myeye
 
 import android.content.Intent
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.vector.ImageVector
 import me.proteus.myeye.io.ResultDataCollector
 import me.proteus.myeye.io.ResultDataSaver
@@ -25,21 +29,93 @@ interface VisionTest {
      * @param activity The canvas activity to display the layout
      */
     @Composable
-    fun DisplayStage(activity: VisionTestLayoutActivity, modifier: Modifier, stages: List<SerializablePair>, isResult: Boolean)
+    fun DisplayStage(
+        activity: VisionTestLayoutActivity,
+        stage: SerializableStage,
+        isResult: Boolean,
+        difficulty: Int,
+        onUpdate: (String) -> Unit
+    )
 
     @Composable
-    fun BeginTest(activity: VisionTestLayoutActivity, modifier: Modifier, isResult: Boolean, result: TestResult?)
+    fun BeginTest(activity: VisionTestLayoutActivity, isResult: Boolean, result: TestResult?) {
+        BeginTestImpl(activity, isResult, result)
+    }
 
-    fun generateQuestion(): Any
+    @Composable
+    fun BeginTestImpl(activity: VisionTestLayoutActivity, isResult: Boolean, result: TestResult?) {
+
+        if (isResult) {
+            var i by remember { mutableIntStateOf(0) }
+
+            val resultData = ResultDataCollector.deserializeResult(result!!.result)
+            var stageList = remember { resultData }
+
+            var currentResultStage = stageList[i]
+            var stageDifficulty = currentResultStage.difficulty
+
+            DisplayStage(activity, currentResultStage, true, stageDifficulty) { answer ->
+                if (answer == "PREV") {
+                    if (i > 0) i--
+                } else if (answer == "NEXT") {
+                    if (i < stageList.size - 1) i++
+                    else {
+                        var exitIntent = Intent(activity, MenuActivity::class.java)
+                        // TODO: Dodac podsumowanie testu
+                        activity.startActivity(exitIntent)
+                    }
+                }
+            }
+
+        } else {
+
+            var currentDifficulty by remember { mutableIntStateOf(0) }
+
+            var currentStage by remember { mutableStateOf(
+                SerializableStage(
+                    generateQuestion(currentDifficulty).toString(),
+                    getExampleAnswers().joinToString(" "),
+                    currentDifficulty
+                )
+            ) }
+
+            DisplayStage(activity, currentStage, false, currentDifficulty) { answer ->
+
+                if (answer == "REGENERATE") {
+
+                    currentStage = SerializableStage(
+                        generateQuestion(currentDifficulty).toString(),
+                        getExampleAnswers().joinToString(" "),
+                        currentDifficulty
+                    )
+                    println("Regenerate")
+
+                } else if (currentDifficulty == stageCount) {
+
+                    storeResult(currentStage.first, answer, currentDifficulty)
+                    endTest(activity)
+
+                } else {
+                    println("Answer: $answer")
+                    storeResult(currentStage.first, answer, currentDifficulty)
+                    currentDifficulty++
+                }
+
+            }
+
+        }
+
+    }
+
+    fun generateQuestion(stage: Int?): String
 
     fun getExampleAnswers(): Array<String>
 
     fun checkAnswer(answer: String): Boolean
 
-    fun storeResult(question: String, answer: String) {
-        resultCollector.addResult(question, answer)
+    fun storeResult(question: String, answer: String, difficulty: Int) {
+        resultCollector.addResult(question, answer, difficulty)
     }
-
 
      fun endTest(activity: VisionTestLayoutActivity) {
 

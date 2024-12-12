@@ -1,6 +1,5 @@
 package me.proteus.myeye.visiontests
 
-import android.content.Intent
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -13,22 +12,15 @@ import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import me.proteus.myeye.MenuActivity
-import me.proteus.myeye.SerializablePair
-import me.proteus.myeye.TestResult
+import me.proteus.myeye.SerializableStage
 import me.proteus.myeye.VisionTest
 import me.proteus.myeye.io.ResultDataCollector
-import me.proteus.myeye.io.ResultDataSaver
 import me.proteus.myeye.ui.VisionTestLayoutActivity
 import java.util.Random
 import kotlin.math.abs
@@ -45,52 +37,16 @@ class ExampleTest : VisionTest {
 
     override val resultCollector: ResultDataCollector = ResultDataCollector()
 
-
     @Composable
-    override fun BeginTest(
+    override fun DisplayStage(
         activity: VisionTestLayoutActivity,
-        modifier: Modifier,
+        stage: SerializableStage,
         isResult: Boolean,
-        result: TestResult?
+        difficulty: Int,
+        onUpdate: (String) -> Unit
     ) {
 
-        if (isResult) {
-
-            var resultStages: MutableList<SerializablePair> = ArrayList<SerializablePair>()
-            val resultData = ResultDataCollector.deserializeResult(result!!.result)
-
-            for (i in 0..stageCount-1) {
-                resultStages.add(resultData[i])
-            }
-
-            DisplayStage(activity, modifier, resultStages, true)
-
-        } else {
-
-            var testStages: MutableList<SerializablePair> = ArrayList<SerializablePair>()
-
-            for (i in 0..stageCount-1) {
-
-                correctAnswer = this.generateQuestion().toString()
-
-                var variants = this.getExampleAnswers()
-                var joinedVariants = variants.joinToString(separator = "")
-
-                testStages.add(SerializablePair(correctAnswer, joinedVariants))
-            }
-
-            DisplayStage(activity, modifier, testStages, false)
-
-        }
-
-    }
-
-    @Composable
-    override fun DisplayStage(activity: VisionTestLayoutActivity, modifier: Modifier, stages: List<SerializablePair>, isResult: Boolean) {
-
-        var stageIterator: Int by remember { mutableIntStateOf(0) }
-
-        println("$score $stageIterator")
+        println("$score")
 
         Column(
             modifier = Modifier
@@ -104,7 +60,7 @@ class ExampleTest : VisionTest {
                 Text(text = score.toString())
             }
             Box (
-                modifier = modifier
+                modifier = Modifier
                     .weight(1f)
                     .padding(bottom = 32.dp),
                 contentAlignment = Alignment.Center,
@@ -114,15 +70,15 @@ class ExampleTest : VisionTest {
                     horizontalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
                     Text(
-                        text = stages[stageIterator].first,
+                        text = stage.first,
                         color = Color.Black,
                         fontSize = 48.sp
                     )
 
                     if (isResult) {
                         Text(
-                            text = stages[stageIterator].second,
-                            color = (if (stages[stageIterator].first == stages[stageIterator].second) Color.Green else Color.Red),
+                            text = stage.second,
+                            color = (if (stage.first == stage.second) Color.Green else Color.Red),
                             fontSize = 48.sp
                         )
                     }
@@ -134,43 +90,32 @@ class ExampleTest : VisionTest {
 
             if (!isResult) {
                 Row(
-                    modifier = modifier
+                    modifier = Modifier
                         .fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceEvenly,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    for (el in stages[stageIterator].second) {
+                    var buttons = stage.second.filter { it != ' ' }
+                    for (el in buttons) {
 
                         var ans: String = el.toString()
 
-                        Button(onClick = {
-
-                            if (ans == stages[stageIterator].first) score++
-
-                            if (stageIterator < stageCount - 1) {
-                                storeResult(stages[stageIterator].first, ans)
-                                stageIterator++
-                            } else {
-                                storeResult(stages[stageIterator].first, ans)
-                                if (!isResult) endTest(activity)
-                            }
-
-                        }) {
+                        Button(onClick = { onUpdate(ans) }) {
                             Text(if (isResult) "Dalej" else ans)
                         }
                     }
                 }
             } else {
                 Row(
-                    modifier = modifier
+                    modifier = Modifier
                         .fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceEvenly,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Button(onClick = { stageIterator-- }) {
+                    Button(onClick = { onUpdate("PREV") }) {
                         Text(text = "Poprzedni etap")
                     }
-                    Button(onClick = { stageIterator++ }) {
+                    Button(onClick = { onUpdate("NEXT") }) {
                         Text(text = "Następny etap")
                     }
                 }
@@ -180,11 +125,11 @@ class ExampleTest : VisionTest {
 
     }
 
-    override fun generateQuestion(): Any {
+    override fun generateQuestion(stage: Int?): String {
 
-        var question = randomChar()
+        var question = randomChar().toString()
 
-        correctAnswer = question.toString()
+        correctAnswer = question
 
         return question
 
@@ -192,12 +137,6 @@ class ExampleTest : VisionTest {
 
     override fun checkAnswer(answer: String): Boolean {
         return answer == correctAnswer
-    }
-
-    override fun storeResult(question: String, answer: String) {
-
-        resultCollector.addResult(question, answer)
-
     }
 
     override fun getExampleAnswers(): Array<String> {

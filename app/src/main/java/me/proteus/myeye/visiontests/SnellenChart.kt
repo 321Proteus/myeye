@@ -1,6 +1,5 @@
 package me.proteus.myeye.visiontests
 
-import android.content.Intent
 import android.content.res.Configuration
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -31,8 +30,7 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import me.proteus.myeye.R
 import me.proteus.myeye.ScreenScalingUtils.getScreenInfo
-import me.proteus.myeye.SerializablePair
-import me.proteus.myeye.TestResult
+import me.proteus.myeye.SerializableStage
 import me.proteus.myeye.VisionTest
 import me.proteus.myeye.io.ResultDataCollector
 import me.proteus.myeye.ui.VisionTestLayoutActivity
@@ -132,44 +130,13 @@ class SnellenChart : VisionTest {
     }
 
     @Composable
-    override fun BeginTest(
+    override fun DisplayStage(
         activity: VisionTestLayoutActivity,
-        modifier: Modifier,
+        stage: SerializableStage,
         isResult: Boolean,
-        result: TestResult?
+        difficulty: Int,
+        onUpdate: (String) -> Unit
     ) {
-
-        if (isResult) {
-
-            var resultStages: MutableList<SerializablePair> = ArrayList<SerializablePair>(stageCount)
-
-            val resultData = ResultDataCollector.deserializeResult(result!!.result)
-
-
-            for (i in 0..<stageCount) {
-                resultStages.add(resultData[i])
-            }
-
-            DisplayStage(activity, modifier, resultStages, true)
-
-        } else {
-
-            var testStages: MutableList<SerializablePair> = ArrayList<SerializablePair>(stageCount)
-
-            for (i in 0..<stageCount) {
-                testStages.add(SerializablePair(this.generateQuestion().toString(), randomText(5)))
-            }
-
-            DisplayStage(activity, modifier, testStages, false)
-
-        }
-
-    }
-
-    @Composable
-    override fun DisplayStage(activity: VisionTestLayoutActivity, modifier: Modifier, stages: List<SerializablePair>, isResult: Boolean) {
-
-        var questionIterator: Int by remember { mutableIntStateOf(0) }
 
         Column(
             modifier = Modifier
@@ -180,7 +147,7 @@ class SnellenChart : VisionTest {
         ) {
 
             Box (
-                modifier = modifier
+                modifier = Modifier
                     .weight(1f)
                     .padding(bottom = 16.dp),
                 contentAlignment = Alignment.Center,
@@ -189,17 +156,17 @@ class SnellenChart : VisionTest {
                     horizontalArrangement = Arrangement.SpaceEvenly
                 ) {
                     LetterContainer(
-                        stage = questionIterator,
-                        text = stages[questionIterator].first,
+                        stage = difficulty,
+                        text = stage.first,
                         key = null,
-                        modifier = modifier
+                        modifier = Modifier
                     )
                     if (isResult) {
                         LetterContainer(
-                            stage = questionIterator,
-                            text = stages[questionIterator].second,
-                            key = stages[questionIterator].first,
-                            modifier = modifier
+                            stage = difficulty,
+                            text = stage.second,
+                            key = stage.first,
+                            modifier = Modifier
                         )
                     }
 
@@ -209,33 +176,23 @@ class SnellenChart : VisionTest {
 
             if (!isResult) {
                 ButtonRow(
-                    onRegenerate = { questionIterator++ },
+                    onRegenerate = { onUpdate("REGENERATE") },
                     onSizeDecrease = {
-
-                        if (questionIterator < stageCount - 1) {
-
-                            // TODO: Zaimplementowac polecenia glosowe do zbierania odpowiedzi
-                            storeResult(stages[questionIterator].first, randomText(5))
-                            questionIterator++
-                        } else {
-                            storeResult(stages[questionIterator].first, randomText(5))
-                            if (!isResult) endTest(activity)
-
-                        }
+                        onUpdate(randomText(5))
                     }
                 )
             } else {
 
                 Row(
-                    modifier = modifier
+                    modifier = Modifier
                         .fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceEvenly,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Button(onClick = { questionIterator-- }) {
+                    Button(onClick = { onUpdate("PREV") }) {
                         Text(text = "Poprzedni etap")
                     }
-                    Button(onClick = { questionIterator++ }) {
+                    Button(onClick = { onUpdate("NEXT") }) {
                         Text(text = "Następny etap")
                     }
                 }
@@ -244,13 +201,7 @@ class SnellenChart : VisionTest {
         }
     }
 
-    override fun storeResult(question: String, answer: String) {
-
-        resultCollector.addResult(question, answer)
-
-    }
-
-    override fun generateQuestion(): Any {
+    override fun generateQuestion(stage: Int?): String {
 
         var question: String = randomText(5)
 
