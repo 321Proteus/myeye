@@ -25,6 +25,15 @@ public class SpeechDecoderResult {
         ArrayList<SpeechDecoderResult> list = new ArrayList<>();
         JsonObject obj = JsonParser.parseString(json).getAsJsonObject();
 
+        if (obj.has("alternatives")) {
+
+            JsonArray alternatives = obj.getAsJsonArray("alternatives");
+            for (JsonElement el : alternatives) {
+                ArrayList<SpeechDecoderResult> part = getSingleResult(el.getAsJsonObject());
+            }
+
+        }
+
         if (obj.has("result")) {
 
             JsonArray resultArray = obj.getAsJsonArray("result");
@@ -41,6 +50,28 @@ public class SpeechDecoderResult {
                 ));
 
             }
+        }
+
+        return list;
+
+    }
+
+    private static ArrayList<SpeechDecoderResult> getSingleResult(JsonObject json) {
+
+        ArrayList<SpeechDecoderResult> list = new ArrayList<>();
+
+        if (json.has("confidence")) {
+
+            JsonArray resultArray = json.getAsJsonArray("result");
+            for (JsonElement el : resultArray) System.out.println(el);
+
+        } else {
+            list.add(new SpeechDecoderResult(
+                json.get("conf").getAsFloat(),
+                json.get("start").getAsFloat(),
+                json.get("end").getAsFloat(),
+                json.get("word").getAsString()
+            ));
         }
 
         return list;

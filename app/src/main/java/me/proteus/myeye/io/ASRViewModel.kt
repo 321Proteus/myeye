@@ -136,7 +136,7 @@ class ASRViewModel(application: Application) : AndroidViewModel(application) {
         recognizer = Recognizer(model, samplerate.toFloat()).apply {
             setWords(true)
             setPartialWords(true)
-            setMaxAlternatives(2)
+         //   setMaxAlternatives(2)
             setGrammar("[\"" + modelGrammar.joinToString(
                 separator = "\",\"",
             ) + "\"]")
