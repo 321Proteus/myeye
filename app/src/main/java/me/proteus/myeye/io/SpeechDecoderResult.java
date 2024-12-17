@@ -60,10 +60,28 @@ public class SpeechDecoderResult {
 
         ArrayList<SpeechDecoderResult> list = new ArrayList<>();
 
+        System.out.println(json);
+
         if (json.has("confidence")) {
 
-            JsonArray resultArray = json.getAsJsonArray("result");
-            for (JsonElement el : resultArray) System.out.println(el);
+            if (json.has("result")) {
+
+                JsonArray resultArray = json.getAsJsonArray("result");
+                float avgConf = json.get("confidence").getAsFloat() / resultArray.size();
+
+                for (JsonElement el : resultArray) {
+
+                    System.out.println(el);
+                    JsonObject obj = el.getAsJsonObject();
+
+                    list.add(new SpeechDecoderResult(
+                            avgConf,
+                            obj.get("start").getAsFloat(),
+                            obj.get("end").getAsFloat(),
+                            obj.get("word").getAsString()
+                    ));
+                }
+            }
 
         } else {
             list.add(new SpeechDecoderResult(
