@@ -20,6 +20,8 @@ public class HTTPDownloader {
 
     public CompletableFuture<Void> download(String url, File output) {
 
+        System.out.println(url);
+
         CompletableFuture<Void> promise = new CompletableFuture<>();
 
         File path = new File(output.getParent());
@@ -28,7 +30,9 @@ public class HTTPDownloader {
             throw new RuntimeException("Sciezka do katalogu nie istnieje i nie mogla zostac utworzona");
         }
 
-        try (FileOutputStream fos = new FileOutputStream(output)) {
+        try {
+
+            FileOutputStream fos = new FileOutputStream(output);
 
             client.prepareGet(url).execute(new AsyncHandler<Void>() {
                 private long total = 0;
@@ -59,6 +63,9 @@ public class HTTPDownloader {
 
                 @Override
                 public void onThrowable(Throwable t) {
+                    try { fos.close(); } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
                     promise.completeExceptionally(t);
                 }
 
