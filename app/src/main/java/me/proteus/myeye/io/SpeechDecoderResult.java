@@ -30,6 +30,7 @@ public class SpeechDecoderResult {
             JsonArray alternatives = obj.getAsJsonArray("alternatives");
             for (JsonElement el : alternatives) {
                 ArrayList<SpeechDecoderResult> part = getSingleResult(el.getAsJsonObject());
+                list.addAll(part);
             }
 
         }
@@ -40,7 +41,6 @@ public class SpeechDecoderResult {
             for (JsonElement el : resultArray) {
 
                 JsonObject result = el.getAsJsonObject();
-                System.out.println(result);
 
                 list.add(new SpeechDecoderResult(
                         result.get("conf").getAsFloat(),
@@ -60,7 +60,7 @@ public class SpeechDecoderResult {
 
         ArrayList<SpeechDecoderResult> list = new ArrayList<>();
 
-        System.out.println(json);
+//        System.out.println("JSON: " + json);
 
         if (json.has("confidence")) {
 
@@ -71,7 +71,6 @@ public class SpeechDecoderResult {
 
                 for (JsonElement el : resultArray) {
 
-                    System.out.println(el);
                     JsonObject obj = el.getAsJsonObject();
 
                     list.add(new SpeechDecoderResult(
