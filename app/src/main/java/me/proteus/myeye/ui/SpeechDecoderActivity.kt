@@ -12,6 +12,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
@@ -60,33 +61,52 @@ class SpeechDecoderActivity : ComponentActivity() {
             },
             content = { innerPadding ->
 
-                LazyColumn(
+                Box(
                     modifier = Modifier
                         .fillMaxSize()
                         .padding(innerPadding)
                 ) {
-                    itemsIndexed(result) { index, item ->
+                    if (result.isEmpty()) {
 
-                        Box() {
-
-                            val line = "${item.word}"
-                            val probabilityColor = Color(ColorUtils.blendARGB(Color.Red.toArgb(), Color.Green.toArgb(), item.confidence))
-
+                        Box(
+                            modifier = Modifier.fillMaxSize(),
+                            contentAlignment = Alignment.Center
+                        ) {
                             Text(
-                                text = line,
-                                fontSize = 24.sp,
-                                lineHeight = 24.sp,
-                                color = probabilityColor
-                            )
+                                text = "Zacznij mówić",
+                                fontSize = 48.sp,
+                                color = Color.LightGray
 
+                            )
                         }
 
+                    } else {
+                        LazyColumn {
+                            itemsIndexed(result) { index, item ->
+
+                                Box {
+                                    Text(
+                                        text = item.word,
+                                        fontSize = 24.sp,
+                                        lineHeight = 24.sp,
+                                        color = getProbabilityColor(item.confidence)
+                                    )
+
+                                }
+
+                            }
+                        }
                     }
                 }
+
             }
 
         )
 
+    }
+
+    fun getProbabilityColor(p: Float): Color {
+        return Color(ColorUtils.blendARGB(Color.Red.toArgb(), Color.Green.toArgb(), p))
     }
 
 
