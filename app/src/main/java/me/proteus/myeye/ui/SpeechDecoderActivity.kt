@@ -1,6 +1,7 @@
 package me.proteus.myeye.ui
 
 import android.Manifest
+import android.app.Activity
 import android.content.pm.PackageManager
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -16,8 +17,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.graphics.ColorUtils
+import me.proteus.myeye.MyEyeApplication
 import me.proteus.myeye.io.ASRViewModel
 
 class SpeechDecoderActivity : ComponentActivity() {
@@ -54,10 +58,34 @@ class SpeechDecoderActivity : ComponentActivity() {
     fun AppContent() {
 
         val result = viewModel.wordBuffer
+        val context = LocalContext.current
 
         Scaffold(
             topBar = {
-                TopAppBar(title = { Text("Rozpoznawanie Mowy") })
+                TopAppBar(
+                    title = { Text("Rozpoznawanie Mowy") },
+                    actions = {
+                        Button(
+                            modifier = Modifier
+                                .padding(8.dp),
+                            onClick = {
+                                val app = context.applicationContext as MyEyeApplication
+                                val activity = context as Activity
+                                app.setAppLanguage(activity, "pl")
+                            }
+                        ) { Text("Polski") }
+
+                        Button(
+                            modifier = Modifier
+                                .padding(8.dp),
+                            onClick = {
+                                val app = context.applicationContext as MyEyeApplication
+                                val activity = context as Activity
+                                app.setAppLanguage(activity, "en")
+                            }
+                        ) { Text("English") }
+                    }
+                )
             },
             content = { innerPadding ->
 
