@@ -2,6 +2,7 @@ package me.proteus.myeye.ui
 
 import android.Manifest
 import android.app.Activity
+import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -18,16 +19,18 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.graphics.ColorUtils
+import me.proteus.myeye.LanguageUtils
 import me.proteus.myeye.MyEyeApplication
 import me.proteus.myeye.io.ASRViewModel
+import me.proteus.myeye.R
 
 class SpeechDecoderActivity : ComponentActivity() {
 
     private val viewModel: ASRViewModel by viewModels()
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -53,6 +56,12 @@ class SpeechDecoderActivity : ComponentActivity() {
         }
     }
 
+    override fun attachBaseContext(newBase: Context?) {
+        val currentLanguage = LanguageUtils.getCurrentLanguage(newBase)
+        val newContext = LanguageUtils.setLocale(newBase, currentLanguage)
+        super.attachBaseContext(newContext)
+    }
+
     @Composable
     @OptIn(ExperimentalMaterial3Api::class)
     fun AppContent() {
@@ -63,7 +72,7 @@ class SpeechDecoderActivity : ComponentActivity() {
         Scaffold(
             topBar = {
                 TopAppBar(
-                    title = { Text("Rozpoznawanie Mowy") },
+                    title = { Text(stringResource(R.string.test)) },
                     actions = {
                         Button(
                             modifier = Modifier
@@ -101,7 +110,7 @@ class SpeechDecoderActivity : ComponentActivity() {
                             contentAlignment = Alignment.Center
                         ) {
                             Text(
-                                text = "Zacznij mówić",
+                                text = stringResource(R.string.start_talking),
                                 fontSize = 48.sp,
                                 color = Color.LightGray
 

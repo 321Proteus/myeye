@@ -48,7 +48,6 @@ class ASRViewModel(application: Application) : AndroidViewModel(application) {
         }
 
         letterArrays.recycle()
-        for (el in grammar) println("${el.key}: ${el.value.joinToString(",")}")
         return grammar
 
     }
