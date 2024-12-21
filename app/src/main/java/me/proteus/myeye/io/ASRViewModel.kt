@@ -41,12 +41,15 @@ class ASRViewModel(application: Application) : AndroidViewModel(application) {
         for (i in 0 until letterArrays.length()) {
             val arrayId = letterArrays.getResourceId(i, 0)
             if (arrayId != 0) {
+
                 val words = resources.getStringArray(arrayId).toMutableList()
-                words.add(('a' + i).toString())
-                grammar['a' + i] = words
+                var charCode = 'a' + i
+
+                if (words.isEmpty()) words.add(charCode.toString())
+                grammar[charCode] = words
+
             }
         }
-
         letterArrays.recycle()
         return grammar
 
