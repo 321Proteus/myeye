@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools">
+
+    <string name="modelName"> "vosk-model-small-en-us-0.15" </string>
+
+    <string-array name="a" tools:ignore="InconsistentArrays">
+    </string-array>
+    <string-array name="b" tools:ignore="InconsistentArrays">
+    </string-array>
+    <string-array name="c" tools:ignore="InconsistentArrays">
+    </string-array>
+    <string-array name="d" tools:ignore="InconsistentArrays">
+    </string-array>
+    <string-array name="e" tools:ignore="InconsistentArrays">
+    </string-array>
+    <string-array name="f" tools:ignore="InconsistentArrays">
+    </string-array>
+    <string-array name="g" tools:ignore="InconsistentArrays">
+    </string-array>
+    <string-array name="h" tools:ignore="InconsistentArrays">
+    </string-array>
+    <string-array name="i" tools:ignore="InconsistentArrays">
+    </string-array>
+    <string-array name="j" tools:ignore="InconsistentArrays">
+    </string-array>
+    <string-array name="k" tools:ignore="InconsistentArrays">
+    </string-array>
+    <string-array name="l" tools:ignore="InconsistentArrays">
+    </string-array>
+    <string-array name="m" tools:ignore="InconsistentArrays">
+    </string-array>
+    <string-array name="n" tools:ignore="InconsistentArrays">
+    </string-array>
+    <string-array name="o" tools:ignore="InconsistentArrays">
+    </string-array>
+    <string-array name="p" tools:ignore="InconsistentArrays">
+    </string-array>
+    <string-array name="q" tools:ignore="InconsistentArrays">
+    </string-array>
+    <string-array name="r" tools:ignore="InconsistentArrays">
+    </string-array>
+    <string-array name="s" tools:ignore="InconsistentArrays">
+    </string-array>
+    <string-array name="t" tools:ignore="InconsistentArrays">
+    </string-array>
+    <string-array name="u" tools:ignore="InconsistentArrays">
+    </string-array>
+    <string-array name="v" tools:ignore="InconsistentArrays">
+    </string-array>
+    <string-array name="w" tools:ignore="InconsistentArrays">
+    </string-array>
+    <string-array name="x" tools:ignore="InconsistentArrays">
+    </string-array>
+    <string-array name="y" tools:ignore="InconsistentArrays">
+    </string-array>
+    <string-array name="z" tools:ignore="InconsistentArrays">
+    </string-array>
+
+    <string-array name="grammar_mapping" translatable="false">
+        <item>@array/a</item>
+        <item>@array/b</item>
+        <item>@array/c</item>
+        <item>@array/d</item>
+        <item>@array/e</item>
+        <item>@array/f</item>
+        <item>@array/g</item>
+        <item>@array/h</item>
+        <item>@array/i</item>
+        <item>@array/j</item>
+        <item>@array/k</item>
+        <item>@array/l</item>
+        <item>@array/m</item>
+        <item>@array/n</item>
+        <item>@array/o</item>
+        <item>@array/p</item>
+        <item>@array/q</item>
+        <item>@array/r</item>
+        <item>@array/s</item>
+        <item>@array/t</item>
+        <item>@array/u</item>
+        <item>@array/v</item>
+        <item>@array/w</item>
+        <item>@array/x</item>
+        <item>@array/y</item>
+        <item>@array/z</item>
+    </string-array>
+
+</resources>

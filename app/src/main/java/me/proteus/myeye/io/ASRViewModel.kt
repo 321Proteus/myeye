@@ -15,6 +15,7 @@ import java.io.File
 import java.io.IOException
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
+import me.proteus.myeye.R
 
 class ASRViewModel(application: Application) : AndroidViewModel(application) {
 
@@ -22,16 +23,35 @@ class ASRViewModel(application: Application) : AndroidViewModel(application) {
     private lateinit var model: Model
     private lateinit var audioRecord: AudioRecord
     private var executor: ExecutorService = Executors.newSingleThreadExecutor()
-    private var modelName: String = "vosk-model-small-pl-0.22"
+    private var modelName: String = application.resources.getString(R.string.modelName)
+
+    val grammarMapping = loadGrammarMapping()
 
     var wordBuffer: List<SpeechDecoderResult> by mutableStateOf(listOf())
 
-    val modelGrammar = listOf<String>("a", "a", "a", "a", "be", "ce", "de", "e", "f",
-        "gdzie", "ha", "i", "ił", "jod", "ka", "el", "m", "n", "o", "p", "q", "r", "er",
-        "es", "te", "u", "wał", "wu", "ix", "igrek", "zet",
-        "jeden", "dwa", "trzy", "cztery", "pięć", "sześć", "siedem", "osiem", "dziewięć", "zero"
-    )
     // Info: w jezyku polskim Vosk niezbyt dobrze odroznia e od i, nie uzywac razem
+
+    fun loadGrammarMapping(): MutableMap<Char, List<String>> {
+
+        val grammar = mutableMapOf<Char, List<String>>()
+
+        val resources = getApplication<Application>().resources
+        val letterArrays = resources.obtainTypedArray(R.array.grammar_mapping)
+
+        for (i in 0 until letterArrays.length()) {
+            val arrayId = letterArrays.getResourceId(i, 0)
+            if (arrayId != 0) {
+                val words = resources.getStringArray(arrayId).toMutableList()
+                words.add(('a' + i).toString())
+                grammar['a' + i] = words
+            }
+        }
+
+        letterArrays.recycle()
+        for (el in grammar) println("${el.key}: ${el.value.joinToString(",")}")
+        return grammar
+
+    }
 
     @Throws(IOException::class)
     fun getNextWord(): SpeechDecoderResult {
@@ -133,10 +153,15 @@ class ASRViewModel(application: Application) : AndroidViewModel(application) {
 
     fun initRecognizer(samplerate: Int) {
 
+        val modelGrammar = mutableListOf<String>()
+        for (sublist in grammarMapping.values) {
+            modelGrammar.add(sublist.joinToString("\",\""))
+        }
+
         recognizer = Recognizer(model, samplerate.toFloat()).apply {
             setWords(true)
             setPartialWords(true)
-           // setMaxAlternatives(2)
+//            setMaxAlternatives(2)
             setGrammar("[\"" + modelGrammar.joinToString(
                 separator = "\",\"",
             ) + "\"]")
@@ -157,6 +182,7 @@ class ASRViewModel(application: Application) : AndroidViewModel(application) {
                         val words = SpeechDecoderResult.deserialize(recognizer.result)
                         for (el in words) {
                             wordBuffer = wordBuffer + el
+                            println(el.word)
                         }
                     }
                 }

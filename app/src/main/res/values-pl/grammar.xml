@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools">
+
+    <string name="modelName"> "vosk-model-small-pl-0.22" </string>
+
+    <string-array name="a" tools:ignore="InconsistentArrays">
+    </string-array>
+    <string-array name="b" tools:ignore="InconsistentArrays">
+        <item> be </item>
+    </string-array>
+    <string-array name="c" tools:ignore="InconsistentArrays">
+        <item> ce </item>
+    </string-array>
+    <string-array name="d" tools:ignore="InconsistentArrays">
+        <item> de </item>
+    </string-array>
+    <string-array name="e" tools:ignore="InconsistentArrays">
+    </string-array>
+    <string-array name="f" tools:ignore="InconsistentArrays">
+    </string-array>
+    <string-array name="g" tools:ignore="InconsistentArrays">
+        <item> gdzie </item>
+    </string-array>
+    <string-array name="h" tools:ignore="InconsistentArrays">
+        <item> ha </item>
+    </string-array>
+    <string-array name="i" tools:ignore="InconsistentArrays">
+    </string-array>
+    <string-array name="j" tools:ignore="InconsistentArrays">
+        <item> jod </item>
+    </string-array>
+    <string-array name="k" tools:ignore="InconsistentArrays">
+        <item> ka </item>
+    </string-array>
+    <string-array name="l" tools:ignore="InconsistentArrays">
+        <item> el </item>
+    </string-array>
+    <string-array name="m" tools:ignore="InconsistentArrays">
+        <item> em </item>
+    </string-array>
+    <string-array name="n" tools:ignore="InconsistentArrays">
+        <item> en </item>
+    </string-array>
+    <string-array name="o" tools:ignore="InconsistentArrays">
+    </string-array>
+    <string-array name="p" tools:ignore="InconsistentArrays">
+    </string-array>
+    <string-array name="q" tools:ignore="InconsistentArrays">
+    </string-array>
+    <string-array name="r" tools:ignore="InconsistentArrays">
+        <item> er </item>
+    </string-array>
+    <string-array name="s" tools:ignore="InconsistentArrays">
+        <item> es </item>
+    </string-array>
+    <string-array name="t" tools:ignore="InconsistentArrays">
+        <item> te </item>
+    </string-array>
+    <string-array name="u" tools:ignore="InconsistentArrays">
+    </string-array>
+    <string-array name="v" tools:ignore="InconsistentArrays">
+        <item> wał </item>
+    </string-array>
+    <string-array name="w" tools:ignore="InconsistentArrays">
+        <item> wu </item>
+    </string-array>
+    <string-array name="x" tools:ignore="InconsistentArrays">
+        <item> ix </item>
+    </string-array>
+    <string-array name="y" tools:ignore="InconsistentArrays">
+        <item> igrek </item>
+    </string-array>
+    <string-array name="z" tools:ignore="InconsistentArrays">
+        <item> zet </item>
+    </string-array>
+
+</resources>
