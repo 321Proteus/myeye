@@ -6,13 +6,10 @@
     <string-array name="a" tools:ignore="InconsistentArrays">
     </string-array>
     <string-array name="b" tools:ignore="InconsistentArrays">
-        <item> be </item>
     </string-array>
     <string-array name="c" tools:ignore="InconsistentArrays">
-        <item> ce </item>
     </string-array>
     <string-array name="d" tools:ignore="InconsistentArrays">
-        <item> de </item>
     </string-array>
     <string-array name="e" tools:ignore="InconsistentArrays">
     </string-array>
@@ -30,16 +27,12 @@
         <item> jod </item>
     </string-array>
     <string-array name="k" tools:ignore="InconsistentArrays">
-        <item> ka </item>
     </string-array>
     <string-array name="l" tools:ignore="InconsistentArrays">
-        <item> el </item>
     </string-array>
     <string-array name="m" tools:ignore="InconsistentArrays">
-        <item> em </item>
     </string-array>
     <string-array name="n" tools:ignore="InconsistentArrays">
-        <item> en </item>
     </string-array>
     <string-array name="o" tools:ignore="InconsistentArrays">
     </string-array>
@@ -62,7 +55,6 @@
         <item> wał </item>
     </string-array>
     <string-array name="w" tools:ignore="InconsistentArrays">
-        <item> wu </item>
     </string-array>
     <string-array name="x" tools:ignore="InconsistentArrays">
         <item> ix </item>
