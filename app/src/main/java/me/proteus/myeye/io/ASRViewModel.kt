@@ -2,6 +2,7 @@ package me.proteus.myeye.io
 
 import android.annotation.SuppressLint
 import android.app.Application
+import android.content.Context
 import android.media.AudioFormat
 import android.media.AudioRecord
 import android.media.MediaRecorder
@@ -9,6 +10,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.AndroidViewModel
+import me.proteus.myeye.LanguageUtils
 import org.vosk.Model
 import org.vosk.Recognizer
 import java.io.File
@@ -23,19 +25,26 @@ class ASRViewModel(application: Application) : AndroidViewModel(application) {
     private lateinit var model: Model
     private lateinit var audioRecord: AudioRecord
     private var executor: ExecutorService = Executors.newSingleThreadExecutor()
-    private var modelName: String = application.resources.getString(R.string.modelName)
 
     val grammarMapping = loadGrammarMapping()
 
     var wordBuffer: List<SpeechDecoderResult> by mutableStateOf(listOf())
 
-    // Info: w jezyku polskim Vosk niezbyt dobrze odroznia e od i, nie uzywac razem
+    fun getLocalizedContext(): Context {
+
+        val appContext = getApplication<Application>().applicationContext
+        val currentLang = LanguageUtils.getCurrentLanguage(appContext)
+        val localizedContext = LanguageUtils.setLocale(appContext, currentLang)
+
+        return localizedContext
+
+    }
 
     fun loadGrammarMapping(): MutableMap<Char, List<String>> {
 
         val grammar = mutableMapOf<Char, List<String>>()
 
-        val resources = getApplication<Application>().resources
+        val resources = getLocalizedContext().resources
         val letterArrays = resources.obtainTypedArray(R.array.grammar_mapping)
 
         for (i in 0 until letterArrays.length()) {
@@ -124,6 +133,9 @@ class ASRViewModel(application: Application) : AndroidViewModel(application) {
                 AudioFormat.ENCODING_PCM_16BIT,
                 bufferSize
             )
+
+            var modelName = getLocalizedContext().getString(R.string.modelName)
+            println("updated modelName to $modelName")
 
             var modelDir: File = File(context.filesDir.path + "/models/" + modelName)
 
