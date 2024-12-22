@@ -4,8 +4,12 @@ import android.annotation.SuppressLint
 import android.app.Application
 import android.content.Context
 import android.media.AudioFormat
+import android.media.AudioManager
 import android.media.AudioRecord
 import android.media.MediaRecorder
+import android.media.ToneGenerator
+import android.os.Handler
+import android.os.Looper
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -62,18 +66,6 @@ class ASRViewModel(application: Application) : AndroidViewModel(application) {
         return grammar
 
     }
-
-//    @Throws(IOException::class)
-//    fun getNextWord(): SpeechDecoderResult {
-//        if (wordBuffer.isEmpty()) throw IOException("Word buffer is empty")
-//        else {
-//            var word = wordBuffer.last()
-//            wordBuffer = wordBuffer.toMutableList().apply {
-//                removeAt(lastIndex)
-//            }
-//            return word
-//        }
-//    }
 
     @SuppressLint("MissingPermission")
     private fun getMaximumSampleRate(): Int {
@@ -197,6 +189,13 @@ class ASRViewModel(application: Application) : AndroidViewModel(application) {
                             println(el.word)
                         }
                         _wordBuffer.postValue(_wordBuffer.value?.plus(words))
+
+                        var toneGenerator = ToneGenerator(AudioManager.STREAM_MUSIC, 100)
+                        toneGenerator.startTone(ToneGenerator.TONE_PROP_BEEP, 1000)
+                        Handler(Looper.getMainLooper()).postDelayed({
+                            toneGenerator.release()
+                        }, 1000)
+
                     }
                 }
             }
