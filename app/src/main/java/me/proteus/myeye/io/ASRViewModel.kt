@@ -6,15 +6,13 @@ import android.content.Context
 import android.media.AudioFormat
 import android.media.AudioRecord
 import android.media.MediaRecorder
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
 import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import me.proteus.myeye.LanguageUtils
 import org.vosk.Model
 import org.vosk.Recognizer
 import java.io.File
-import java.io.IOException
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 import me.proteus.myeye.R
@@ -28,7 +26,8 @@ class ASRViewModel(application: Application) : AndroidViewModel(application) {
 
     val grammarMapping = loadGrammarMapping()
 
-    var wordBuffer: List<SpeechDecoderResult> by mutableStateOf(listOf())
+    private val _wordBuffer = MutableLiveData<List<SpeechDecoderResult>>(emptyList())
+    val wordBuffer: LiveData<List<SpeechDecoderResult>> get() = _wordBuffer
 
     fun getLocalizedContext(): Context {
 
@@ -64,17 +63,17 @@ class ASRViewModel(application: Application) : AndroidViewModel(application) {
 
     }
 
-    @Throws(IOException::class)
-    fun getNextWord(): SpeechDecoderResult {
-        if (wordBuffer.isEmpty()) throw IOException("Word buffer is empty")
-        else {
-            var word = wordBuffer.last()
-            wordBuffer = wordBuffer.toMutableList().apply {
-                removeAt(lastIndex)
-            }
-            return word
-        }
-    }
+//    @Throws(IOException::class)
+//    fun getNextWord(): SpeechDecoderResult {
+//        if (wordBuffer.isEmpty()) throw IOException("Word buffer is empty")
+//        else {
+//            var word = wordBuffer.last()
+//            wordBuffer = wordBuffer.toMutableList().apply {
+//                removeAt(lastIndex)
+//            }
+//            return word
+//        }
+//    }
 
     @SuppressLint("MissingPermission")
     private fun getMaximumSampleRate(): Int {
@@ -195,9 +194,9 @@ class ASRViewModel(application: Application) : AndroidViewModel(application) {
                     if (recognizer.acceptWaveForm(buffer, bytesRead)) {
                         val words = SpeechDecoderResult.deserialize(recognizer.result)
                         for (el in words) {
-                            wordBuffer = wordBuffer + el
                             println(el.word)
                         }
+                        _wordBuffer.postValue(_wordBuffer.value?.plus(words))
                     }
                 }
             }

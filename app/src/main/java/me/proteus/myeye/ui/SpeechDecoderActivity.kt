@@ -4,7 +4,12 @@ import android.Manifest
 import android.app.Activity
 import android.content.Context
 import android.content.pm.PackageManager
+import android.media.AudioManager
+import android.media.ToneGenerator
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
@@ -23,10 +28,12 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.graphics.ColorUtils
+import androidx.lifecycle.LifecycleOwner
 import me.proteus.myeye.LanguageUtils
 import me.proteus.myeye.MyEyeApplication
 import me.proteus.myeye.io.ASRViewModel
 import me.proteus.myeye.R
+import me.proteus.myeye.io.SpeechDecoderResult
 
 class SpeechDecoderActivity : ComponentActivity() {
 
@@ -66,8 +73,15 @@ class SpeechDecoderActivity : ComponentActivity() {
     @OptIn(ExperimentalMaterial3Api::class)
     fun AppContent() {
 
-        val result = viewModel.wordBuffer
+        val result = remember { mutableStateListOf<SpeechDecoderResult>() }
         val context = LocalContext.current
+
+        viewModel.wordBuffer.observe(context as LifecycleOwner) { data ->
+
+            result.clear()
+            result.addAll(data)
+
+        }
 
         Scaffold(
             topBar = {
