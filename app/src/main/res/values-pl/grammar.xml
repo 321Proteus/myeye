@@ -3,67 +3,33 @@
 
     <string name="modelName"> "vosk-model-small-pl-0.22" </string>
 
-    <string-array name="a" tools:ignore="InconsistentArrays">
-    </string-array>
-    <string-array name="b" tools:ignore="InconsistentArrays">
-    </string-array>
-    <string-array name="c" tools:ignore="InconsistentArrays">
-    </string-array>
-    <string-array name="d" tools:ignore="InconsistentArrays">
-    </string-array>
-    <string-array name="e" tools:ignore="InconsistentArrays">
-    </string-array>
-    <string-array name="f" tools:ignore="InconsistentArrays">
-    </string-array>
-    <string-array name="g" tools:ignore="InconsistentArrays">
-        <item> gdzie </item>
-    </string-array>
-    <string-array name="h" tools:ignore="InconsistentArrays">
-        <item> ha </item>
-    </string-array>
-    <string-array name="i" tools:ignore="InconsistentArrays">
-    </string-array>
-    <string-array name="j" tools:ignore="InconsistentArrays">
-        <item> jod </item>
-    </string-array>
-    <string-array name="k" tools:ignore="InconsistentArrays">
-    </string-array>
-    <string-array name="l" tools:ignore="InconsistentArrays">
-    </string-array>
-    <string-array name="m" tools:ignore="InconsistentArrays">
-    </string-array>
-    <string-array name="n" tools:ignore="InconsistentArrays">
-    </string-array>
-    <string-array name="o" tools:ignore="InconsistentArrays">
-    </string-array>
-    <string-array name="p" tools:ignore="InconsistentArrays">
-    </string-array>
-    <string-array name="q" tools:ignore="InconsistentArrays">
-    </string-array>
-    <string-array name="r" tools:ignore="InconsistentArrays">
-        <item> er </item>
-    </string-array>
-    <string-array name="s" tools:ignore="InconsistentArrays">
-        <item> es </item>
-    </string-array>
-    <string-array name="t" tools:ignore="InconsistentArrays">
-        <item> te </item>
-    </string-array>
-    <string-array name="u" tools:ignore="InconsistentArrays">
-    </string-array>
-    <string-array name="v" tools:ignore="InconsistentArrays">
-        <item> wał </item>
-    </string-array>
-    <string-array name="w" tools:ignore="InconsistentArrays">
-    </string-array>
-    <string-array name="x" tools:ignore="InconsistentArrays">
-        <item> ix </item>
-    </string-array>
-    <string-array name="y" tools:ignore="InconsistentArrays">
-        <item> igrek </item>
-    </string-array>
-    <string-array name="z" tools:ignore="InconsistentArrays">
-        <item> zet </item>
+    <string-array name="phonetic" tools:ignore="InconsistentArrays">
+
+        <item>g:gdzie</item>
+        <item>h:ha</item>
+        <item>j:jod</item>
+        <item>r:er</item>
+        <item>s:es</item>
+        <item>t:te</item>
+        <item>v:wał</item>
+        <item>x:ix</item>
+        <item>y:igrek</item>
+        <item>z:zet</item>
+        <item>top:góra</item>
+        <item>bottom:dół</item>
+        <item>left:lewa</item>
+        <item>right:prawa</item>
+        <item>one:jeden</item>
+        <item>two:dwa</item>
+        <item>three:trzy</item>
+        <item>four:cztery</item>
+        <item>five:pięć</item>
+        <item>six:sześć</item>
+        <item>seven:siedem</item>
+        <item>eight:osiem</item>
+        <item>nine:dziewięć</item>
+        <item>zero:zero</item>
+
     </string-array>
 
 </resources>

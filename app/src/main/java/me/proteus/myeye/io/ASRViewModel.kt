@@ -43,26 +43,27 @@ class ASRViewModel(application: Application) : AndroidViewModel(application) {
 
     }
 
-    fun loadGrammarMapping(): MutableMap<Char, List<String>> {
+    fun loadGrammarMapping(): MutableMap<String, String> {
 
-        val grammar = mutableMapOf<Char, List<String>>()
+        val grammar = mutableMapOf<String, String>()
+
+        for (i in 'a'..'z') grammar[i.toString()] = i.toString()
+        val sides = listOf("top", "bottom", "left", "right")
+        sides.forEach { it -> grammar[it] = it }
+        val numbers = listOf("one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "zero")
+        numbers.forEach { it -> grammar[it] = it }
 
         val resources = getLocalizedContext().resources
-        val letterArrays = resources.obtainTypedArray(R.array.grammar_mapping)
+        val phoneticWords = resources.getStringArray(R.array.phonetic)
 
-        for (i in 0 until letterArrays.length()) {
-            val arrayId = letterArrays.getResourceId(i, 0)
-            if (arrayId != 0) {
+        for (i in 0 until phoneticWords.size) {
 
-                val words = resources.getStringArray(arrayId).toMutableList()
-                var charCode = 'a' + i
+            var overrideKey = phoneticWords[i].split(':')[0]
+            var overrideValue = phoneticWords[i].split(':')[1]
 
-                if (words.isEmpty()) words.add(charCode.toString())
-                grammar[charCode] = words
+            grammar[overrideKey] = overrideValue
 
-            }
         }
-        letterArrays.recycle()
         return grammar
 
     }
@@ -158,16 +159,11 @@ class ASRViewModel(application: Application) : AndroidViewModel(application) {
 
     fun initRecognizer(samplerate: Int) {
 
-        val modelGrammar = mutableListOf<String>()
-        for (sublist in grammarMapping.values) {
-            modelGrammar.add(sublist.joinToString("\",\""))
-        }
-
         recognizer = Recognizer(model, samplerate.toFloat()).apply {
             setWords(true)
             setPartialWords(true)
 //            setMaxAlternatives(2)
-            setGrammar("[\"" + modelGrammar.joinToString(
+            setGrammar("[\"" + grammarMapping.values.joinToString(
                 separator = "\",\"",
             ) + "\"]")
         }
