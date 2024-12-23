@@ -1,5 +1,5 @@
 [versions]
-agp = "8.7.2"
+agp = "8.7.3"
 kotlin = "2.0.0"
 coreKtx = "1.13.1"
 junit = "4.13.2"
@@ -16,6 +16,7 @@ appcompat = "1.7.0"
 gson = "2.11.0"
 asyncHttpClient = "3.0.0"
 zip4j = "2.11.5"
+slf4jSimple = "2.1.0-alpha1"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -40,6 +41,7 @@ androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version
 gson = { group = "com.google.code.gson", name = "gson", version.ref = "gson" }
 async-http-client = { group = "org.asynchttpclient", name = "async-http-client", version.ref = "asyncHttpClient" }
 zip4j = { group = "net.lingala.zip4j", name = "zip4j", version.ref = "zip4j" }
+slf4j-simple = { group = "org.slf4j", name = "slf4j-simple", version.ref = "slf4jSimple" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

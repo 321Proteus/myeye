@@ -66,6 +66,7 @@ dependencies {
     implementation(libs.gson)
     implementation(libs.async.http.client)
     implementation(libs.zip4j)
+    implementation(libs.slf4j.simple)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

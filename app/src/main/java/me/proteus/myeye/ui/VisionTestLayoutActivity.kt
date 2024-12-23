@@ -4,6 +4,8 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.Scaffold
 import androidx.compose.ui.Alignment
@@ -15,9 +17,23 @@ import me.proteus.myeye.visiontests.VisionTestUtils
 import me.proteus.myeye.TestResult
 
 class VisionTestLayoutActivity : ComponentActivity() {
+
+    private lateinit var rpl: ActivityResultLauncher<String>
+    private lateinit var testObject: VisionTest
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+
+        rpl =
+            registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted: Boolean ->
+                if (isGranted) {
+                    println("Uprawnienia przyznane")
+                } else {
+                    println("Brak uprawnień")
+                }
+            }
+
 
         setContent {
 
@@ -36,18 +52,20 @@ class VisionTestLayoutActivity : ComponentActivity() {
 
                         println(if (resultData != null) "Znaleziono TestResult o ID ${resultData.resultID}" else "Nie przekazano TestResult")
 
-                        var testID: String?
-
-                        if (isResult && resultData != null) {
-                            testID = resultData.testID
+                        var testID: String? = if (isResult && resultData != null) {
+                            resultData.testID
                         } else {
-                            testID = intent.getStringExtra("TEST_ID")
+                            intent.getStringExtra("TEST_ID")
                         }
 
-                        val testObject: VisionTest = VisionTestUtils().getTestByID(testID)
+                        testObject = VisionTestUtils().getTestByID(testID)
 
-                        testObject.BeginTest(activity = this@VisionTestLayoutActivity, isResult = isResult, result = resultData)
-
+                        testObject.BeginTest(
+                            activity = this@VisionTestLayoutActivity,
+                            isResult = isResult,
+                            result = resultData,
+                            rpl = rpl
+                        )
                     }
 
                 }
@@ -55,4 +73,10 @@ class VisionTestLayoutActivity : ComponentActivity() {
 
         }
     }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        testObject.endTest(this, true)
+    }
+
 }

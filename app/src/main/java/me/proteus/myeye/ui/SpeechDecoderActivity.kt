@@ -1,6 +1,8 @@
 package me.proteus.myeye.ui
 
 import android.Manifest
+import android.app.Activity
+import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -12,17 +14,25 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.graphics.ColorUtils
+import androidx.lifecycle.LifecycleOwner
+import me.proteus.myeye.LanguageUtils
+import me.proteus.myeye.MyEyeApplication
 import me.proteus.myeye.io.ASRViewModel
+import me.proteus.myeye.R
+import me.proteus.myeye.io.SpeechDecoderResult
 
 class SpeechDecoderActivity : ComponentActivity() {
 
     private val viewModel: ASRViewModel by viewModels()
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -48,45 +58,101 @@ class SpeechDecoderActivity : ComponentActivity() {
         }
     }
 
+    override fun attachBaseContext(newBase: Context?) {
+        val currentLanguage = LanguageUtils.getCurrentLanguage(newBase)
+        val newContext = LanguageUtils.setLocale(newBase, currentLanguage)
+        super.attachBaseContext(newContext)
+    }
+
     @Composable
     @OptIn(ExperimentalMaterial3Api::class)
     fun AppContent() {
 
-        val result = viewModel.result
+        val result = remember { mutableStateListOf<SpeechDecoderResult>() }
+        val context = LocalContext.current
+
+        viewModel.wordBuffer.observe(context as LifecycleOwner) { data ->
+
+            result.clear()
+            result.addAll(data)
+
+        }
 
         Scaffold(
             topBar = {
-                TopAppBar(title = { Text("Rozpoznawanie Mowy") })
+                TopAppBar(
+                    title = { Text(stringResource(R.string.test)) },
+                    actions = {
+                        Button(
+                            modifier = Modifier
+                                .padding(8.dp),
+                            onClick = {
+                                val app = context.applicationContext as MyEyeApplication
+                                val activity = context as Activity
+                                app.setAppLanguage(activity, "pl")
+                            }
+                        ) { Text("Polski") }
+
+                        Button(
+                            modifier = Modifier
+                                .padding(8.dp),
+                            onClick = {
+                                val app = context.applicationContext as MyEyeApplication
+                                val activity = context as Activity
+                                app.setAppLanguage(activity, "en")
+                            }
+                        ) { Text("English") }
+                    }
+                )
             },
             content = { innerPadding ->
 
-                LazyColumn(
+                Box(
                     modifier = Modifier
                         .fillMaxSize()
                         .padding(innerPadding)
                 ) {
-                    itemsIndexed(result) { index, item ->
+                    if (result.isEmpty()) {
 
-                        Box() {
-
-                            val line = "${item.word}"
-                            val probabilityColor = Color(ColorUtils.blendARGB(Color.Red.toArgb(), Color.Green.toArgb(), item.confidence))
-
+                        Box(
+                            modifier = Modifier.fillMaxSize(),
+                            contentAlignment = Alignment.Center
+                        ) {
                             Text(
-                                text = line,
-                                fontSize = 24.sp,
-                                lineHeight = 24.sp,
-                                color = probabilityColor
-                            )
+                                text = stringResource(R.string.start_talking),
+                                fontSize = 48.sp,
+                                color = Color.LightGray
 
+                            )
                         }
 
+                    } else {
+                        LazyColumn {
+                            itemsIndexed(result) { index, item ->
+
+                                Box {
+                                    Text(
+                                        text = item.word,
+                                        fontSize = 24.sp,
+                                        lineHeight = 24.sp,
+                                        color = getProbabilityColor(item.confidence)
+                                    )
+
+                                }
+
+                            }
+                        }
                     }
                 }
+
             }
 
         )
 
+    }
+
+    fun getProbabilityColor(p: Float): Color {
+        return Color(ColorUtils.blendARGB(Color.Red.toArgb(), Color.Green.toArgb(), p))
     }
 
 

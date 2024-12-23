@@ -1,6 +1,9 @@
 package me.proteus.myeye.visiontests
 
+import android.Manifest
+import android.content.pm.PackageManager
 import android.content.res.Configuration
+import androidx.activity.result.ActivityResultLauncher
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -14,10 +17,6 @@ import androidx.compose.material.icons.twotone.Face
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -28,10 +27,15 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.ViewModelProvider
+import me.proteus.myeye.GrammarType
 import me.proteus.myeye.R
 import me.proteus.myeye.ScreenScalingUtils.getScreenInfo
 import me.proteus.myeye.SerializableStage
+import me.proteus.myeye.TestResult
 import me.proteus.myeye.VisionTest
+import me.proteus.myeye.io.ASRViewModel
 import me.proteus.myeye.io.ResultDataCollector
 import me.proteus.myeye.ui.VisionTestLayoutActivity
 import java.util.Random
@@ -45,6 +49,8 @@ class SnellenChart : VisionTest {
     private var correctAnswer: String = ""
 
     override val stageCount: Int = 10
+
+    private lateinit var asr: ASRViewModel
 
     override val resultCollector: ResultDataCollector = ResultDataCollector()
 
@@ -134,9 +140,28 @@ class SnellenChart : VisionTest {
         activity: VisionTestLayoutActivity,
         stage: SerializableStage,
         isResult: Boolean,
-        difficulty: Int,
         onUpdate: (String) -> Unit
     ) {
+
+        if (!isResult) {
+            val context = LocalContext.current
+            val mapping = asr.grammarMapping
+
+            asr.wordBuffer.observe(context as LifecycleOwner) { data ->
+
+                if (data.isEmpty()) return@observe
+
+                println("Data: ${data.map { it -> it.word }.joinToString(",")}")
+
+                val mapped = data.map { it -> mapping.entries.first { key -> key.value == it.word} }
+
+                if (mapped.size == 5) {
+                    onUpdate(mapped.map { it -> it.key }.joinToString("").uppercase())
+                    asr.clearBuffer()
+                }
+            }
+
+        }
 
         Column(
             modifier = Modifier
@@ -156,14 +181,14 @@ class SnellenChart : VisionTest {
                     horizontalArrangement = Arrangement.SpaceEvenly
                 ) {
                     LetterContainer(
-                        stage = difficulty,
+                        stage = stage.difficulty,
                         text = stage.first,
                         key = null,
                         modifier = Modifier
                     )
                     if (isResult) {
                         LetterContainer(
-                            stage = difficulty,
+                            stage = stage.difficulty,
                             text = stage.second,
                             key = stage.first,
                             modifier = Modifier
@@ -201,6 +226,31 @@ class SnellenChart : VisionTest {
         }
     }
 
+    @Composable
+    override fun BeginTest(
+        activity: VisionTestLayoutActivity,
+        isResult: Boolean,
+        result: TestResult?,
+        rpl: ActivityResultLauncher<String>?
+    ) {
+
+        if (!isResult) {
+            asr = ViewModelProvider(
+                activity,
+                ViewModelProvider.AndroidViewModelFactory.getInstance(activity.application)
+            )[ASRViewModel::class]
+
+            if (activity.checkSelfPermission(Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED) {
+                asr.initialize(GrammarType.LETTERS_LOGMAR)
+            } else {
+                rpl?.launch(Manifest.permission.RECORD_AUDIO)
+            }
+        }
+
+        super.BeginTest(activity, isResult, result, null)
+
+    }
+
     override fun generateQuestion(stage: Int?): String {
 
         var question: String = randomText(5)
@@ -229,22 +279,29 @@ class SnellenChart : VisionTest {
 
     }
 
-    fun randomChar(): Char {
+    fun randomText(n: Int): String {
+
+        var all = GrammarType.LETTERS_LOGMAR.items.shuffled()
 
         var random = Random()
-        return ((abs(random.nextInt() % 25)) + 65).toChar()
-    }
-
-    fun randomText(n: Int): String {
 
         var text: String = ""
         var i: Int = 0
+        var j: Int = random.nextInt(all.size)
 
         while(i++ < n)  {
-            text += randomChar()
+            text += all[j]
+            j++; j %= all.size
         }
 
         return text
+    }
+
+    override fun endTest(activity: VisionTestLayoutActivity, isExit: Boolean) {
+
+        super.endTest(activity, isExit)
+        if (::asr.isInitialized) asr.close()
+
     }
 
 }

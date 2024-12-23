@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools">
+
+    <string name="modelName"> "vosk-model-small-pl-0.22" </string>
+
+    <string-array name="phonetic" tools:ignore="InconsistentArrays">
+
+        <item>g:gdzie</item>
+        <item>h:ha</item>
+        <item>j:jod</item>
+        <item>r:er</item>
+        <item>s:es</item>
+        <item>t:te</item>
+        <item>v:wał</item>
+        <item>x:ix</item>
+        <item>y:igrek</item>
+        <item>z:zet</item>
+        <item>top:góra</item>
+        <item>bottom:dół</item>
+        <item>left:lewa</item>
+        <item>right:prawa</item>
+        <item>one:jeden</item>
+        <item>two:dwa</item>
+        <item>three:trzy</item>
+        <item>four:cztery</item>
+        <item>five:pięć</item>
+        <item>six:sześć</item>
+        <item>seven:siedem</item>
+        <item>eight:osiem</item>
+        <item>nine:dziewięć</item>
+        <item>zero:zero</item>
+
+    </string-array>
+
+</resources>

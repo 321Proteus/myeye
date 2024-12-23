@@ -2,6 +2,7 @@ package me.proteus.myeye.visiontests
 
 import android.graphics.Color.parseColor
 import android.graphics.Color.colorToHSV
+import androidx.activity.result.ActivityResultLauncher
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.gestures.Orientation
@@ -118,32 +119,33 @@ class ColorArrangementTest : VisionTest {
         activity: VisionTestLayoutActivity,
         stage: SerializableStage,
         isResult: Boolean,
-        difficulty: Int,
         onUpdate: (String) -> Unit
     ) {
 
-        val inputColors by remember(stage) {
+        if (stage.first.isNotEmpty())  println("First ${stage.first.split(' ').map { getHue(it) }}")
+        if (stage.second.isNotEmpty()) println("Second ${stage.second.split(' ').map { getHue(it) }}")
+
+        val questionColors by remember(stage) {
             derivedStateOf {
                 if (isResult) stage.second.split(' ')
                 else stage.first.split(' ')
             }
         }
 
-        val sortedColors by remember(stage) {
+        val answerColors by remember(stage) {
             derivedStateOf {
-                if (isResult) stage.first.split(' ')
-                else inputColors.sortedBy { getHue(it) }
+                questionColors.sortedBy { getHue(it) }
             }
         }
 
-        var stageColors by remember { mutableStateOf(inputColors) }
+        var stageColors by remember { mutableStateOf(questionColors) }
 
         var correctnessMap by remember { mutableStateOf<Map<Int, Int>>(emptyMap()) }
 
-        LaunchedEffect(inputColors) {
-            stageColors = inputColors
+        LaunchedEffect(questionColors) {
+            stageColors = questionColors
             if (isResult) {
-                correctnessMap = getCorrectnessMapping(sortedColors, stageColors)
+                correctnessMap = getCorrectnessMapping(answerColors, stageColors)
             }
 
         }
@@ -268,7 +270,7 @@ class ColorArrangementTest : VisionTest {
                             horizontalAlignment = Alignment.CenterHorizontally,
                             verticalArrangement = Arrangement.SpaceEvenly
                         ) {
-                            itemsIndexed(sortedColors) { index, item ->
+                            itemsIndexed(answerColors) { index, item ->
 
                                 FarnsworthItem(Modifier, item, index, currentlyDragged)
 
@@ -320,7 +322,8 @@ class ColorArrangementTest : VisionTest {
     override fun BeginTest(
         activity: VisionTestLayoutActivity,
         isResult: Boolean,
-        result: TestResult?
+        result: TestResult?,
+        rpl: ActivityResultLauncher<String>?
     ) {
         colors = activity.resources.getStringArray(R.array.farnsworth_colors)
 
