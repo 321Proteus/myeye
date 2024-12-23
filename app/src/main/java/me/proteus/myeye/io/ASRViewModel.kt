@@ -180,22 +180,44 @@ class ASRViewModel(application: Application) : AndroidViewModel(application) {
                 val bytesRead = audioRecord.read(buffer, 0, buffer.size)
                 if (bytesRead > 0) {
                     if (recognizer.acceptWaveForm(buffer, bytesRead)) {
-                        val words = SpeechDecoderResult.deserialize(recognizer.result)
-                        for (el in words) {
-                            println(el.word)
-                        }
-                        _wordBuffer.postValue(_wordBuffer.value?.plus(words))
 
-                        var toneGenerator = ToneGenerator(AudioManager.STREAM_MUSIC, 100)
-                        toneGenerator.startTone(ToneGenerator.TONE_PROP_BEEP, 1000)
-                        Handler(Looper.getMainLooper()).postDelayed({
-                            toneGenerator.release()
-                        }, 1000)
+                        val words = SpeechDecoderResult.deserialize(recognizer.result)
+                        processWords(words)
 
                     }
                 }
             }
         }
+    }
+
+    fun processWords(words: List<SpeechDecoderResult>) {
+
+        val doubtThreshold = 0.7
+
+        for (el in words) {
+            println("${el.word} ${el.confidence}")
+            if (el.confidence < doubtThreshold) {
+                playAudio(ToneGenerator.TONE_CDMA_ABBR_ALERT, 200, 100)
+                return
+            }
+        }
+
+        _wordBuffer.postValue(_wordBuffer.value?.plus(words))
+        playAudio(ToneGenerator.TONE_PROP_BEEP, 500, 100)
+
+        return
+
+    }
+
+    fun playAudio(sound: Int, duration: Long, volume: Int?) {
+
+        var toneGenerator = ToneGenerator(AudioManager.STREAM_MUSIC, volume ?: 70)
+
+        toneGenerator.startTone(sound, duration.toInt())
+        Handler(Looper.getMainLooper()).postDelayed({
+            toneGenerator.release()
+        }, duration)
+
     }
 
     fun close() {
