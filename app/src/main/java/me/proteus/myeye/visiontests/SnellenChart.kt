@@ -29,6 +29,7 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModelProvider
+import me.proteus.myeye.GrammarType
 import me.proteus.myeye.R
 import me.proteus.myeye.ScreenScalingUtils.getScreenInfo
 import me.proteus.myeye.SerializableStage
@@ -240,7 +241,7 @@ class SnellenChart : VisionTest {
             )[ASRViewModel::class]
 
             if (activity.checkSelfPermission(Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED) {
-                asr.initialize()
+                asr.initialize(GrammarType.LETTERS_LOGMAR)
             } else {
                 rpl?.launch(Manifest.permission.RECORD_AUDIO)
             }
@@ -278,19 +279,19 @@ class SnellenChart : VisionTest {
 
     }
 
-    fun randomChar(): Char {
+    fun randomText(n: Int): String {
+
+        var all = GrammarType.LETTERS_LOGMAR.items.shuffled()
 
         var random = Random()
-        return ((abs(random.nextInt() % 25)) + 65).toChar()
-    }
-
-    fun randomText(n: Int): String {
 
         var text: String = ""
         var i: Int = 0
+        var j: Int = random.nextInt(all.size)
 
         while(i++ < n)  {
-            text += randomChar()
+            text += all[j]
+            j++; j %= all.size
         }
 
         return text

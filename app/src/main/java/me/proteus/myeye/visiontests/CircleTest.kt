@@ -30,6 +30,7 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModelProvider
+import me.proteus.myeye.GrammarType
 import me.proteus.myeye.R
 import me.proteus.myeye.ScreenScalingUtils.getScreenInfo
 import me.proteus.myeye.SerializableStage
@@ -256,7 +257,7 @@ class CircleTest : VisionTest {
             )[ASRViewModel::class]
 
             if (activity.checkSelfPermission(Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED) {
-                asr.initialize()
+                asr.initialize(GrammarType.SIDES)
             } else {
                 rpl?.launch(Manifest.permission.RECORD_AUDIO)
             }

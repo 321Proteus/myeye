@@ -14,6 +14,7 @@ import android.os.Looper
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import me.proteus.myeye.GrammarType
 import me.proteus.myeye.LanguageUtils
 import org.vosk.Model
 import org.vosk.Recognizer
@@ -28,10 +29,11 @@ class ASRViewModel(application: Application) : AndroidViewModel(application) {
     private lateinit var recognizer: Recognizer
     private lateinit var model: Model
     private lateinit var audioRecord: AudioRecord
+
     private var executor: ExecutorService = Executors.newSingleThreadExecutor()
     private var isOpen: Boolean = false
 
-    val grammarMapping = loadGrammarMapping()
+    lateinit var grammarMapping: MutableMap<String, String>
 
     private val _wordBuffer = MutableLiveData<List<SpeechDecoderResult>>(emptyList())
     val wordBuffer: LiveData<List<SpeechDecoderResult>> get() = _wordBuffer
@@ -46,15 +48,15 @@ class ASRViewModel(application: Application) : AndroidViewModel(application) {
 
     }
 
-    fun loadGrammarMapping(): MutableMap<String, String> {
+    fun loadGrammarMapping(grammarTypes: List<GrammarType>): MutableMap<String, String> {
 
         val grammar = mutableMapOf<String, String>()
 
-        for (i in 'a'..'z') grammar[i.toString()] = i.toString()
-        val sides = listOf("top", "bottom", "left", "right")
-        sides.forEach { it -> grammar[it] = it }
-        val numbers = listOf("one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "zero")
-        numbers.forEach { it -> grammar[it] = it }
+        grammarTypes.forEach{ type ->
+            type.items.forEach { it ->
+                grammar[it] = it
+            }
+        }
 
         val resources = getLocalizedContext().resources
         val phoneticWords = resources.getStringArray(R.array.phonetic)
@@ -64,7 +66,9 @@ class ASRViewModel(application: Application) : AndroidViewModel(application) {
             var overrideKey = phoneticWords[i].split(':')[0]
             var overrideValue = phoneticWords[i].split(':')[1]
 
-            grammar[overrideKey] = overrideValue
+            if (grammar.contains(overrideKey)) {
+                grammar[overrideKey] = overrideValue
+            }
 
         }
         return grammar
@@ -106,9 +110,10 @@ class ASRViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     @SuppressLint("MissingPermission")
-    fun initialize() {
+    fun initialize(vararg grammarTypes: GrammarType) {
 
         val context = getApplication<Application>().applicationContext
+        grammarMapping = loadGrammarMapping(grammarTypes.toList())
 
         isOpen = true
 
