@@ -54,8 +54,7 @@ interface VisionTest {
             var currentResultStage = stageList[i]
 
             DisplayStage(activity, currentResultStage, true) { answer ->
-                println(answer)
-                print("Update")
+
                 if (answer == "PREV") {
                     if (i > 0) i--
                 } else if (answer == "NEXT") {
@@ -120,17 +119,18 @@ interface VisionTest {
 
      fun endTest(activity: VisionTestLayoutActivity, isExit: Boolean) {
 
-         var localSaver = ResultDataSaver(activity.applicationContext)
+         if (!isExit) {
+             var localSaver = ResultDataSaver(activity.applicationContext)
 
-         var timestamp = LocalDateTime.now().toEpochSecond(ZoneOffset.UTC)
-         localSaver.insert(this.testID, this.resultCollector.stages, timestamp)
+             var timestamp = LocalDateTime.now().toEpochSecond(ZoneOffset.UTC)
+             localSaver.insert(this.testID, this.resultCollector.stages, timestamp)
 
-         val testLeavingIntent = Intent(activity, TestResultActivity::class.java)
-         testLeavingIntent.putExtra("IS_AFTER", true)
-         testLeavingIntent.putExtra("RESULT_PARCEL", localSaver.lastResult)
+             val testLeavingIntent = Intent(activity, TestResultActivity::class.java)
+             testLeavingIntent.putExtra("IS_AFTER", true)
+             testLeavingIntent.putExtra("RESULT_PARCEL", localSaver.lastResult)
 
-         activity.startActivity(testLeavingIntent)
-
+             activity.startActivity(testLeavingIntent)
+         }
     }
 
 }

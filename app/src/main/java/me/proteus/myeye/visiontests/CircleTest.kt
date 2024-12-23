@@ -37,7 +37,6 @@ import me.proteus.myeye.TestResult
 import me.proteus.myeye.VisionTest
 import me.proteus.myeye.io.ASRViewModel
 import me.proteus.myeye.io.ResultDataCollector
-import me.proteus.myeye.io.SpeechDecoderResult
 import me.proteus.myeye.ui.VisionTestLayoutActivity
 import java.util.Random
 import kotlin.math.*
@@ -153,6 +152,8 @@ class CircleTest : VisionTest {
             val mapping = asr.grammarMapping
 
             asr.wordBuffer.observe(context as LifecycleOwner) { data ->
+
+                if (data.isEmpty()) return@observe
 
                 println("Data: ${data.map { it -> it.word }.joinToString(",")}")
 
@@ -311,11 +312,8 @@ class CircleTest : VisionTest {
 
     override fun endTest(activity: VisionTestLayoutActivity, isExit: Boolean) {
 
-        if (!isExit) {
-            super.endTest(activity, true)
-        } else {
-            asr.close()
-        }
+        super.endTest(activity, true)
+        if (::asr.isInitialized) asr.close()
 
     }
 
