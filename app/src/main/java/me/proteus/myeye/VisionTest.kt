@@ -1,8 +1,8 @@
 package me.proteus.myeye
 
 import android.content.Intent
+import androidx.activity.result.ActivityResultLauncher
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -13,7 +13,6 @@ import me.proteus.myeye.io.ResultDataCollector
 import me.proteus.myeye.io.ResultDataSaver
 import me.proteus.myeye.ui.TestResultActivity
 import me.proteus.myeye.ui.VisionTestLayoutActivity
-import me.proteus.myeye.visiontests.ColorArrangementTest
 import java.time.LocalDateTime
 import java.time.ZoneOffset
 
@@ -39,7 +38,7 @@ interface VisionTest {
     )
 
     @Composable
-    fun BeginTest(activity: VisionTestLayoutActivity, isResult: Boolean, result: TestResult?) {
+    fun BeginTest(activity: VisionTestLayoutActivity, isResult: Boolean, result: TestResult?, rpl: ActivityResultLauncher<String>?) {
         BeginTestImpl(activity, isResult, result)
     }
 
@@ -55,6 +54,7 @@ interface VisionTest {
             var currentResultStage = stageList[i]
 
             DisplayStage(activity, currentResultStage, true) { answer ->
+                println(answer)
                 print("Update")
                 if (answer == "PREV") {
                     if (i > 0) i--
@@ -86,7 +86,7 @@ interface VisionTest {
                 } else if (currentDifficulty == stageCount) {
 
                     storeResult(currentStage.first, answer, currentDifficulty)
-                    endTest(activity)
+                    endTest(activity, false)
 
                 } else {
                     storeResult(currentStage.first, answer, currentDifficulty)
@@ -118,7 +118,7 @@ interface VisionTest {
         resultCollector.addResult(question, answer, difficulty)
     }
 
-     fun endTest(activity: VisionTestLayoutActivity) {
+     fun endTest(activity: VisionTestLayoutActivity, isExit: Boolean) {
 
          var localSaver = ResultDataSaver(activity.applicationContext)
 
