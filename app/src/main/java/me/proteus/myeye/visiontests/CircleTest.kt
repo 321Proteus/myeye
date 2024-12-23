@@ -1,6 +1,9 @@
 package me.proteus.myeye.visiontests
 
+import android.Manifest
+import android.content.pm.PackageManager
 import android.content.res.Configuration
+import androidx.activity.result.ActivityResultLauncher
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -25,11 +28,16 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.ViewModelProvider
 import me.proteus.myeye.R
 import me.proteus.myeye.ScreenScalingUtils.getScreenInfo
 import me.proteus.myeye.SerializableStage
+import me.proteus.myeye.TestResult
 import me.proteus.myeye.VisionTest
+import me.proteus.myeye.io.ASRViewModel
 import me.proteus.myeye.io.ResultDataCollector
+import me.proteus.myeye.io.SpeechDecoderResult
 import me.proteus.myeye.ui.VisionTestLayoutActivity
 import java.util.Random
 import kotlin.math.*
@@ -42,6 +50,8 @@ class CircleTest : VisionTest {
     override val stageCount: Int = 10
 
     private var correctAnswer: String = ""
+
+    private lateinit var asr: ASRViewModel
 
     override val resultCollector: ResultDataCollector = ResultDataCollector()
 
@@ -138,6 +148,33 @@ class CircleTest : VisionTest {
         onUpdate: (String) -> Unit
     ) {
 
+        if (!isResult) {
+            val context = LocalContext.current
+            val mapping = asr.grammarMapping
+
+            asr.wordBuffer.observe(context as LifecycleOwner) { data ->
+
+                println("Data: ${data.map { it -> it.word }.joinToString(",")}")
+
+                val mapped = data.map { it -> mapping.entries.first { key -> key.value == it.word} }
+                val directions = mapped.map { it ->
+                    when (it.key) {
+                        "right" -> 0
+                        "bottom" -> 1
+                        "left" -> 2
+                        "top" -> 3
+                        else -> "error"
+                    }
+                }.joinToString("")
+
+                if (mapped.size == 5) {
+                    onUpdate(directions)
+                    asr.clearBuffer()
+                }
+            }
+
+        }
+
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -203,6 +240,31 @@ class CircleTest : VisionTest {
         }
     }
 
+    @Composable
+    override fun BeginTest(
+        activity: VisionTestLayoutActivity,
+        isResult: Boolean,
+        result: TestResult?,
+        rpl: ActivityResultLauncher<String>?
+    ) {
+
+        if (!isResult) {
+            asr = ViewModelProvider(
+                activity,
+                ViewModelProvider.AndroidViewModelFactory.getInstance(activity.application)
+            )[ASRViewModel::class]
+
+            if (activity.checkSelfPermission(Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED) {
+                asr.initialize()
+            } else {
+                rpl?.launch(Manifest.permission.RECORD_AUDIO)
+            }
+        }
+
+        super.BeginTest(activity, isResult, result, null)
+
+    }
+
     override fun generateQuestion(stage: Int?): String {
 
         var question: String = generateDirections()
@@ -223,7 +285,7 @@ class CircleTest : VisionTest {
         while(i++ < 5)  {
             text += directions[abs(random.nextInt() % 4)]
         }
-
+        println(text)
         return text
 
     }
@@ -244,6 +306,16 @@ class CircleTest : VisionTest {
         arr[abs(random.nextInt()) % 4] = correctAnswer
 
         return arr
+
+    }
+
+    override fun endTest(activity: VisionTestLayoutActivity, isExit: Boolean) {
+
+        if (!isExit) {
+            super.endTest(activity, true)
+        } else {
+            asr.close()
+        }
 
     }
 

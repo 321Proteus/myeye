@@ -218,6 +218,11 @@ class ASRViewModel(application: Application) : AndroidViewModel(application) {
 
     }
 
+    fun clearBuffer() {
+        _wordBuffer.value = emptyList<SpeechDecoderResult>()
+        return
+    }
+
     fun playTone(frequency: Int, duration: Int) {
         val sampleRate = 44100
         val numSamples = duration * sampleRate / 1000
