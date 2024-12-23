@@ -29,6 +29,7 @@ class ASRViewModel(application: Application) : AndroidViewModel(application) {
     private lateinit var model: Model
     private lateinit var audioRecord: AudioRecord
     private var executor: ExecutorService = Executors.newSingleThreadExecutor()
+    private var isOpen: Boolean = false
 
     val grammarMapping = loadGrammarMapping()
 
@@ -108,6 +109,8 @@ class ASRViewModel(application: Application) : AndroidViewModel(application) {
     fun initialize() {
 
         val context = getApplication<Application>().applicationContext
+
+        isOpen = true
 
         executor.execute {
 
@@ -263,6 +266,10 @@ class ASRViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun close() {
+
+        if (!isOpen) return
+        isOpen = false
+
         audioRecord.stop()
         audioRecord.release()
         executor.shutdown()
