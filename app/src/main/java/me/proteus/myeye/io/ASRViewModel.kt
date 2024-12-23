@@ -196,19 +196,23 @@ class ASRViewModel(application: Application) : AndroidViewModel(application) {
 
         val doubtThreshold = 0.7
 
-        for (el in words) {
-            println("${el.word} ${el.confidence}")
-            if (el.confidence < doubtThreshold) {
-                playTone(1000, 200)
-                Handler(Looper.getMainLooper()).postDelayed({
-                }, 100)
-                playTone(1000, 200)
-                return
-            }
-        }
+        if (words.isNotEmpty()) {
 
-        _wordBuffer.postValue(_wordBuffer.value?.plus(words))
-        playTone(280, 500)
+            for (el in words) {
+                println("${el.word} ${el.confidence}")
+                if (el.confidence < doubtThreshold) {
+                    playTone(1000, 200)
+                    Handler(Looper.getMainLooper()).postDelayed({
+                    }, 100)
+                    playTone(1000, 200)
+                    return
+                }
+            }
+
+            _wordBuffer.postValue(_wordBuffer.value?.plus(words))
+            playTone(280, 500)
+
+        }
 
         return
 
