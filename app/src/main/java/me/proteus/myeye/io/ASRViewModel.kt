@@ -3,11 +3,12 @@ package me.proteus.myeye.io
 import android.annotation.SuppressLint
 import android.app.Application
 import android.content.Context
+import android.media.AudioAttributes
 import android.media.AudioFormat
 import android.media.AudioManager
 import android.media.AudioRecord
+import android.media.AudioTrack
 import android.media.MediaRecorder
-import android.media.ToneGenerator
 import android.os.Handler
 import android.os.Looper
 import androidx.lifecycle.AndroidViewModel
@@ -20,6 +21,7 @@ import java.io.File
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 import me.proteus.myeye.R
+import kotlin.math.sin
 
 class ASRViewModel(application: Application) : AndroidViewModel(application) {
 
@@ -197,27 +199,58 @@ class ASRViewModel(application: Application) : AndroidViewModel(application) {
         for (el in words) {
             println("${el.word} ${el.confidence}")
             if (el.confidence < doubtThreshold) {
-                playAudio(ToneGenerator.TONE_CDMA_ABBR_ALERT, 200, 100)
+                playTone(1000, 200)
+                Handler(Looper.getMainLooper()).postDelayed({
+                }, 100)
+                playTone(1000, 200)
                 return
             }
         }
 
         _wordBuffer.postValue(_wordBuffer.value?.plus(words))
-        playAudio(ToneGenerator.TONE_PROP_BEEP, 500, 100)
+        playTone(280, 500)
 
         return
 
     }
 
-    fun playAudio(sound: Int, duration: Long, volume: Int?) {
+    fun playTone(frequency: Int, duration: Int) {
+        val sampleRate = 44100
+        val numSamples = duration * sampleRate / 1000
+        val samples = ShortArray(numSamples)
 
-        var toneGenerator = ToneGenerator(AudioManager.STREAM_MUSIC, volume ?: 70)
+        for (i in samples.indices) {
+            samples[i] = (sin(2.0 * Math.PI * i / (sampleRate / frequency)) * Short.MAX_VALUE).toInt().toShort()
+        }
 
-        toneGenerator.startTone(sound, duration.toInt())
+        val audioManager = getApplication<Application>().applicationContext.getSystemService(Context.AUDIO_SERVICE) as AudioManager
+        val rate = audioManager.getProperty(AudioManager.PROPERTY_OUTPUT_SAMPLE_RATE)
+
+        val audioAttributes = AudioAttributes.Builder()
+            .setUsage(AudioAttributes.USAGE_MEDIA)
+            .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
+            .build()
+
+        val audioFormat = AudioFormat.Builder()
+            .setSampleRate(rate.toInt())
+            .setEncoding(AudioFormat.ENCODING_PCM_16BIT)
+            .setChannelMask(AudioFormat.CHANNEL_OUT_STEREO)
+            .build()
+
+        val audioTrack = AudioTrack(
+            audioAttributes,
+            audioFormat,
+            samples.size * 2,
+            AudioTrack.MODE_STREAM,
+            0
+        )
+
+        audioTrack.write(samples, 0, samples.size)
+        audioTrack.play()
+
         Handler(Looper.getMainLooper()).postDelayed({
-            toneGenerator.release()
-        }, duration)
-
+            audioTrack.release()
+        }, duration.toLong())
     }
 
     fun close() {
