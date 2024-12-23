@@ -286,7 +286,7 @@ class CircleTest : VisionTest {
         while(i++ < 5)  {
             text += directions[abs(random.nextInt() % 4)]
         }
-        println(text)
+
         return text
 
     }
@@ -312,7 +312,7 @@ class CircleTest : VisionTest {
 
     override fun endTest(activity: VisionTestLayoutActivity, isExit: Boolean) {
 
-        super.endTest(activity, true)
+        super.endTest(activity, isExit)
         if (::asr.isInitialized) asr.close()
 
     }

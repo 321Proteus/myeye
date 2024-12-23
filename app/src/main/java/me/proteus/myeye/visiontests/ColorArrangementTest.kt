@@ -2,6 +2,7 @@ package me.proteus.myeye.visiontests
 
 import android.graphics.Color.parseColor
 import android.graphics.Color.colorToHSV
+import androidx.activity.result.ActivityResultLauncher
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.gestures.Orientation
@@ -321,7 +322,8 @@ class ColorArrangementTest : VisionTest {
     override fun BeginTest(
         activity: VisionTestLayoutActivity,
         isResult: Boolean,
-        result: TestResult?
+        result: TestResult?,
+        rpl: ActivityResultLauncher<String>?
     ) {
         colors = activity.resources.getStringArray(R.array.farnsworth_colors)
 
