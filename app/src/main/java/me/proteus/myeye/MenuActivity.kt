@@ -14,6 +14,7 @@ import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.outlined.Call
 import androidx.compose.material.icons.twotone.Check
+import androidx.compose.material.icons.twotone.LocationOn
 import androidx.compose.material3.DrawerState
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -33,6 +34,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextOverflow
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import me.proteus.myeye.ui.DistanceTrackerActivity
 import me.proteus.myeye.ui.ResultBrowserActivity
 import me.proteus.myeye.ui.SpeechDecoderActivity
 import me.proteus.myeye.ui.VisionTestLayoutActivity
@@ -75,6 +77,16 @@ class MenuActivity : ComponentActivity() {
                                 selected = false,
                                 onClick = {
                                     val intent = Intent(this@MenuActivity, SpeechDecoderActivity::class.java)
+                                    startActivity(intent)
+                                },
+                            )
+
+                            NavigationDrawerItem(
+                                icon = { Icon(Icons.TwoTone.LocationOn, contentDescription = null) },
+                                label = { Text("Pomiar dystansu") },
+                                selected = false,
+                                onClick = {
+                                    val intent = Intent(this@MenuActivity, DistanceTrackerActivity::class.java)
                                     startActivity(intent)
                                 },
                             )

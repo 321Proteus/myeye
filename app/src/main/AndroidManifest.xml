@@ -31,6 +31,7 @@
         <activity android:name=".ui.VisionTestLayoutActivity" />
         <activity android:name=".ui.TestResultActivity" />
         <activity android:name=".ui.ResultBrowserActivity" />
+        <activity android:name=".ui.DistanceTrackerActivity" />
     </application>
 
 </manifest>
