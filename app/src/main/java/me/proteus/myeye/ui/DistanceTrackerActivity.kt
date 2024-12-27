@@ -1,5 +1,6 @@
 package me.proteus.myeye.ui
 
+import android.annotation.SuppressLint
 import android.hardware.Sensor
 import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
@@ -46,11 +47,17 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
 import me.proteus.myeye.ui.theme.MyEyeTheme
+import kotlin.math.roundToLong
 
 class DistanceTrackerActivity : ComponentActivity(), SensorEventListener {
 
     private lateinit var sensorManager: SensorManager
     private var accelerometer: Sensor? = null
+    private var isCalibrated = mutableStateOf(false)
+
+    private var sumCoordinates = arrayOf(0f, 0f, 0f)
+    private var kroki = 0
+    private var poczatek = 0L
 
     private var coordinates = mutableStateListOf(0f, 0f, 0f)
 
@@ -138,26 +145,40 @@ class DistanceTrackerActivity : ComponentActivity(), SensorEventListener {
                 .border(width = 2.dp, brush = SolidColor(Color.Black), shape = RoundedCornerShape(8.dp))
                 .zIndex(2f)
         ) {
-            Column(
-                modifier = Modifier.fillMaxSize(),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.SpaceEvenly
-            ) {
+            if (isCalibrated.value == true) {
+                Column(
+                    modifier = Modifier.fillMaxSize(),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.SpaceEvenly
+                ) {
 
-                Text(
-                    fontSize = 24.sp,
-                    text = "X: " + coordinates[0].toString()
-                )
-                Text(
-                    fontSize = 24.sp,
-                    text = "Y: " + coordinates[1].toString()
-                )
-                Text(
-                    fontSize = 24.sp,
-                    text = "Z: " + coordinates[2].toString()
-                )
+                    Text(
+                        fontSize = 24.sp,
+                        text = "X: " + coordinates[0].toString()
+                    )
+                    Text(
+                        fontSize = 24.sp,
+                        text = "Y: " + coordinates[1].toString()
+                    )
+                    Text(
+                        fontSize = 24.sp,
+                        text = "Z: " + coordinates[2].toString()
+                    )
 
+                }
+            } else {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        textAlign = TextAlign.Center,
+                        fontSize = 24.sp,
+                        text = "Trwa kalibracja\nTrzymaj urządzenie nieruchomo"
+                    )
+                }
             }
+
         }
     }
 
@@ -173,9 +194,32 @@ class DistanceTrackerActivity : ComponentActivity(), SensorEventListener {
         println(accelerometer?.name)
     }
 
+    @SuppressLint("DefaultLocale")
     override fun onSensorChanged(event: SensorEvent?) {
-        for (i in 0..<event?.values!!.size) {
-            coordinates[i] = event.values[i]
+
+        if (event == null) return
+
+        if (kroki == 0) poczatek = System.currentTimeMillis()
+
+        if (isCalibrated.value == false) {
+            if (System.currentTimeMillis() - poczatek > 3000) {
+                isCalibrated.value = true
+                for (i in sumCoordinates.indices) {
+                    sumCoordinates[i] = "%.5f".format(sumCoordinates[i]).replace(',', '.').toFloat()
+                    println(sumCoordinates[i])
+                }
+            } else {
+
+                for (i in event.values.indices) {
+                    sumCoordinates[i] += event.values[i]
+                }
+                kroki++
+
+            }
+        }
+
+        for (i in event.values.indices) {
+            coordinates[i] = event.values[i] - (sumCoordinates[i] / kroki)
         }
     }
 
