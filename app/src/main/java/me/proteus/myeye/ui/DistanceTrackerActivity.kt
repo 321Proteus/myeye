@@ -1,6 +1,5 @@
 package me.proteus.myeye.ui
 
-import android.annotation.SuppressLint
 import android.hardware.Sensor
 import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
@@ -17,6 +16,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -47,19 +47,25 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
 import me.proteus.myeye.ui.theme.MyEyeTheme
-import kotlin.math.roundToLong
+import kotlin.math.pow
 
 class DistanceTrackerActivity : ComponentActivity(), SensorEventListener {
 
     private lateinit var sensorManager: SensorManager
     private var accelerometer: Sensor? = null
+    private var gyroscope: Sensor? = null
     private var isCalibrated = mutableStateOf(false)
 
-    private var sumCoordinates = arrayOf(0f, 0f, 0f)
-    private var kroki = 0
-    private var poczatek = 0L
+    var dta = 0L
+    var dtg = 0L
 
-    private var coordinates = mutableStateListOf(0f, 0f, 0f)
+    var lastAcceleration = mutableStateListOf<Float>(0f, 0f, 0f)
+    var lastOrientation = mutableStateListOf<Float>(0f, 0f, 0f)
+    var rotation = mutableStateListOf<Float>(0f, 0f, 0f)
+    var velocity = mutableStateListOf<Float>(0f, 0f, 0f)
+    var position = mutableStateListOf<Float>(0f, 0f, 0f)
+
+    private var totalDistance = 0f
 
     @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -145,37 +151,25 @@ class DistanceTrackerActivity : ComponentActivity(), SensorEventListener {
                 .border(width = 2.dp, brush = SolidColor(Color.Black), shape = RoundedCornerShape(8.dp))
                 .zIndex(2f)
         ) {
-            if (isCalibrated.value == true) {
+            Row(
+                modifier = Modifier.fillMaxSize(),
+                horizontalArrangement = Arrangement.SpaceEvenly,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
                 Column(
-                    modifier = Modifier.fillMaxSize(),
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.SpaceEvenly
                 ) {
-
-                    Text(
-                        fontSize = 24.sp,
-                        text = "X: " + coordinates[0].toString()
-                    )
-                    Text(
-                        fontSize = 24.sp,
-                        text = "Y: " + coordinates[1].toString()
-                    )
-                    Text(
-                        fontSize = 24.sp,
-                        text = "Z: " + coordinates[2].toString()
-                    )
-
+                    Text("Przyspieszenia")
+                    for (el in lastAcceleration) Text(el.toString())
                 }
-            } else {
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
+
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.SpaceEvenly
                 ) {
-                    Text(
-                        textAlign = TextAlign.Center,
-                        fontSize = 24.sp,
-                        text = "Trwa kalibracja\nTrzymaj urządzenie nieruchomo"
-                    )
+                    Text("Rotacje")
+                    for (el in rotation) Text(el.toString())
                 }
             }
 
@@ -184,46 +178,60 @@ class DistanceTrackerActivity : ComponentActivity(), SensorEventListener {
 
     fun initSensor() {
         sensorManager = getSystemService(SENSOR_SERVICE) as SensorManager
-        accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)
+        accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_LINEAR_ACCELERATION)
+        gyroscope = sensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE)
 
         if (accelerometer == null) {
             Toast.makeText(this, "Brak akceleromteru", Toast.LENGTH_SHORT).show()
         }
+        if (gyroscope == null) {
+            Toast.makeText(this, "Brak żyroskopu", Toast.LENGTH_SHORT).show()
+        }
 
-        sensorManager.registerListener(this, accelerometer, SensorManager.SENSOR_DELAY_NORMAL)
+        sensorManager.registerListener(this, accelerometer, SensorManager.SENSOR_DELAY_GAME)
+        sensorManager.registerListener(this, gyroscope, SensorManager.SENSOR_DELAY_GAME)
+
         println(accelerometer?.name)
+        println(gyroscope?.name)
     }
 
-    @SuppressLint("DefaultLocale")
-    override fun onSensorChanged(event: SensorEvent?) {
+    override fun onSensorChanged(e: SensorEvent?) {
+        if (e != null) {
+            when (e.sensor.type) {
+                Sensor.TYPE_LINEAR_ACCELERATION -> {
+                    var delta = (e.timestamp - dta) * 10f.pow(-9)
 
-        if (event == null) return
+                    for (i in 0..2) lastAcceleration[i] = e.values[i]
 
-        if (kroki == 0) poczatek = System.currentTimeMillis()
-
-        if (isCalibrated.value == false) {
-            if (System.currentTimeMillis() - poczatek > 3000) {
-                isCalibrated.value = true
-                for (i in sumCoordinates.indices) {
-                    sumCoordinates[i] = "%.5f".format(sumCoordinates[i]).replace(',', '.').toFloat()
-                    println(sumCoordinates[i])
+                    updateDeadReckoning(delta)
+                    dta = e.timestamp
                 }
-            } else {
+                Sensor.TYPE_GYROSCOPE -> {
+                    var delta = (e.timestamp  - dtg) * 10f.pow(-9)
+                    if (delta > 0.05) println(delta)
 
-                for (i in event.values.indices) {
-                    sumCoordinates[i] += event.values[i]
+                    for (i in 0..2) lastOrientation[i] = e.values[i]
+                   // System.arraycopy(e.values, 0, rotation, 0, e.values.size)
+                    updateRotation(delta)
+                    dtg = e.timestamp
                 }
-                kroki++
-
             }
         }
+    }
 
-        for (i in event.values.indices) {
-            coordinates[i] = event.values[i] - (sumCoordinates[i] / kroki)
+    override fun onAccuracyChanged(p0: Sensor?, p1: Int) {}
+
+    fun updateRotation(time: Float) {
+        for (i in 0..2) {
+            rotation[i] += lastOrientation[i] * time
         }
     }
 
-    override fun onAccuracyChanged(p0: Sensor?, p1: Int) {
+    fun updateDeadReckoning(time: Float) {
+        for (i in 0..2) {
+            velocity[i] += lastAcceleration[i] * time
+            position[i] += velocity[i] * time
+        }
 
     }
 
