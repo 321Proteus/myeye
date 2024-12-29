@@ -199,7 +199,7 @@ class DistanceTrackerActivity : ComponentActivity(), SensorEventListener {
         if (e != null) {
             when (e.sensor.type) {
                 Sensor.TYPE_LINEAR_ACCELERATION -> {
-                    var delta = (e.timestamp - dta) * 10f.pow(-9)
+                    var delta = if (dta != 0L) (e.timestamp - dta) * 10f.pow(-9) else 0f
 
                     for (i in 0..2) lastAcceleration[i] = e.values[i]
 
@@ -207,7 +207,7 @@ class DistanceTrackerActivity : ComponentActivity(), SensorEventListener {
                     dta = e.timestamp
                 }
                 Sensor.TYPE_GYROSCOPE -> {
-                    var delta = (e.timestamp  - dtg) * 10f.pow(-9)
+                    var delta = if (dtg != 0L) (e.timestamp - dtg) * 10f.pow(-9) else 0f
                     if (delta > 0.05) println(delta)
 
                     for (i in 0..2) lastOrientation[i] = e.values[i]
