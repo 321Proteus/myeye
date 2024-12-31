@@ -229,7 +229,7 @@ class DistanceTrackerActivity : ComponentActivity(), SensorEventListener {
 
                     var daneSuma = mutableListOf<Float>()
                     for (i in 0..<daneX.size) {
-                        daneSuma.add(daneX[i].pow(2) + daneY[i].pow(2) + daneZ[i].pow(2))
+                        daneSuma.add(sqrt(daneX[i].pow(2) + daneY[i].pow(2) + daneZ[i].pow(2)))
                     }
 
                     var dataSeries = listOf(daneX, daneY, daneZ, daneSuma)
@@ -243,6 +243,12 @@ class DistanceTrackerActivity : ComponentActivity(), SensorEventListener {
         }
     }
 
+    val paint = Paint().asFrameworkPaint().apply {
+        isAntiAlias = true
+        textSize = 48f
+        color = Color.Black.toArgb()
+    }
+
     @Composable
     fun LineChart(dane: List<List<Float>>, modifier: Modifier) {
 
@@ -250,8 +256,6 @@ class DistanceTrackerActivity : ComponentActivity(), SensorEventListener {
 
         var maksi: Float = scale
         var mini: Float = -scale
-
-        println("$maksi $mini")
 
 //        for (seria in dane) {
 //            if (seria.isEmpty()) continue
@@ -300,6 +304,10 @@ class DistanceTrackerActivity : ComponentActivity(), SensorEventListener {
 
                     colorIterator++
                 }
+
+                drawContext.canvas.nativeCanvas.drawText(maksi.toString(), 0f, 0f, paint)
+                drawContext.canvas.nativeCanvas.drawText(mini.toString(), 0f, height, paint)
+
             }
             Slider(
                 modifier = Modifier.weight(0.1f),
