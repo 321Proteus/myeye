@@ -29,10 +29,12 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -40,11 +42,17 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Paint
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.nativeCanvas
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.text.TextLayoutResult
+import androidx.compose.ui.text.drawText
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -218,7 +226,15 @@ class DistanceTrackerActivity : ComponentActivity(), SensorEventListener {
                     modifier = Modifier.weight(0.4f).fillMaxSize(),
                     contentAlignment = Alignment.Center
                 ) {
+
+                    var daneSuma = mutableListOf<Float>()
+                    for (i in 0..<daneX.size) {
+                        daneSuma.add(daneX[i].pow(2) + daneY[i].pow(2) + daneZ[i].pow(2))
+                    }
+
+                    var dataSeries = listOf(daneX, daneY, daneZ, daneSuma)
                     LineChart(
+                        dane = dataSeries,
                         modifier = Modifier.fillMaxSize()
                     )
                 }
@@ -228,33 +244,34 @@ class DistanceTrackerActivity : ComponentActivity(), SensorEventListener {
     }
 
     @Composable
-    fun LineChart(modifier: Modifier) {
+    fun LineChart(dane: List<List<Float>>, modifier: Modifier) {
 
-        var daneSuma = mutableListOf<Float>()
-        for (i in 0..<daneX.size) {
-            daneSuma.add(daneX[i].pow(2) + daneY[i].pow(2) + daneZ[i].pow(2))
-        }
+        var scale by remember { mutableFloatStateOf(1f) }
 
-        var dataSeries = listOf(daneX, daneY, daneZ, daneSuma)
+        var maksi: Float = scale
+        var mini: Float = -scale
 
-        var mini: Float = 0f
-        var maksi: Float = 0f
+        println("$maksi $mini")
 
-        for (seria in dataSeries) {
-            if (seria.isEmpty()) continue
-            maksi = max(maksi, seria.max())
-            mini = min(mini, seria.min())
-        }
+//        for (seria in dane) {
+//            if (seria.isEmpty()) continue
+//            maksi = max(maksi, seria.max())
+//            mini = min(mini, seria.min())
+//        }
 
-        Column {
-            Canvas(modifier = modifier.background(Color.LightGray)) {
+        Column(modifier = modifier) {
+            Canvas(
+                modifier = modifier
+                    .background(Color.LightGray)
+                    .weight(0.9f)
+            ) {
 
                 val width = size.width
                 val height = size.height
 
                 var colorIterator = 0
 
-                for (axis in dataSeries) {
+                for (axis in dane) {
                     if (axis.isEmpty()) continue
 
                     val odleglosc = width / (axis.size - 1).coerceAtLeast(1)
@@ -284,6 +301,12 @@ class DistanceTrackerActivity : ComponentActivity(), SensorEventListener {
                     colorIterator++
                 }
             }
+            Slider(
+                modifier = Modifier.weight(0.1f),
+                value = scale,
+                onValueChange = { scale = it },
+                valueRange = 0.01f..10f
+            )
         }
 
     }
