@@ -18,6 +18,11 @@ asyncHttpClient = "3.0.0"
 zip4j = "2.11.5"
 slf4jSimple = "2.1.0-alpha1"
 core = "1.47.0"
+faceDetection = "16.1.7"
+cameraCore = "1.5.0-alpha04"
+cameraLifecycle = "1.5.0-alpha04"
+cameraView = "1.5.0-alpha04"
+cameraCamera2 = "1.5.0-alpha04"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -44,6 +49,11 @@ async-http-client = { group = "org.asynchttpclient", name = "async-http-client",
 zip4j = { group = "net.lingala.zip4j", name = "zip4j", version.ref = "zip4j" }
 slf4j-simple = { group = "org.slf4j", name = "slf4j-simple", version.ref = "slf4jSimple" }
 core = { group = "com.google.ar", name = "core", version.ref = "core" }
+face-detection = { group = "com.google.mlkit", name = "face-detection", version.ref = "faceDetection" }
+androidx-camera-core = { group = "androidx.camera", name = "camera-core", version.ref = "cameraCore" }
+androidx-camera-lifecycle = { group = "androidx.camera", name = "camera-lifecycle", version.ref = "cameraLifecycle" }
+androidx-camera-view = { group = "androidx.camera", name = "camera-view", version.ref = "cameraView" }
+androidx-camera-camera2 = { group = "androidx.camera", name = "camera-camera2", version.ref = "cameraCamera2" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
