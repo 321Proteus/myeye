@@ -34,8 +34,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextOverflow
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import me.proteus.myeye.ui.DistanceTrackerActivity
 import me.proteus.myeye.ui.ResultBrowserActivity
+import me.proteus.myeye.ui.SimpleDistanceActivity
 import me.proteus.myeye.ui.SpeechDecoderActivity
 import me.proteus.myeye.ui.VisionTestLayoutActivity
 import me.proteus.myeye.ui.theme.MyEyeTheme
@@ -86,7 +86,7 @@ class MenuActivity : ComponentActivity() {
                                 label = { Text("Pomiar dystansu") },
                                 selected = false,
                                 onClick = {
-                                    val intent = Intent(this@MenuActivity, DistanceTrackerActivity::class.java)
+                                    val intent = Intent(this@MenuActivity, SimpleDistanceActivity::class.java)
                                     startActivity(intent)
                                 },
                             )
