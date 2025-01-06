@@ -70,7 +70,7 @@ class SimpleDistanceActivity : ComponentActivity() {
             imageSize = getDeviceSize()
 
             camera.imageAnalysisBackpressureStrategy = ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST
-            camera.imageAnalysisResolutionSelector = createSelector(imageSize.first, imageSize.second)
+            camera.imageAnalysisResolutionSelector = createSelector()
 
             CameraView()
         }
@@ -154,7 +154,7 @@ class SimpleDistanceActivity : ComponentActivity() {
 
     }
 
-    fun createSelector(width: Float, height: Float): ResolutionSelector {
+    fun createSelector(): ResolutionSelector {
 //        val devSize = Size(width, height)
 //        val strategy = ResolutionStrategy(boundSize = devSize, fallbackRule = ResolutionStrategy.FALLBACK_RULE_CLOSEST_HIGHER)
         val rs = ResolutionSelector.Builder().setResolutionStrategy(ResolutionStrategy.HIGHEST_AVAILABLE_STRATEGY).build()
