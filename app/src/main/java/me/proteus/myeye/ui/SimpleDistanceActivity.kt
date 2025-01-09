@@ -75,7 +75,7 @@ class SimpleDistanceActivity : ComponentActivity() {
     private val executor = Executors.newSingleThreadExecutor()
     private val faces = mutableStateOf<List<Face>>(emptyList())
 
-    private val measurements: MutableList<Float> = mutableListOf()
+    private val measurements: MutableList<Int> = mutableListOf()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -94,8 +94,6 @@ class SimpleDistanceActivity : ComponentActivity() {
 
     @Composable
     private fun StartView() {
-
-        var inputTestId = intent.getStringExtra("TEST_ID")
 
         var isStarted by remember { mutableStateOf(false) }
 
@@ -193,6 +191,8 @@ class SimpleDistanceActivity : ComponentActivity() {
 
         var measurementCount by remember { mutableIntStateOf(0) }
 
+        var inputTestId = intent.getStringExtra("TEST_ID")
+
         camera.bindToLifecycle(LocalLifecycleOwner.current)
         camera.cameraSelector = CameraSelector.DEFAULT_FRONT_CAMERA
         preview.controller = camera
@@ -249,15 +249,27 @@ class SimpleDistanceActivity : ComponentActivity() {
                     val inputImage = InputImage.fromMediaImage(mediaImage, rotationDegrees)
 
                     detectFaces(inputImage) { detectedFaces ->
+
                         faces.value = detectedFaces
-                        measurements.add(faces.value[0].boundingBox.width().toFloat())
-                        measurementCount++
+
+                        if (detectedFaces.isNotEmpty()) {
+                            measurements.add(faces.value[0].boundingBox.width())
+                            measurementCount++
+                        }
 
                         if (measurements.size >= 25) {
 
+                            val average = measurements.sum() / 25f
+                            println(average)
+
                             val intent = Intent(this@SimpleDistanceActivity, VisionTestLayoutActivity::class.java)
-                            intent.putExtra("DISTANCE", measurements.sum() / 25)
+                            intent.putExtra("TEST_ID", inputTestId)
+                            intent.putExtra("DISTANCE", average)
                             startActivity(intent)
+                            println("Stopped")
+
+                            finish()
+                            return@detectFaces
 
                         }
                         imageProxy.close()

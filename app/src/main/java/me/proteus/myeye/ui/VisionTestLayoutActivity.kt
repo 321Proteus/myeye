@@ -1,5 +1,6 @@
 package me.proteus.myeye.ui
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -20,6 +21,7 @@ class VisionTestLayoutActivity : ComponentActivity() {
 
     private lateinit var rpl: ActivityResultLauncher<String>
     private lateinit var testObject: VisionTest
+//    private lateinit var distanceLauncher: ActivityResultLauncher<Intent>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -34,6 +36,40 @@ class VisionTestLayoutActivity : ComponentActivity() {
                 }
             }
 
+        val isResult: Boolean = intent.getBooleanExtra("IS_RESULT", false)
+        val resultData: TestResult? = IntentCompat.getParcelableExtra(intent, "RESULT_PARCEL", TestResult::class.java)
+
+        println(if (resultData != null) "Znaleziono TestResult o ID ${resultData.resultID}" else "Nie przekazano TestResult")
+
+        var testID: String? = if (isResult && resultData != null) {
+            resultData.testID
+        } else {
+            intent.getStringExtra("TEST_ID")
+        }
+
+        testObject = VisionTestUtils().getTestByID(testID)
+//        distanceLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+//            if (result.resultCode == RESULT_OK) {
+//                val distance = result.data?.getFloatExtra("DISTANCE", 2f) ?: 2f
+//                testObject.distance = distance
+//            }
+//        }
+
+        if (testObject.distance != -1f) {
+
+            if (intent.hasExtra("DISTANCE")) {
+                val distance: Float = intent.getFloatExtra("DISTANCE", 2f)
+                println("Distance $distance")
+                testObject.distance = distance
+            } else {
+                val distanceIntent = Intent(this@VisionTestLayoutActivity, SimpleDistanceActivity::class.java)
+                distanceIntent.putExtra("TEST_ID", testID)
+//                distanceLauncher.launch(distanceIntent)
+                startActivity(distanceIntent)
+                return
+            }
+
+        }
 
         setContent {
 
@@ -46,20 +82,6 @@ class VisionTestLayoutActivity : ComponentActivity() {
                             .fillMaxSize(),
                         contentAlignment = Alignment.Center
                     ) {
-
-                        var isResult: Boolean = intent.getBooleanExtra("IS_RESULT", false)
-                        var resultData: TestResult? = IntentCompat.getParcelableExtra(intent, "RESULT_PARCEL", TestResult::class.java)
-
-                        println(if (resultData != null) "Znaleziono TestResult o ID ${resultData.resultID}" else "Nie przekazano TestResult")
-
-                        var testID: String? = if (isResult && resultData != null) {
-                            resultData.testID
-                        } else {
-                            intent.getStringExtra("TEST_ID")
-                        }
-
-                        testObject = VisionTestUtils().getTestByID(testID)
-
                         testObject.BeginTest(
                             activity = this@VisionTestLayoutActivity,
                             isResult = isResult,
