@@ -2,6 +2,7 @@ package me.proteus.myeye.ui
 
 import android.Manifest
 import android.content.Context
+import android.content.Intent
 import android.content.res.Configuration
 import android.hardware.camera2.CameraAccessException
 import android.hardware.camera2.CameraCharacteristics
@@ -74,6 +75,8 @@ class SimpleDistanceActivity : ComponentActivity() {
     private val executor = Executors.newSingleThreadExecutor()
     private val faces = mutableStateOf<List<Face>>(emptyList())
 
+    private val measurements: MutableList<Float> = mutableListOf()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -91,6 +94,9 @@ class SimpleDistanceActivity : ComponentActivity() {
 
     @Composable
     private fun StartView() {
+
+        var inputTestId = intent.getStringExtra("TEST_ID")
+
         var isStarted by remember { mutableStateOf(false) }
 
         imageSize = getDeviceSize()
@@ -185,6 +191,8 @@ class SimpleDistanceActivity : ComponentActivity() {
         val preview = remember { PreviewView(context) }
         val camInfo by remember { mutableStateOf(cameraInfo(context)) }
 
+        var measurementCount by remember { mutableIntStateOf(0) }
+
         camera.bindToLifecycle(LocalLifecycleOwner.current)
         camera.cameraSelector = CameraSelector.DEFAULT_FRONT_CAMERA
         preview.controller = camera
@@ -227,14 +235,12 @@ class SimpleDistanceActivity : ComponentActivity() {
                     text = "Oczekiwanie na wykrycie twarzy"
                 }
 
-                Text(text, modifier = Modifier.weight(0.2f), fontSize = 48.sp)
+                Text("$text ($measurementCount)", modifier = Modifier.weight(0.2f), fontSize = 48.sp)
             }
 
             camera.setImageAnalysisAnalyzer(executor) { imageProxy ->
                 val rotationDegrees = imageProxy.imageInfo.rotationDegrees
                 val mediaImage = imageProxy.image
-
-//                println("${mediaImage?.width} ${mediaImage?.height}")
 
                 if (mediaImage != null) {
 
@@ -244,6 +250,16 @@ class SimpleDistanceActivity : ComponentActivity() {
 
                     detectFaces(inputImage) { detectedFaces ->
                         faces.value = detectedFaces
+                        measurements.add(faces.value[0].boundingBox.width().toFloat())
+                        measurementCount++
+
+                        if (measurements.size >= 25) {
+
+                            val intent = Intent(this@SimpleDistanceActivity, VisionTestLayoutActivity::class.java)
+                            intent.putExtra("DISTANCE", measurements.sum() / 25)
+                            startActivity(intent)
+
+                        }
                         imageProxy.close()
                     }
                 } else {

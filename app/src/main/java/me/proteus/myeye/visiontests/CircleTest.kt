@@ -51,6 +51,8 @@ class CircleTest : VisionTest {
 
     private var correctAnswer: String = ""
 
+    override var distance: Float = 0f
+
     private lateinit var asr: ASRViewModel
 
     override val resultCollector: ResultDataCollector = ResultDataCollector()

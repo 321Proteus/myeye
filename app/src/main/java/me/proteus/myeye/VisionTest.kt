@@ -26,6 +26,14 @@ interface VisionTest {
     val resultCollector: ResultDataCollector
 
     /**
+     * Field in which Distance Tracker output should be placed.
+     * Should typically range from 2f to 6f (meters).
+     *
+     * -1f in initializer means that no distance measurement is needed
+     */
+    var distance: Float
+
+    /**
      * Display the test stage as Composable in the target activity context
      * @param activity The canvas activity to display the layout
      */

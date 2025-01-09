@@ -29,13 +29,12 @@ class ExampleTest : VisionTest {
 
     override val testID: String = "TEST_INFO"
     override val testIcon: ImageVector = Icons.Outlined.Info
+    override val stageCount: Int = 10
+    override val resultCollector: ResultDataCollector = ResultDataCollector()
+    override var distance: Float = -1f
 
     private var correctAnswer: String = ""
     private var score: Int = 0
-
-    override val stageCount: Int = 10
-
-    override val resultCollector: ResultDataCollector = ResultDataCollector()
 
     @Composable
     override fun DisplayStage(

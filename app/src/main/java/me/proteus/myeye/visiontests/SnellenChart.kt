@@ -45,14 +45,13 @@ class SnellenChart : VisionTest {
 
     override val testID: String = "SNELLEN_CHART"
     override val testIcon: ImageVector = Icons.TwoTone.Face
+    override val stageCount: Int = 10
+    override val resultCollector: ResultDataCollector = ResultDataCollector()
+    override var distance: Float = 0f
 
     private var correctAnswer: String = ""
 
-    override val stageCount: Int = 10
-
     private lateinit var asr: ASRViewModel
-
-    override val resultCollector: ResultDataCollector = ResultDataCollector()
 
     fun stageToCentimeters(stage: Int, distance: Float): Float {
 
