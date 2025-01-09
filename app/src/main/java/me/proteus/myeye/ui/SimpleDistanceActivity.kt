@@ -75,7 +75,7 @@ class SimpleDistanceActivity : ComponentActivity() {
     private val executor = Executors.newSingleThreadExecutor()
     private val faces = mutableStateOf<List<Face>>(emptyList())
 
-    private val measurements: MutableList<Int> = mutableListOf()
+    private val measurements: MutableList<Float> = mutableListOf()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -253,13 +253,13 @@ class SimpleDistanceActivity : ComponentActivity() {
                         faces.value = detectedFaces
 
                         if (detectedFaces.isNotEmpty()) {
-                            measurements.add(faces.value[0].boundingBox.width())
+                            measurements.add(toMetric(camInfo.first, camInfo.second))
                             measurementCount++
                         }
 
                         if (measurements.size >= 25) {
 
-                            val average = measurements.sum() / 25f
+                            val average = measurements.sum() / 25
                             println(average)
 
                             val intent = Intent(this@SimpleDistanceActivity, VisionTestLayoutActivity::class.java)
@@ -280,6 +280,13 @@ class SimpleDistanceActivity : ComponentActivity() {
             }
         }
 
+    }
+    fun toMetric(ogniskowa: Float, sensorWidth: Float): Float {
+
+        val imageWidth = faces.value[0].boundingBox.width().toFloat()
+        val sensorSize = imageWidth * sensorWidth / imageSize.first
+
+        return sredniaSzerokoscTwarzy * ogniskowa / sensorSize / 10f
     }
 
     fun createSelector(): ResolutionSelector {
