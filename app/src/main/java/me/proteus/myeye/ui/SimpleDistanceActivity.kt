@@ -81,7 +81,7 @@ class SimpleDistanceActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         registerForActivityResult(ActivityResultContracts.RequestPermission()) { permission ->
-            println(permission)
+            return@registerForActivityResult
         }.launch(Manifest.permission.CAMERA)
 
         camera = LifecycleCameraController(this)
@@ -260,13 +260,11 @@ class SimpleDistanceActivity : ComponentActivity() {
                         if (measurements.size >= 25) {
 
                             val average = measurements.sum() / 25
-                            println(average)
 
                             val intent = Intent(this@SimpleDistanceActivity, VisionTestLayoutActivity::class.java)
                             intent.putExtra("TEST_ID", inputTestId)
                             intent.putExtra("DISTANCE", average)
                             startActivity(intent)
-                            println("Stopped")
 
                             finish()
                             return@detectFaces
@@ -359,31 +357,31 @@ class SimpleDistanceActivity : ComponentActivity() {
         }
     }
 
-    @Composable
-    fun FaceCanvas(faces: List<Face>, width: Int, height: Int) {
-
-        val scaleX = width / imageSize.first
-        val scaleY = height / imageSize.second
-
-        Canvas(modifier = Modifier.fillMaxSize()) {
-            for (face in faces) {
-                val b = face.boundingBox
-
-                val left = width - (b.right * scaleX)
-                val right = width - (b.left * scaleX)
-
-                val top = b.top * scaleY
-                val bottom = b.bottom * scaleY
-
-                drawLine(
-                    brush = SolidColor(Color.Red),
-                    strokeWidth = 5f,
-                    start = Offset(left, (top + bottom) / 2),
-                    end = Offset(right, (top + bottom) / 2)
-                )
-
-            }
-        }
-    }
+//    @Composable
+//    fun FaceCanvas(faces: List<Face>, width: Int, height: Int) {
+//
+//        val scaleX = width / imageSize.first
+//        val scaleY = height / imageSize.second
+//
+//        Canvas(modifier = Modifier.fillMaxSize()) {
+//            for (face in faces) {
+//                val b = face.boundingBox
+//
+//                val left = width - (b.right * scaleX)
+//                val right = width - (b.left * scaleX)
+//
+//                val top = b.top * scaleY
+//                val bottom = b.bottom * scaleY
+//
+//                drawLine(
+//                    brush = SolidColor(Color.Red),
+//                    strokeWidth = 5f,
+//                    start = Offset(left, (top + bottom) / 2),
+//                    end = Offset(right, (top + bottom) / 2)
+//                )
+//
+//            }
+//        }
+//    }
 
 }

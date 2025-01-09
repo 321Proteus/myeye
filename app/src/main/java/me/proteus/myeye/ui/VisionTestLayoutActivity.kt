@@ -21,7 +21,6 @@ class VisionTestLayoutActivity : ComponentActivity() {
 
     private lateinit var rpl: ActivityResultLauncher<String>
     private lateinit var testObject: VisionTest
-//    private lateinit var distanceLauncher: ActivityResultLauncher<Intent>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -48,12 +47,6 @@ class VisionTestLayoutActivity : ComponentActivity() {
         }
 
         testObject = VisionTestUtils().getTestByID(testID)
-//        distanceLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-//            if (result.resultCode == RESULT_OK) {
-//                val distance = result.data?.getFloatExtra("DISTANCE", 2f) ?: 2f
-//                testObject.distance = distance
-//            }
-//        }
 
         if (testObject.distance != -1f) {
 
@@ -64,7 +57,6 @@ class VisionTestLayoutActivity : ComponentActivity() {
             } else {
                 val distanceIntent = Intent(this@VisionTestLayoutActivity, SimpleDistanceActivity::class.java)
                 distanceIntent.putExtra("TEST_ID", testID)
-//                distanceLauncher.launch(distanceIntent)
                 startActivity(distanceIntent)
                 return
             }
