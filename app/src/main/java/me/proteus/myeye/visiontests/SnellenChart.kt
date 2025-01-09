@@ -45,21 +45,20 @@ class SnellenChart : VisionTest {
 
     override val testID: String = "SNELLEN_CHART"
     override val testIcon: ImageVector = Icons.TwoTone.Face
+    override val stageCount: Int = 10
+    override val resultCollector: ResultDataCollector = ResultDataCollector()
+    override var distance: Float = 0f
 
     private var correctAnswer: String = ""
 
-    override val stageCount: Int = 10
-
     private lateinit var asr: ASRViewModel
 
-    override val resultCollector: ResultDataCollector = ResultDataCollector()
-
-    fun stageToCentimeters(stage: Int, distance: Float): Float {
+    fun stageToCentimeters(stage: Int): Float {
 
         var marBase = ((PI/180) / 60) * 5  // 5 minut katowych
         var marCurrent = marBase * 10f.pow(-stage * 0.1f)
 
-        var height = 2 * distance * tan(marCurrent / 2)
+        var height = distance * tan(marCurrent / 2)
 
         return height.toFloat()
 
@@ -72,7 +71,7 @@ class SnellenChart : VisionTest {
         val opticianSansFamily = FontFamily(Font(R.font.opticiansans))
 
         var screenDensity = getScreenInfo(LocalContext.current).densityDpi / 2.54f
-        var calculatedSize = stageToCentimeters(stage, 100f)
+        var calculatedSize = stageToCentimeters(stage)
         println(calculatedSize)
         var pixelSize = with(LocalDensity.current) { (screenDensity * calculatedSize).toSp() }
 

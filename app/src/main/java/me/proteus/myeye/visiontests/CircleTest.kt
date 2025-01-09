@@ -51,16 +51,18 @@ class CircleTest : VisionTest {
 
     private var correctAnswer: String = ""
 
+    override var distance: Float = 0f
+
     private lateinit var asr: ASRViewModel
 
     override val resultCollector: ResultDataCollector = ResultDataCollector()
 
-    fun stageToCentimeters(stage: Int, distance: Float): Float {
+    fun stageToCentimeters(stage: Int): Float {
 
         var marBase = ((PI/180) / 60) * 5  // 5 minut katowych
         var marCurrent = marBase * 10f.pow(-stage * 0.1f)
 
-        var height = 2 * distance * tan(marCurrent / 2)
+        var height = distance * tan(marCurrent / 2)
 
         return height.toFloat()
 
@@ -73,7 +75,7 @@ class CircleTest : VisionTest {
         val opticianSansFamily = FontFamily(Font(R.font.opticiansans))
 
         var screenDensity = getScreenInfo(LocalContext.current).densityDpi / 2.54f
-        var calculatedSize = stageToCentimeters(currentStage, 100f)
+        var calculatedSize = stageToCentimeters(currentStage)
         println(calculatedSize)
         var pixelSize = with(LocalDensity.current) { (screenDensity * calculatedSize).toSp() }
 

@@ -14,11 +14,9 @@ class BuildTest : VisionTest {
 
     override val testID: String = "TEST_BUILD"
     override val testIcon: ImageVector = Icons.Outlined.Build
-
-    override val stageCount: Int
-        get() = TODO("Not yet implemented")
-
+    override val stageCount: Int = 5
     override val resultCollector: ResultDataCollector = ResultDataCollector()
+    override var distance: Float = -1f
 
     @Composable
     override fun DisplayStage(

@@ -6,12 +6,12 @@ plugins {
 
 android {
     namespace = "me.proteus.myeye"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "me.proteus.myeye"
         minSdk = 26
-        targetSdk = 34
+        targetSdk = 35
         versionCode = 1
         versionName = "1.0"
 
@@ -67,6 +67,12 @@ dependencies {
     implementation(libs.async.http.client)
     implementation(libs.zip4j)
     implementation(libs.slf4j.simple)
+    implementation(libs.core)
+    implementation(libs.face.detection)
+    implementation(libs.androidx.camera.core)
+    implementation(libs.androidx.camera.lifecycle)
+    implementation(libs.androidx.camera.view)
+    implementation(libs.androidx.camera.camera2)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

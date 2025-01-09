@@ -1,7 +1,6 @@
 package me.proteus.myeye
 
 import android.content.Intent
-import android.util.Log
 import androidx.activity.result.ActivityResultLauncher
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -25,6 +24,14 @@ interface VisionTest {
     val stageCount: Int
 
     val resultCollector: ResultDataCollector
+
+    /**
+     * Field in which Distance Tracker output should be placed.
+     * Should typically range from 2f to 6f (meters).
+     *
+     * -1f in initializer means that no distance measurement is needed
+     */
+    var distance: Float
 
     /**
      * Display the test stage as Composable in the target activity context

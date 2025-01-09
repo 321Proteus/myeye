@@ -62,11 +62,12 @@ class ColorArrangementTest : VisionTest {
     override val testIcon: ImageVector = Icons.AutoMirrored.Outlined.List
     override val stageCount: Int = 6
     override val resultCollector: ResultDataCollector = ResultDataCollector()
+    override var distance: Float = -1f
 
-    val difficultyScale = listOf(7, 6, 5, 4, 3, 2, 1)
-    var colorOffset = 0
+    private val difficultyScale = listOf(7, 6, 5, 4, 3, 2, 1)
+    private var colorOffset = 0
 
-    var colors: Array<String> = arrayOf()
+    private var colors: Array<String> = arrayOf()
 
     @Composable
     fun FarnsworthItem(modifier: Modifier, item: String, index: Int, cd: Int?) {
