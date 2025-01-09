@@ -22,14 +22,24 @@ import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
@@ -38,14 +48,22 @@ import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
+import androidx.compose.ui.zIndex
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.google.mlkit.vision.common.InputImage
 import com.google.mlkit.vision.face.Face
 import com.google.mlkit.vision.face.FaceDetection
 import com.google.mlkit.vision.face.FaceDetectorOptions
+import kotlinx.coroutines.delay
 import java.util.concurrent.Executors
+import me.proteus.myeye.R
 
 class SimpleDistanceActivity : ComponentActivity() {
 
@@ -66,13 +84,95 @@ class SimpleDistanceActivity : ComponentActivity() {
         camera = LifecycleCameraController(this)
 
         setContent {
+            StartView()
+        }
 
-            imageSize = getDeviceSize()
+    }
 
-            camera.imageAnalysisBackpressureStrategy = ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST
-            camera.imageAnalysisResolutionSelector = createSelector()
+    @Composable
+    private fun StartView() {
+        var isStarted by remember { mutableStateOf(false) }
 
-            CameraView()
+        imageSize = getDeviceSize()
+
+        camera.imageAnalysisBackpressureStrategy = ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST
+        camera.imageAnalysisResolutionSelector = createSelector()
+
+        val introText = "Umieść urządzenie w odległości 2-6 metrów od siebie, na lub trochę poniżej linii wzroku, a następnie stań lub usiądź"
+
+        if (isStarted) {
+            Counter()
+        } else {
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                Column(
+                    modifier = Modifier.fillMaxWidth().fillMaxHeight(0.6f),
+                    verticalArrangement = Arrangement.SpaceEvenly,
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Text(
+                        modifier = Modifier
+                            .weight(3f)
+                            .padding(24.dp),
+                        fontSize = 24.sp,
+                        text = introText,
+                        textAlign = TextAlign.Center
+                    )
+                    Button(
+                        modifier = Modifier
+                            .weight(1f)
+                            .aspectRatio(1f)
+                            .zIndex(3f),
+                        colors = ButtonColors(Color.Red, Color.White, Color.DarkGray, Color.Gray),
+                        shape = CircleShape,
+                        onClick = { isStarted = !isStarted },
+                        contentPadding = PaddingValues(0.dp)
+                    ) {
+                        Box(
+                            contentAlignment = Alignment.Center,
+                            modifier = Modifier.fillMaxSize()
+                        ) {
+                            Text(
+                                text = "START",
+                                textAlign = TextAlign.Center,
+                                fontSize = 24.sp,
+                                fontWeight = FontWeight.Bold
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    @Composable
+    private fun Counter() {
+        var timeLeft by remember { mutableIntStateOf(5) }
+        var isTimeOver by remember { mutableStateOf(false) }
+
+        LaunchedEffect(Unit) {
+            while (timeLeft > 0) {
+                delay(1000)
+                timeLeft--
+            }
+            isTimeOver = true
+        }
+
+        if (isTimeOver) CameraView()
+        else {
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    fontFamily = FontFamily(Font(R.font.opticiansans)),
+                    fontSize = 256.sp,
+                    text = timeLeft.toString()
+                )
+            }
+
         }
 
     }
@@ -134,7 +234,7 @@ class SimpleDistanceActivity : ComponentActivity() {
                 val rotationDegrees = imageProxy.imageInfo.rotationDegrees
                 val mediaImage = imageProxy.image
 
-                println("${mediaImage?.width} ${mediaImage?.height}")
+//                println("${mediaImage?.width} ${mediaImage?.height}")
 
                 if (mediaImage != null) {
 
