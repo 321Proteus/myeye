@@ -3,6 +3,7 @@ package me.proteus.myeye.visiontests
 import android.Manifest
 import android.content.pm.PackageManager
 import android.content.res.Configuration
+import android.util.Log
 import androidx.activity.result.ActivityResultLauncher
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -46,6 +47,7 @@ class CircleTest : VisionTest {
 
     override val testID: String = "TEST_CIRCLE"
     override val testIcon: ImageVector = Icons.Outlined.AccountCircle
+    override val needsMicrophone: Boolean = true
 
     override val stageCount: Int = 10
 
@@ -248,8 +250,7 @@ class CircleTest : VisionTest {
     override fun BeginTest(
         activity: VisionTestLayoutActivity,
         isResult: Boolean,
-        result: TestResult?,
-        rpl: ActivityResultLauncher<String>?
+        result: TestResult?
     ) {
 
         if (!isResult) {
@@ -260,12 +261,11 @@ class CircleTest : VisionTest {
 
             if (activity.checkSelfPermission(Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED) {
                 asr.initialize(GrammarType.SIDES)
-            } else {
-                rpl?.launch(Manifest.permission.RECORD_AUDIO)
             }
+
         }
 
-        super.BeginTest(activity, isResult, result, null)
+        super.BeginTest(activity, isResult, result)
 
     }
 

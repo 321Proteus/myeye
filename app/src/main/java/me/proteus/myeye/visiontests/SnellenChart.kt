@@ -45,6 +45,7 @@ class SnellenChart : VisionTest {
 
     override val testID: String = "SNELLEN_CHART"
     override val testIcon: ImageVector = Icons.TwoTone.Face
+    override val needsMicrophone: Boolean = true
     override val stageCount: Int = 10
     override val resultCollector: ResultDataCollector = ResultDataCollector()
     override var distance: Float = 0f
@@ -229,8 +230,7 @@ class SnellenChart : VisionTest {
     override fun BeginTest(
         activity: VisionTestLayoutActivity,
         isResult: Boolean,
-        result: TestResult?,
-        rpl: ActivityResultLauncher<String>?
+        result: TestResult?
     ) {
 
         if (!isResult) {
@@ -241,12 +241,10 @@ class SnellenChart : VisionTest {
 
             if (activity.checkSelfPermission(Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED) {
                 asr.initialize(GrammarType.LETTERS_LOGMAR)
-            } else {
-                rpl?.launch(Manifest.permission.RECORD_AUDIO)
             }
         }
 
-        super.BeginTest(activity, isResult, result, null)
+        super.BeginTest(activity, isResult, result)
 
     }
 

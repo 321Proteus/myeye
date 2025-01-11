@@ -35,9 +35,9 @@ class VisionTestUtils {
 
     }
 
-    fun getTestTypeByID(testID: String?): String {
+    fun getTestTypeByID(testID: String): String {
 
-        return when (testID?.split('_')[0]) {
+        return when (testID.split('_')[0]) {
             "TEST" -> "Test ostrości"
             "COLOR" -> "Test kolorów"
             else -> "Test wzroku"

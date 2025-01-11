@@ -33,6 +33,8 @@ interface VisionTest {
      */
     var distance: Float
 
+    val needsMicrophone: Boolean
+
     /**
      * Display the test stage as Composable in the target activity context
      * @param activity The canvas activity to display the layout
@@ -46,7 +48,7 @@ interface VisionTest {
     )
 
     @Composable
-    fun BeginTest(activity: VisionTestLayoutActivity, isResult: Boolean, result: TestResult?, rpl: ActivityResultLauncher<String>?) {
+    fun BeginTest(activity: VisionTestLayoutActivity, isResult: Boolean, result: TestResult?) {
         BeginTestImpl(activity, isResult, result)
     }
 

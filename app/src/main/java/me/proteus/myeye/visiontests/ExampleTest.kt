@@ -29,6 +29,7 @@ class ExampleTest : VisionTest {
 
     override val testID: String = "TEST_INFO"
     override val testIcon: ImageVector = Icons.Outlined.Info
+    override val needsMicrophone: Boolean = false
     override val stageCount: Int = 10
     override val resultCollector: ResultDataCollector = ResultDataCollector()
     override var distance: Float = -1f

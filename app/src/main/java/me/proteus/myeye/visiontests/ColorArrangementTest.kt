@@ -60,6 +60,7 @@ class ColorArrangementTest : VisionTest {
 
     override val testID: String = "COLOR_ARRANGE"
     override val testIcon: ImageVector = Icons.AutoMirrored.Outlined.List
+    override val needsMicrophone: Boolean = false
     override val stageCount: Int = 6
     override val resultCollector: ResultDataCollector = ResultDataCollector()
     override var distance: Float = -1f
@@ -323,8 +324,7 @@ class ColorArrangementTest : VisionTest {
     override fun BeginTest(
         activity: VisionTestLayoutActivity,
         isResult: Boolean,
-        result: TestResult?,
-        rpl: ActivityResultLauncher<String>?
+        result: TestResult?
     ) {
         colors = activity.resources.getStringArray(R.array.farnsworth_colors)
 
