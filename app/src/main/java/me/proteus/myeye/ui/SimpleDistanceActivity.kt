@@ -62,6 +62,7 @@ import com.google.mlkit.vision.face.FaceDetectorOptions
 import kotlinx.coroutines.delay
 import java.util.concurrent.Executors
 import me.proteus.myeye.R
+import java.lang.reflect.Constructor
 
 class SimpleDistanceActivity : ComponentActivity() {
 
@@ -256,15 +257,20 @@ class SimpleDistanceActivity : ComponentActivity() {
 
                         if (measurements.size >= 25) {
 
-                            val average = measurements.sum() / 25
+                            if (intent.hasExtra("TEST_ID")) {
 
-                            val intent = Intent(this@SimpleDistanceActivity, VisionTestLayoutActivity::class.java)
-                            intent.putExtra("TEST_ID", inputTestId)
-                            intent.putExtra("DISTANCE", average)
-                            startActivity(intent)
+                                val average = measurements.sum() / 25
 
-                            finish()
-                            return@detectFaces
+                                val intent = Intent(this@SimpleDistanceActivity, VisionTestLayoutActivity::class.java)
+                                intent.putExtra("TEST_ID", inputTestId)
+                                intent.putExtra("DISTANCE", average)
+                                startActivity(intent)
+
+                                finish()
+                                return@detectFaces
+                            } else {
+                                measurements.removeAt(0)
+                            }
 
                         }
                         imageProxy.close()
@@ -282,14 +288,6 @@ class SimpleDistanceActivity : ComponentActivity() {
         val sensorSize = imageWidth * sensorWidth / imageSize.first
 
         return sredniaSzerokoscTwarzy * ogniskowa / sensorSize / 10f
-    }
-
-    fun createSelector(): ResolutionSelector {
-//        val devSize = Size(width, height)
-//        val strategy = ResolutionStrategy(boundSize = devSize, fallbackRule = ResolutionStrategy.FALLBACK_RULE_CLOSEST_HIGHER)
-        val rs = ResolutionSelector.Builder().setResolutionStrategy(ResolutionStrategy.HIGHEST_AVAILABLE_STRATEGY).build()
-
-        return rs
     }
 
     private fun detectFaces(image: InputImage, callback: (List<Face>) -> Unit) {
