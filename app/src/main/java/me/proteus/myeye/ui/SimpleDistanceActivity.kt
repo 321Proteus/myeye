@@ -71,6 +71,7 @@ class SimpleDistanceActivity : ComponentActivity() {
     private lateinit var imageSize: Pair<Float, Float>
     private val executor = Executors.newSingleThreadExecutor()
     private val faces = mutableStateOf<List<Face>>(emptyList())
+    private var isBeforeTest: Boolean = true
 
     private val measurements: MutableList<Float> = mutableListOf()
 
@@ -82,6 +83,7 @@ class SimpleDistanceActivity : ComponentActivity() {
         }.launch(Manifest.permission.CAMERA)
 
         camera = LifecycleCameraController(this)
+        isBeforeTest = intent.hasExtra("TEST_ID")
 
         setContent {
             StartView()
@@ -163,7 +165,7 @@ class SimpleDistanceActivity : ComponentActivity() {
             isTimeOver = true
         }
 
-        if (isTimeOver) CameraView()
+        if (isTimeOver || !isBeforeTest) CameraView()
         else {
             Box(
                 modifier = Modifier.fillMaxSize(),
@@ -258,7 +260,7 @@ class SimpleDistanceActivity : ComponentActivity() {
 
                         if (measurements.size >= 25) {
 
-                            if (intent.hasExtra("TEST_ID")) {
+                            if (isBeforeTest) {
 
                                 val average = measurements.sum() / 25
 
