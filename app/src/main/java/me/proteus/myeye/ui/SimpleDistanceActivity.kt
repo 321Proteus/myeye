@@ -12,11 +12,10 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.OptIn
+import android.util.Size
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ExperimentalGetImage
 import androidx.camera.core.ImageAnalysis
-import androidx.camera.core.resolutionselector.ResolutionSelector
-import androidx.camera.core.resolutionselector.ResolutionStrategy
 import androidx.camera.view.LifecycleCameraController
 import androidx.camera.view.PreviewView
 import androidx.compose.foundation.layout.Arrangement
@@ -62,7 +61,7 @@ import com.google.mlkit.vision.face.FaceDetectorOptions
 import kotlinx.coroutines.delay
 import java.util.concurrent.Executors
 import me.proteus.myeye.R
-import java.lang.reflect.Constructor
+import me.proteus.myeye.io.CameraUtils
 
 class SimpleDistanceActivity : ComponentActivity() {
 
@@ -98,7 +97,9 @@ class SimpleDistanceActivity : ComponentActivity() {
         imageSize = getDeviceSize()
 
         camera.imageAnalysisBackpressureStrategy = ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST
-        camera.imageAnalysisResolutionSelector = createSelector()
+        camera.imageAnalysisResolutionSelector = CameraUtils.createSelector(Size(
+            imageSize.first.toInt(), imageSize.second.toInt()
+        ))
 
         val introText = "Umieść urządzenie w odległości 2-6 metrów od siebie, na lub trochę poniżej linii wzroku, a następnie stań lub usiądź"
 
