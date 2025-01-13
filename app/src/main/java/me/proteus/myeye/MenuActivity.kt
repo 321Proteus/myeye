@@ -13,6 +13,7 @@ import androidx.compose.material.icons.filled.Create
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.outlined.Call
+import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material.icons.twotone.Check
 import androidx.compose.material.icons.twotone.LocationOn
 import androidx.compose.material3.DrawerState
@@ -35,6 +36,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import me.proteus.myeye.ui.ResultBrowserActivity
+import me.proteus.myeye.ui.SettingsActivity
 import me.proteus.myeye.ui.SimpleDistanceActivity
 import me.proteus.myeye.ui.SpeechDecoderActivity
 import me.proteus.myeye.ui.VisionTestLayoutActivity
@@ -89,6 +91,16 @@ class MenuActivity : ComponentActivity() {
                                     val intent = Intent(this@MenuActivity, SimpleDistanceActivity::class.java)
                                     startActivity(intent)
                                 },
+                            )
+
+                            NavigationDrawerItem(
+                                icon = { Icon(Icons.Outlined.Settings, contentDescription = null) },
+                                label = { Text("Ustawienia") },
+                                selected = false,
+                                onClick = {
+                                    val intent = Intent(this@MenuActivity, SettingsActivity::class.java)
+                                    startActivity(intent)
+                                }
                             )
 
                         }

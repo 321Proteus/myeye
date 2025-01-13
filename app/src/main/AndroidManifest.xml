@@ -38,6 +38,7 @@
         <activity android:name=".ui.TestResultActivity" />
         <activity android:name=".ui.ResultBrowserActivity" />
         <activity android:name=".ui.SimpleDistanceActivity" />
+        <activity android:name=".ui.SettingsActivity" />
 
         <meta-data
             android:name="com.google.ar.core"
