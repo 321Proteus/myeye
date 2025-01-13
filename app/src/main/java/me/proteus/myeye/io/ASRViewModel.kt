@@ -14,6 +14,9 @@ import android.os.Looper
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.launch
 import me.proteus.myeye.GrammarType
 import me.proteus.myeye.LanguageUtils
 import org.vosk.Model
@@ -31,14 +34,19 @@ class ASRViewModel(application: Application) : AndroidViewModel(application) {
     private lateinit var audioRecord: AudioRecord
 
     private var executor: ExecutorService = Executors.newSingleThreadExecutor()
+    private val downloaderModel = HTTPRequestViewModel()
+
+    private val progressFlow: StateFlow<Float> = downloaderModel.progressFlow
+
     private var isOpen: Boolean = false
+    private var samplerate: Int = 0
 
     lateinit var grammarMapping: MutableMap<String, String>
 
     private val _wordBuffer = MutableLiveData<List<SpeechDecoderResult>>(emptyList())
     val wordBuffer: LiveData<List<SpeechDecoderResult>> get() = _wordBuffer
 
-    fun getLocalizedContext(): Context {
+    private fun getLocalizedContext(): Context {
 
         val appContext = getApplication<Application>().applicationContext
         val currentLang = LanguageUtils.getCurrentLanguage(appContext)
@@ -48,23 +56,21 @@ class ASRViewModel(application: Application) : AndroidViewModel(application) {
 
     }
 
-    fun loadGrammarMapping(grammarTypes: List<GrammarType>): MutableMap<String, String> {
+    private fun loadGrammarMapping(grammarTypes: List<GrammarType>): MutableMap<String, String> {
 
         val grammar = mutableMapOf<String, String>()
 
         grammarTypes.forEach{ type ->
-            type.items.forEach { it ->
-                grammar[it] = it
-            }
+            type.items.forEach { grammar[it] = it }
         }
 
         val resources = getLocalizedContext().resources
         val phoneticWords = resources.getStringArray(R.array.phonetic)
 
-        for (i in 0 until phoneticWords.size) {
+        for (i in phoneticWords.indices) {
 
-            var overrideKey = phoneticWords[i].split(':')[0]
-            var overrideValue = phoneticWords[i].split(':')[1]
+            val overrideKey = phoneticWords[i].split(':')[0]
+            val overrideValue = phoneticWords[i].split(':')[1]
 
             if (grammar.contains(overrideKey)) {
                 grammar[overrideKey] = overrideValue
@@ -112,14 +118,13 @@ class ASRViewModel(application: Application) : AndroidViewModel(application) {
     @SuppressLint("MissingPermission")
     fun initialize(vararg grammarTypes: GrammarType) {
 
-        val context = getApplication<Application>().applicationContext
         grammarMapping = loadGrammarMapping(grammarTypes.toList())
 
         isOpen = true
 
         executor.execute {
 
-            val samplerate = getMaximumSampleRate()
+            samplerate = getMaximumSampleRate()
             println(samplerate)
 
             val bufferSize = AudioRecord.getMinBufferSize(
@@ -135,16 +140,26 @@ class ASRViewModel(application: Application) : AndroidViewModel(application) {
                 AudioFormat.ENCODING_PCM_16BIT,
                 bufferSize
             )
+        }
 
-            var modelName = getLocalizedContext().getString(R.string.modelName)
-            println("updated modelName to $modelName")
+        initModel(true)
 
-            var modelDir: File = File(context.filesDir.path + "/models/" + modelName)
+    }
 
-            if (!modelDir.exists()) {
+    fun initModel(startRecognizer: Boolean) {
 
-                var rootUrl = "https://alphacephei.com/vosk/models/"
-                var downloaderPromise = HTTPDownloader().download(
+        val context = getApplication<Application>().applicationContext
+
+        val modelName = getLocalizedContext().getString(R.string.modelName)
+        println("updated modelName to $modelName")
+
+        val modelDir = File(context.filesDir.path + "/models/" + modelName)
+
+        if (!modelDir.exists()) {
+
+            viewModelScope.launch {
+                val rootUrl = "https://alphacephei.com/vosk/models/"
+                val downloaderPromise = downloaderModel.download(
                     "$rootUrl$modelName.zip",
                     File(modelDir.path + ".zip")
                 )
@@ -153,21 +168,24 @@ class ASRViewModel(application: Application) : AndroidViewModel(application) {
                     FileSaver.unzip(File(modelDir.path + ".zip"))
                     model = Model(modelDir.path)
 
-                    initRecognizer(samplerate)
+                    if (startRecognizer) initRecognizer(samplerate)
 
                 } .exceptionally { e ->
                     println("Error: $e")
                     return@exceptionally null
                 }
 
-            } else {
-                model = Model(modelDir.path)
-                initRecognizer(samplerate)
             }
+
+
+        } else {
+            model = Model(modelDir.path)
+            if (startRecognizer) initRecognizer(samplerate)
         }
+
     }
 
-    fun initRecognizer(samplerate: Int) {
+    private fun initRecognizer(samplerate: Int) {
 
         recognizer = Recognizer(model, samplerate.toFloat()).apply {
             setWords(true)
@@ -181,7 +199,7 @@ class ASRViewModel(application: Application) : AndroidViewModel(application) {
         startRecognition()
     }
 
-     fun startRecognition() {
+     private fun startRecognition() {
         executor.execute {
             audioRecord.startRecording()
             val buffer = ByteArray(4096)
@@ -200,7 +218,7 @@ class ASRViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    fun processWords(words: List<SpeechDecoderResult>) {
+    private fun processWords(words: List<SpeechDecoderResult>) {
 
         val doubtThreshold = 0.7
 
@@ -227,11 +245,11 @@ class ASRViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun clearBuffer() {
-        _wordBuffer.value = emptyList<SpeechDecoderResult>()
+        _wordBuffer.value = emptyList()
         return
     }
 
-    fun playTone(frequency: Int, duration: Int) {
+    private fun playTone(frequency: Int, duration: Int) {
         val sampleRate = 44100
         val numSamples = duration * sampleRate / 1000
         val samples = ShortArray(numSamples)
