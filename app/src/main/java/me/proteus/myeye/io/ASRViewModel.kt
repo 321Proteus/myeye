@@ -35,7 +35,7 @@ class ASRViewModel(application: Application) : AndroidViewModel(application) {
 
     private var executor: ExecutorService = Executors.newSingleThreadExecutor()
 
-    private val downloaderModel = HTTPRequestViewModel(SavedStateHandle())
+    private val downloaderModel = HTTPRequestViewModel()
 
 //    val progressFlow: StateFlow<Float> = downloaderModel.progressFlow
 //    val showRequestDialog: StateFlow<Boolean> = downloaderModel.showDialog
