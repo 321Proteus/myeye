@@ -99,10 +99,11 @@ class SettingsActivity : ComponentActivity() {
                                         modifier = Modifier
                                             .padding(8.dp),
                                         onClick = {
+
                                             model.setShowDialog(true)
                                             val app = context.applicationContext as MyEyeApplication
-                                            println(app.getString(R.string.setting_desc_language))
                                             val activity = context as Activity
+
                                             app.setAppLanguage(activity, "pl")
                                             scope.launch {
                                                 val modelName = app.getString(R.string.modelName) + ".zip"
@@ -113,6 +114,7 @@ class SettingsActivity : ComponentActivity() {
 
                                                 downloaderPromise.thenRun {
                                                     FileSaver.unzip(File(app.filesDir.path + "/models/$modelName"))
+                                                    model.setShowDialog(false)
                                                 }
                                             }
                                         }
@@ -122,9 +124,23 @@ class SettingsActivity : ComponentActivity() {
                                         modifier = Modifier
                                             .padding(8.dp),
                                         onClick = {
+                                            model.setShowDialog(true)
                                             val app = context.applicationContext as MyEyeApplication
                                             val activity = context as Activity
+
                                             app.setAppLanguage(activity, "en")
+                                            scope.launch {
+                                                val modelName = app.getString(R.string.modelName) + ".zip"
+                                                val url = "https://alphacephei.com/vosk/models/$modelName"
+                                                val downloaderPromise = model.download(url,
+                                                    File(app.filesDir.path + "/models/$modelName")
+                                                )
+
+                                                downloaderPromise.thenRun {
+                                                    FileSaver.unzip(File(app.filesDir.path + "/models/$modelName"))
+                                                    model.setShowDialog(false)
+                                                }
+                                            }
                                         }
                                     ) { Text("English") }
                                 }
