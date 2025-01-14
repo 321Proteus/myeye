@@ -1,5 +1,6 @@
 package me.proteus.myeye.io
 
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import io.netty.handler.codec.http.HttpHeaders
 import kotlinx.coroutines.Dispatchers
@@ -22,12 +23,19 @@ class HTTPRequestViewModel : ViewModel() {
     private val _progressFlow = MutableStateFlow(0f)
     val progressFlow: StateFlow<Float> = _progressFlow
 
-    init {
+    private var _showDialog = MutableStateFlow(false)
+    val showDialog: StateFlow<Boolean> =_showDialog
 
+    init {
         client = Dsl.asyncHttpClient(
             Dsl.config()
                 .setFollowRedirect(true)
         )
+    }
+
+
+    fun setShowDialog(value: Boolean) {
+        _showDialog.value = value
     }
 
     suspend fun download(url: String?, output: File): CompletableFuture<Void?> {
@@ -47,6 +55,7 @@ class HTTPRequestViewModel : ViewModel() {
 
                 client!!.prepareGet(url).execute(object : AsyncHandler<Void?> {
                     private var total: Long = 0
+                    private var downloaded: Long = 0
 
                     override fun onStatusReceived(responseStatus: HttpResponseStatus): AsyncHandler.State {
                         println("Status: " + responseStatus.statusCode)
@@ -64,8 +73,8 @@ class HTTPRequestViewModel : ViewModel() {
                     @Throws(Exception::class)
                     override fun onBodyPartReceived(bodyPart: HttpResponseBodyPart): AsyncHandler.State {
                         fos.write(bodyPart.bodyPartBytes)
-                        _progressFlow.value = bodyPart.length().toFloat() / total
-                        println("Pobrano: " + fos.channel.size() + " bajtow")
+                        downloaded += bodyPart.length()
+                        _progressFlow.value = downloaded.toFloat() / total
                         return AsyncHandler.State.CONTINUE
                     }
 

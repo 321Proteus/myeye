@@ -14,8 +14,8 @@ import android.os.Looper
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import me.proteus.myeye.GrammarType
 import me.proteus.myeye.LanguageUtils
@@ -34,9 +34,11 @@ class ASRViewModel(application: Application) : AndroidViewModel(application) {
     private lateinit var audioRecord: AudioRecord
 
     private var executor: ExecutorService = Executors.newSingleThreadExecutor()
-    private val downloaderModel = HTTPRequestViewModel()
 
-    private val progressFlow: StateFlow<Float> = downloaderModel.progressFlow
+    private val downloaderModel = HTTPRequestViewModel(SavedStateHandle())
+
+//    val progressFlow: StateFlow<Float> = downloaderModel.progressFlow
+//    val showRequestDialog: StateFlow<Boolean> = downloaderModel.showDialog
 
     private var isOpen: Boolean = false
     private var samplerate: Int = 0
@@ -191,9 +193,13 @@ class ASRViewModel(application: Application) : AndroidViewModel(application) {
             setWords(true)
             setPartialWords(true)
 //            setMaxAlternatives(2)
-            setGrammar("[\"" + grammarMapping.values.joinToString(
-                separator = "\",\"",
-            ) + "\"]")
+
+            if (grammarMapping.isNotEmpty()) {
+                setGrammar("[\"" + grammarMapping.values.joinToString(
+                    separator = "\",\"",
+                ) + "\"]")
+            }
+
         }
 
         startRecognition()
