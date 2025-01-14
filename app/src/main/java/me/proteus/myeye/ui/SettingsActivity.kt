@@ -17,6 +17,8 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -24,17 +26,25 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import kotlinx.coroutines.launch
 import me.proteus.myeye.MyEyeApplication
-import me.proteus.myeye.io.ASRViewModel
+import me.proteus.myeye.R
+import me.proteus.myeye.io.FileSaver
+import me.proteus.myeye.io.HTTPDownloaderDialog
+import me.proteus.myeye.io.HTTPRequestViewModel
 import me.proteus.myeye.ui.theme.MyEyeTheme
+import java.io.File
 
 class SettingsActivity : ComponentActivity() {
 
-    private val asrViewModel: ASRViewModel by viewModels()
+    private val model: HTTPRequestViewModel by viewModels()
 
     @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        println(savedInstanceState?.keySet())
+
         enableEdgeToEdge()
 
         setContent {
@@ -58,8 +68,12 @@ class SettingsActivity : ComponentActivity() {
                                 verticalArrangement = Arrangement.SpaceEvenly,
                                 horizontalAlignment = Alignment.CenterHorizontally
                             ) {
-                                Row {
-                                    Column {
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    val context = LocalContext.current
+
+                                    Column(Modifier.weight(0.4f)) {
                                         Text(
                                             fontSize = 24.sp,
                                             fontWeight = FontWeight.Bold,
@@ -68,19 +82,39 @@ class SettingsActivity : ComponentActivity() {
                                         Text(
                                             fontSize = 12.sp,
                                             fontWeight = FontWeight.Normal,
-                                            text = "Wybiera język używany w aplikacji"
+                                            text = context.getString(R.string.setting_desc_language)
                                         )
                                     }
 
-                                    val context = LocalContext.current
+                                    val showDialog = model.showDialog.collectAsState()
+                                    val progress = model.progressFlow.collectAsState()
+
+                                    val scope = rememberCoroutineScope()
+
+                                    if (showDialog.value) {
+                                        HTTPDownloaderDialog(progress.value) { model.setShowDialog(false) }
+                                    }
 
                                     Button(
                                         modifier = Modifier
                                             .padding(8.dp),
                                         onClick = {
+                                            model.setShowDialog(true)
                                             val app = context.applicationContext as MyEyeApplication
+                                            println(app.getString(R.string.setting_desc_language))
                                             val activity = context as Activity
                                             app.setAppLanguage(activity, "pl")
+                                            scope.launch {
+                                                val modelName = app.getString(R.string.modelName) + ".zip"
+                                                val url = "https://alphacephei.com/vosk/models/$modelName"
+                                                val downloaderPromise = model.download(url,
+                                                    File(app.filesDir.path + "/models/$modelName")
+                                                )
+
+                                                downloaderPromise.thenRun {
+                                                    FileSaver.unzip(File(app.filesDir.path + "/models/$modelName"))
+                                                }
+                                            }
                                         }
                                     ) { Text("Polski") }
 

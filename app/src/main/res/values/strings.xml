@@ -2,4 +2,5 @@
     <string name="app_name" translatable="false">MyEye</string>
     <string name="test">Speech Recognition</string>
     <string name="start_talking">Speak now</string>
+    <string name="setting_desc_language">Select the language used by the user interface and Speech Recognition. Requires app restart.</string>
 </resources>
