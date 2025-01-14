@@ -24,10 +24,10 @@ class MyEyeApplication : Application() {
 
         LanguageUtils.saveLanguage(activity, language)
 
-        val intent = activity.intent
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK)
-        activity.startActivity(intent)
-        activity.finish()
+//        val intent = activity.intent
+//        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK)
+//        activity.startActivity(intent)
+//        activity.finish()
 
     }
 
