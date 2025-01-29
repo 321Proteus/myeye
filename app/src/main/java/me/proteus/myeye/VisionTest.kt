@@ -1,7 +1,6 @@
 package me.proteus.myeye
 
 import android.content.Intent
-import androidx.activity.result.ActivityResultLauncher
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.getValue
@@ -133,7 +132,7 @@ interface VisionTest {
              var localSaver = ResultDataSaver(activity.applicationContext)
 
              var timestamp = LocalDateTime.now().toEpochSecond(ZoneOffset.UTC)
-             localSaver.insert(this.testID, this.resultCollector.stages, timestamp)
+             localSaver.insert(this.testID, this.resultCollector.stages, timestamp, this.distance)
 
              val testLeavingIntent = Intent(activity, TestResultActivity::class.java)
              testLeavingIntent.putExtra("IS_AFTER", true)

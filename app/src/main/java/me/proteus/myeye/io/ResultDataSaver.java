@@ -26,7 +26,7 @@ public class ResultDataSaver {
         SupportSQLiteOpenHelper.Configuration config = SupportSQLiteOpenHelper
                 .Configuration.builder(context)
                 .name(context.getFilesDir().getPath() + "/results.db")
-                .callback(new SupportSQLiteOpenHelper.Callback(1) {
+                .callback(new SupportSQLiteOpenHelper.Callback(2) {
 
                     @Override
                     public void onCreate(SupportSQLiteDatabase db) {
@@ -34,14 +34,16 @@ public class ResultDataSaver {
                                 "ID INTEGER PRIMARY KEY AUTOINCREMENT, " +
                                 "TIMESTAMP INTEGER NOT NULL, " +
                                 "TEST TEXT NOT NULL, " +
+                                "DISTANCE REAL NOT NULL, " +
                                 "RESULT BLOB NOT NULL)";
                         db.execSQL(schema);
                     }
 
                     @Override
                     public void onUpgrade(@NonNull SupportSQLiteDatabase db, int i, int i1) {
-                        // TODO: Obsluga migracji
-                        db.execSQL("DROP TABLE IF EXISTS RESULTS");
+//                        db.execSQL("DROP TABLE IF EXISTS RESULTS");
+                        System.out.println("Updating db");
+                        db.execSQL("ALTER TABLE RESULTS ADD COLUMN DISTANCE REAL");
                         onCreate(db);
                     }
 
@@ -73,6 +75,7 @@ public class ResultDataSaver {
                 int idIndex = cursor.getColumnIndex("ID");
                 int timestampIndex = cursor.getColumnIndex("TIMESTAMP");
                 int testIndex = cursor.getColumnIndex("TEST");
+                int distanceIndex = cursor.getColumnIndex("DISTANCE");
                 int resultIndex = cursor.getColumnIndex("RESULT");
 
                 if (resultIndex >= 0 && testIndex >= 0 && idIndex >= 0) {
@@ -82,6 +85,7 @@ public class ResultDataSaver {
                             cursor.getInt(idIndex),
                             cursor.getString(testIndex),
                             cursor.getLong(timestampIndex),
+                            cursor.getFloat(distanceIndex),
                             cursor.getBlob(resultIndex)
 
                     ));
@@ -108,9 +112,10 @@ public class ResultDataSaver {
                 int id = cursor.getInt(cursor.getColumnIndex("ID"));
                 String testId = cursor.getString(cursor.getColumnIndex("TEST"));
                 long timestamp = cursor.getLong(cursor.getColumnIndex("TIMESTAMP"));
+                float distance = cursor.getFloat(cursor.getColumnIndex("DISTANCE"));
                 byte[] resultData = cursor.getBlob(cursor.getColumnIndex("RESULT"));
 
-                return new TestResult(id, testId, timestamp, resultData);
+                return new TestResult(id, testId, timestamp, distance, resultData);
 
             } else {
                 System.out.println("Bledna kolumna w tabeli RESULTS");
@@ -121,13 +126,13 @@ public class ResultDataSaver {
         return null;
     }
 
-    public void insert(String testName, List<SerializableStage> result, long ts) {
+    public void insert(String testName, List<SerializableStage> result, long ts, float distance) {
 
         SupportSQLiteDatabase db = this.dbHelper.getWritableDatabase();
 
-        String ResultInsertionQuery = "INSERT INTO RESULTS (TIMESTAMP, TEST, RESULT) VALUES (?, ?, ?)";
+        String ResultInsertionQuery = "INSERT INTO RESULTS (TIMESTAMP, TEST, DISTANCE, RESULT) VALUES (?, ?, ?, ?)";
 
-        db.execSQL(ResultInsertionQuery, new Object[]{ ts, testName, ResultDataCollector.serializeResult(result) });
+        db.execSQL(ResultInsertionQuery, new Object[]{ ts, testName, distance, ResultDataCollector.serializeResult(result) });
 
     }
 

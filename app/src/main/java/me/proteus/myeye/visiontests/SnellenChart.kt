@@ -3,7 +3,6 @@ package me.proteus.myeye.visiontests
 import android.Manifest
 import android.content.pm.PackageManager
 import android.content.res.Configuration
-import androidx.activity.result.ActivityResultLauncher
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -242,6 +241,8 @@ class SnellenChart : VisionTest {
             if (activity.checkSelfPermission(Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED) {
                 asr.initialize(GrammarType.LETTERS_LOGMAR)
             }
+        } else {
+            distance = result!!.distance
         }
 
         super.BeginTest(activity, isResult, result)

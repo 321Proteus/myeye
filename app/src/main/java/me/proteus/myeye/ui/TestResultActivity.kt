@@ -27,6 +27,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.util.fastRoundToInt
 import androidx.core.content.ContextCompat
 import androidx.core.content.IntentCompat
 import androidx.fragment.app.FragmentActivity
@@ -73,7 +74,7 @@ fun TestResultScreen(
     ) {
 
     val resultData = IntentCompat.getParcelableExtra(inputIntent, "RESULT_PARCEL", TestResult::class.java)
-    if (resultData == null) return;
+    if (resultData == null) return
 
     val isAfterTest = inputIntent.getBooleanExtra("IS_AFTER", false)
 
@@ -124,8 +125,14 @@ fun TestResultScreen(
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
 
-                    Box() {
+                    Box {
                         Text("Data wykonania: " + resultData.formattedTimestamp)
+                    }
+
+                    if (resultData.distance != -1f) {
+                        Box {
+                            Text("Odległość: " + resultData.distance.fastRoundToInt() + " cm")
+                        }
                     }
 
                     if (isAfterTest) {
@@ -145,9 +152,9 @@ fun TestResultScreen(
                             modifier = Modifier,
                             onClick = {
 
-                                val debug_auth = false
+                                val debugAuth = false
 
-                                if (debug_auth == true) {
+                                if (debugAuth == true) {
                                     if (viewModel.isAuthorized) {
                                         navigate(resultData)
                                     } else {

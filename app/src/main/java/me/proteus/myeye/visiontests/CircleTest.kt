@@ -3,8 +3,6 @@ package me.proteus.myeye.visiontests
 import android.Manifest
 import android.content.pm.PackageManager
 import android.content.res.Configuration
-import android.util.Log
-import androidx.activity.result.ActivityResultLauncher
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -263,6 +261,8 @@ class CircleTest : VisionTest {
                 asr.initialize(GrammarType.SIDES)
             }
 
+        } else {
+            distance = result!!.distance
         }
 
         super.BeginTest(activity, isResult, result)

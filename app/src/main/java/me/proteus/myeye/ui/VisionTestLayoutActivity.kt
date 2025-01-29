@@ -53,9 +53,9 @@ class VisionTestLayoutActivity : ComponentActivity() {
 
         launcher = registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
 
-            val isMicGranted = permissions[Manifest.permission.RECORD_AUDIO] ?: false
-            val isCamGranted = permissions[Manifest.permission.CAMERA] ?: false
-
+            val isMicGranted = permissions[Manifest.permission.RECORD_AUDIO] == true
+            val isCamGranted = permissions[Manifest.permission.CAMERA] == true
+            println("$isCamGranted $isMicGranted")
             if (isCamGranted && isMicGranted) {
                 getDistance()
             } else {
@@ -63,7 +63,7 @@ class VisionTestLayoutActivity : ComponentActivity() {
             }
         }
 
-        if (permissionList.isNotEmpty()) launcher.launch(permissionList.toTypedArray())
+        if (permissionList.isNotEmpty() && isResult == false) launcher.launch(permissionList.toTypedArray())
         else showTestScreen()
 
     }
