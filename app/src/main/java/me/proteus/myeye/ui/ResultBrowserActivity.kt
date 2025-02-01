@@ -85,20 +85,12 @@ fun ResultColumn(activity: ResultBrowserActivity, paddingValues: PaddingValues) 
                 ) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
 
-                        Box(
+                        VisionTestIcon(
                             modifier = Modifier
-                                .padding(vertical = 8.dp, horizontal = 16.dp)
-                                .aspectRatio(1.0f)
-                                .clip(shape = RoundedCornerShape(15.dp))
-                                .background(MaterialTheme.colorScheme.primary),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Icon(
-                                imageVector = VisionTestUtils().getTestByID(result.testID).testIcon,
-                                contentDescription = null,
-                                tint = MaterialTheme.colorScheme.onPrimary
-                            )
-                        }
+                                .padding(vertical = 8.dp, horizontal = 16.dp),
+                            testID = result.testID
+                        )
+
                         Column(
                             verticalArrangement = Arrangement.SpaceEvenly
                         ) {

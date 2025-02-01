@@ -17,6 +17,7 @@ class VisionTestUtils {
             "TEST_BUILD" -> BuildTest()
             "TEST_INFO" -> ExampleTest()
             "COLOR_ARRANGE" -> ColorArrangementTest()
+            "REACTION_TEST" -> ReactionTest()
             else -> throw IllegalArgumentException("Nie znaleziono testu o podanym ID")
         }
 
@@ -30,6 +31,7 @@ class VisionTestUtils {
             "TEST_BUILD" -> "TODO"
             "TEST_INFO" -> "Przykładowy"
             "COLOR_ARRANGE" -> "Farnsworth"
+            "REACTION_TEST" -> "czasu reakcji"
             else -> throw IllegalArgumentException("Nie znaleziono testu o podanym ID")
         }
 
@@ -40,7 +42,7 @@ class VisionTestUtils {
         return when (testID.split('_')[0]) {
             "TEST" -> "Test ostrości"
             "COLOR" -> "Test kolorów"
-            else -> "Test wzroku"
+            else -> "Test"
 
         }
 

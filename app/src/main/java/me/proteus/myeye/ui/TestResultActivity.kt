@@ -99,24 +99,13 @@ fun TestResultScreen(
 
                     Text(text = resultData.fullTestName, fontSize = 24.sp)
 
-                    Box(
+                    VisionTestIcon(
                         modifier = Modifier
                             .padding(start = 100.dp, end = 100.dp)
-                            .weight(0.65f)
-                            .aspectRatio(1.0f)
-                            .clip(shape = RoundedCornerShape(15.dp))
-                            .background(MaterialTheme.colorScheme.primary),
-                        contentAlignment = Alignment.Center
-                    ) {
-
-                        Icon(
-                            modifier = Modifier.fillMaxSize(0.4f),
-                            imageVector = VisionTestUtils().getTestByID(resultData.testID).testIcon,
-                            contentDescription = null,
-                            tint = MaterialTheme.colorScheme.onPrimary
-                        )
-
-                    }
+                            .weight(0.65f),
+                        testID = resultData.testID,
+                        size = 0.4f
+                    )
                 }
 
                 Column(
