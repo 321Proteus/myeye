@@ -1,7 +1,9 @@
 package me.proteus.myeye.ui
 
 import android.app.Activity
+import android.content.Context
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -22,11 +24,13 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.launch
+import me.proteus.myeye.LanguageUtils
 import me.proteus.myeye.MyEyeApplication
 import me.proteus.myeye.R
 import me.proteus.myeye.io.FileSaver
@@ -42,8 +46,6 @@ class SettingsActivity : ComponentActivity() {
     @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        println(savedInstanceState?.keySet())
 
         enableEdgeToEdge()
 
@@ -82,7 +84,7 @@ class SettingsActivity : ComponentActivity() {
                                         Text(
                                             fontSize = 12.sp,
                                             fontWeight = FontWeight.Normal,
-                                            text = context.getString(R.string.setting_desc_language)
+                                            text = stringResource(R.string.setting_desc_language)
                                         )
                                     }
 
@@ -103,18 +105,22 @@ class SettingsActivity : ComponentActivity() {
                                             model.setShowDialog(true)
                                             val app = context.applicationContext as MyEyeApplication
                                             val activity = context as Activity
-
                                             app.setAppLanguage(activity, "pl")
+
                                             scope.launch {
-                                                val modelName = app.getString(R.string.modelName) + ".zip"
-                                                val url = "https://alphacephei.com/vosk/models/$modelName"
+                                                val modelName = context.getString(R.string.modelName)
+                                                val url = "https://alphacephei.com/vosk/models/$modelName.zip"
                                                 val downloaderPromise = model.download(url,
+                                                    File(app.filesDir.path + "/models/$modelName.zip"),
                                                     File(app.filesDir.path + "/models/$modelName")
                                                 )
 
                                                 downloaderPromise.thenRun {
                                                     FileSaver.unzip(File(app.filesDir.path + "/models/$modelName"))
                                                     model.setShowDialog(false)
+                                                }.exceptionally { ex ->
+                                                    Log.e("SettingsActivity", ex.message!!)
+                                                    null
                                                 }
                                             }
                                         }
@@ -127,18 +133,22 @@ class SettingsActivity : ComponentActivity() {
                                             model.setShowDialog(true)
                                             val app = context.applicationContext as MyEyeApplication
                                             val activity = context as Activity
-
                                             app.setAppLanguage(activity, "en")
+
                                             scope.launch {
-                                                val modelName = app.getString(R.string.modelName) + ".zip"
-                                                val url = "https://alphacephei.com/vosk/models/$modelName"
+                                                val modelName = context.getString(R.string.modelName)
+                                                val url = "https://alphacephei.com/vosk/models/$modelName.zip"
                                                 val downloaderPromise = model.download(url,
+                                                    File(app.filesDir.path + "/models/$modelName.zip"),
                                                     File(app.filesDir.path + "/models/$modelName")
                                                 )
 
                                                 downloaderPromise.thenRun {
-                                                    FileSaver.unzip(File(app.filesDir.path + "/models/$modelName"))
+                                                    FileSaver.unzip(File(app.filesDir.path + "/models/$modelName.zip"))
                                                     model.setShowDialog(false)
+                                                }.exceptionally { ex ->
+                                                    Log.e("SettingsActivity", ex.message!!)
+                                                    null
                                                 }
                                             }
                                         }
@@ -151,4 +161,11 @@ class SettingsActivity : ComponentActivity() {
             }
         }
     }
+
+    override fun attachBaseContext(newBase: Context?) {
+        val currentLanguage = LanguageUtils.getCurrentLanguage(newBase)
+        val newContext = LanguageUtils.setLocale(newBase, currentLanguage)
+        super.attachBaseContext(newContext)
+    }
+
 }

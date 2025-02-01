@@ -162,7 +162,8 @@ class ASRViewModel(application: Application) : AndroidViewModel(application) {
                 val rootUrl = "https://alphacephei.com/vosk/models/"
                 val downloaderPromise = downloaderModel.download(
                     "$rootUrl$modelName.zip",
-                    File(modelDir.path + ".zip")
+                    File(modelDir.path + ".zip"),
+                    File(modelDir.path + ".zip"),
                 )
 
                 downloaderPromise.thenRun {
