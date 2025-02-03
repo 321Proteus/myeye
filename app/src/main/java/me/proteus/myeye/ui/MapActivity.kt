@@ -29,6 +29,7 @@ import com.google.maps.android.compose.Marker
 import com.google.maps.android.compose.Polygon
 import com.google.maps.android.compose.rememberCameraPositionState
 import com.google.maps.android.compose.rememberUpdatedMarkerState
+import me.proteus.myeye.BuildConfig
 import me.proteus.myeye.ui.theme.MyEyeTheme
 import kotlin.math.cos
 
@@ -39,7 +40,7 @@ class MapActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        Places.initializeWithNewPlacesApiEnabled(applicationContext, "apikeyhere")
+        Places.initializeWithNewPlacesApiEnabled(applicationContext, BuildConfig.MAPS_API_KEY)
 
         placesClient = Places.createClient(this)
         val startPos = LatLng(52.41, 16.93)

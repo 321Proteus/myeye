@@ -1,12 +1,23 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
 }
 
+val secretProps = Properties()
+val secretFile = rootProject.file("secret.properties")
+
+if (secretFile.exists()) {
+    secretFile.inputStream().use { secretProps.load(it) }
+}
+
 android {
     namespace = "me.proteus.myeye"
     compileSdk = 35
+
+    android.buildFeatures.buildConfig = true
 
     defaultConfig {
         applicationId = "me.proteus.myeye"
@@ -14,6 +25,10 @@ android {
         targetSdk = 35
         versionCode = 1
         versionName = "1.0"
+
+        val mapsApiKey =  secretProps.getProperty("MAPS_API_KEY")
+        buildConfigField("String", "MAPS_API_KEY", mapsApiKey)
+        manifestPlaceholders["MAPS_API_KEY"] = mapsApiKey
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
