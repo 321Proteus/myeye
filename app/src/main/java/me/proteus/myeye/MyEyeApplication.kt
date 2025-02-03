@@ -23,11 +23,12 @@ class MyEyeApplication : Application() {
     fun setAppLanguage(activity: Activity, language: String) {
 
         LanguageUtils.saveLanguage(activity, language)
+        LanguageUtils.getCurrentLanguage(activity)
 
-//        val intent = activity.intent
-//        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK)
-//        activity.startActivity(intent)
-//        activity.finish()
+        val intent = activity.intent
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK)
+        activity.startActivity(intent)
+        activity.finish()
 
     }
 

@@ -73,6 +73,15 @@ dependencies {
     implementation(libs.androidx.camera.lifecycle)
     implementation(libs.androidx.camera.view)
     implementation(libs.androidx.camera.camera2)
+    implementation(libs.maps) {
+        exclude("com.android.support")
+    }
+    implementation(libs.maps.compose)
+    implementation(libs.volley)
+    implementation(libs.play.services.maps)
+    implementation(libs.places.compose)
+    implementation(libs.places)
+    implementation(libs.material)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

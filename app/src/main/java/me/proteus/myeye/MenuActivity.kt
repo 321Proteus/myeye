@@ -35,7 +35,6 @@ import androidx.compose.material.icons.outlined.Call
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material.icons.twotone.Check
 import androidx.compose.material.icons.twotone.LocationOn
-import androidx.compose.material3.Button
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.DrawerState
 import androidx.compose.material3.DrawerValue
@@ -66,6 +65,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import me.proteus.myeye.ui.MapActivity
 import me.proteus.myeye.ui.ResultBrowserActivity
 import me.proteus.myeye.ui.SettingsActivity
 import me.proteus.myeye.ui.SimpleDistanceActivity
@@ -122,6 +122,16 @@ class MenuActivity : ComponentActivity() {
                                 selected = false,
                                 onClick = {
                                     val intent = Intent(this@MenuActivity, SimpleDistanceActivity::class.java)
+                                    startActivity(intent)
+                                },
+                            )
+
+                            NavigationDrawerItem(
+                                icon = { Icon(Icons.TwoTone.LocationOn, contentDescription = null) },
+                                label = { Text("Mapa") },
+                                selected = false,
+                                onClick = {
+                                    val intent = Intent(this@MenuActivity, MapActivity::class.java)
                                     startActivity(intent)
                                 },
                             )
