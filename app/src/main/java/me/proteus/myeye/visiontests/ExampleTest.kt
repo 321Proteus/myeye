@@ -94,10 +94,10 @@ class ExampleTest : VisionTest {
                     horizontalArrangement = Arrangement.SpaceEvenly,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    var buttons = stage.second.filter { it != ' ' }
+                    val buttons = stage.second.filter { it != ' ' }
                     for (el in buttons) {
 
-                        var ans: String = el.toString()
+                        val ans: String = el.toString()
 
                         Button(onClick = { onUpdate(ans) }) {
                             Text(if (isResult) "Dalej" else ans)
@@ -126,7 +126,7 @@ class ExampleTest : VisionTest {
 
     override fun generateQuestion(stage: Int?): String {
 
-        var question = randomChar().toString()
+        val question = randomChar().toString()
 
         correctAnswer = question
 
@@ -140,22 +140,22 @@ class ExampleTest : VisionTest {
 
     override fun getExampleAnswers(): Array<String> {
 
-        var random = Random()
+        val random = Random()
 
-        var arr = Array<String>(4) { "" }
+        val arr = Array(4) { "" }
         for (i in 0..3) {
             arr[i] = correctAnswer
             while (arr[i] == correctAnswer) arr[i] = randomChar().toString()
         }
-        arr[abs(random.nextInt()) % 4] = correctAnswer.toString()
+        arr[abs(random.nextInt()) % 4] = correctAnswer
 
         return arr
 
     }
 
-    fun randomChar(): Char {
+    private fun randomChar(): Char {
 
-        var random = Random()
+        val random = Random()
         return ((abs(random.nextInt() % 25)) + 65).toChar()
     }
 

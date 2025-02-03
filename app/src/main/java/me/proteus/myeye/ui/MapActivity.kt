@@ -35,8 +35,8 @@ import kotlin.math.cos
 
 class MapActivity : ComponentActivity() {
 
-    lateinit var placesClient: PlacesClient
-    var uniquePlaces = mutableListOf<Place>()
+    private lateinit var placesClient: PlacesClient
+    private var uniquePlaces = mutableListOf<Place>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -54,7 +54,7 @@ class MapActivity : ComponentActivity() {
                         position = CameraPosition.fromLatLngZoom(startPos, 15f)
                     }
 
-                    var markerPos by remember { mutableStateOf<LatLng>(startPos) }
+                    var markerPos by remember { mutableStateOf(startPos) }
                     var places by remember { mutableStateOf(emptyList<Place>()) }
 
                     LaunchedEffect(markerPos) {
@@ -122,7 +122,7 @@ class MapActivity : ComponentActivity() {
         Places.deinitialize()
     }
 
-    fun search(center: LatLng, callback: (List<Place>) -> Unit) {
+    private fun search(center: LatLng, callback: (List<Place>) -> Unit) {
 
         val bounds = getRectangularBounds(center, 1.0)
 
@@ -146,11 +146,11 @@ class MapActivity : ComponentActivity() {
 //                foundPlaces = places
             }
             .addOnFailureListener { fall ->
-                Log.e("MapActivity", "search: ${fall.message}", )
+                Log.e("MapActivity", "search: ${fall.message}")
             }
     }
 
-    fun getRectangularBounds(center: LatLng, distance: Double): RectangularBounds {
+    private fun getRectangularBounds(center: LatLng, distance: Double): RectangularBounds {
         val kilometr = 111.32
 
         val latOffset = distance / 2 / kilometr

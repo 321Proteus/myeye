@@ -49,7 +49,7 @@ class TestResultActivity : FragmentActivity() {
 
     fun openTest(data: TestResult?) {
 
-        val detailsIntent: Intent = Intent(this, VisionTestLayoutActivity::class.java)
+        val detailsIntent = Intent(this, VisionTestLayoutActivity::class.java)
         detailsIntent.putExtra("IS_RESULT", true)
         detailsIntent.putExtra("RESULT_PARCEL", data)
         this.startActivity(detailsIntent)
@@ -67,7 +67,7 @@ fun TestResultScreen(
     ) {
 
     val resultData = IntentCompat.getParcelableExtra(inputIntent, "RESULT_PARCEL", TestResult::class.java)
-    if (resultData == null) return
+        ?: return
 
     val isAfterTest = inputIntent.getBooleanExtra("IS_AFTER", false)
 
@@ -136,7 +136,7 @@ fun TestResultScreen(
 
                                 val debugAuth = false
 
-                                if (debugAuth == true) {
+                                if (debugAuth) {
                                     if (viewModel.isAuthorized) {
                                         navigate(resultData)
                                     } else {

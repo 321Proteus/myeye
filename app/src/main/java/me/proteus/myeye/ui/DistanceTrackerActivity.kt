@@ -64,17 +64,17 @@ class DistanceTrackerActivity : ComponentActivity(), SensorEventListener {
 
     private lateinit var sensorManager: SensorManager
 
-    var oldAccTime = 0L
-    var oldGyroTime = 0L
+    private var oldAccTime = 0L
+    private var oldGyroTime = 0L
 
-    var acceleration = mutableStateListOf<Float>(0f, 0f, 0f)
-    var rotation = mutableStateListOf<Float>(0f, 0f, 0f)
-    var velocity = mutableStateListOf<Float>(0f, 0f, 0f)
-    var position = mutableStateListOf<Float>(0f, 0f, 0f)
+    private var acceleration = mutableStateListOf(0f, 0f, 0f)
+    private var rotation = mutableStateListOf(0f, 0f, 0f)
+    private var velocity = mutableStateListOf(0f, 0f, 0f)
+    private var position = mutableStateListOf(0f, 0f, 0f)
 
-    var daneX = mutableStateListOf<Float>()
-    var daneY = mutableStateListOf<Float>()
-    var daneZ = mutableStateListOf<Float>()
+    private var daneX = mutableStateListOf<Float>()
+    private var daneY = mutableStateListOf<Float>()
+    private var daneZ = mutableStateListOf<Float>()
 
     private var totalDistance = 0f
 
@@ -215,12 +215,12 @@ class DistanceTrackerActivity : ComponentActivity(), SensorEventListener {
                     contentAlignment = Alignment.Center
                 ) {
 
-                    var daneSuma = mutableListOf<Float>()
+                    val daneSuma = mutableListOf<Float>()
                     for (i in 0..<daneX.size) {
                         daneSuma.add(sqrt(daneX[i].pow(2) + daneY[i].pow(2) + daneZ[i].pow(2)))
                     }
 
-                    var dataSeries = listOf(daneX, daneY, daneZ, daneSuma)
+                    val dataSeries = listOf(daneX, daneY, daneZ, daneSuma)
                     LineChart(
                         dane = dataSeries,
                         modifier = Modifier.fillMaxSize()
@@ -231,7 +231,7 @@ class DistanceTrackerActivity : ComponentActivity(), SensorEventListener {
         }
     }
 
-    val paint = Paint().asFrameworkPaint().apply {
+    private val paint = Paint().asFrameworkPaint().apply {
         isAntiAlias = true
         textSize = 24f
         color = Color.Black.toArgb()
@@ -242,8 +242,8 @@ class DistanceTrackerActivity : ComponentActivity(), SensorEventListener {
 
         var scale by remember { mutableFloatStateOf(1f) }
 
-        var maksi: Float = scale
-        var mini: Float = -scale
+        val maksi: Float = scale
+        val mini: Float = -scale
 
         Column(modifier = modifier) {
             Canvas(
@@ -266,7 +266,7 @@ class DistanceTrackerActivity : ComponentActivity(), SensorEventListener {
                         axis.forEachIndexed { index, value ->
 
                             val x = index * odleglosc
-                            val y = height - ((value - mini) / (maksi - mini) * height).toFloat()
+                            val y = height - ((value - mini) / (maksi - mini) * height)
 
                             if (index == 0) moveTo(x, y)
                             else lineTo(x, y)
@@ -301,10 +301,10 @@ class DistanceTrackerActivity : ComponentActivity(), SensorEventListener {
 
     }
 
-    fun initSensor() {
+    private fun initSensor() {
         sensorManager = getSystemService(SENSOR_SERVICE) as SensorManager
-        var accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_LINEAR_ACCELERATION)
-        var gyroscope = sensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE)
+        val accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_LINEAR_ACCELERATION)
+        val gyroscope = sensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE)
 
         if (accelerometer == null) {
             Toast.makeText(this, "Brak akcelerometru", Toast.LENGTH_SHORT).show()
@@ -325,16 +325,16 @@ class DistanceTrackerActivity : ComponentActivity(), SensorEventListener {
             when (e.sensor.type) {
                 Sensor.TYPE_LINEAR_ACCELERATION -> {
 
-                    var current = e.timestamp
+                    val current = e.timestamp
 
-                    var dt = if (oldAccTime != 0L) (current - oldAccTime) * 10f.pow(-9) else 0f
+                    val dt = if (oldAccTime != 0L) (current - oldAccTime) * 10f.pow(-9) else 0f
                     oldAccTime = current
 
                     var sumDistance = 0f
 
                     for (i in 0..2) {
 
-                        var isStationary: Boolean = e.values[i] > 0.01f
+                        val isStationary: Boolean = e.values[i] > 0.01f
 
                         acceleration[i] = if (isStationary) e.values[i] else 0f
                         position[i] += dt * (velocity[i] + acceleration[i] * dt / 2)
@@ -358,9 +358,9 @@ class DistanceTrackerActivity : ComponentActivity(), SensorEventListener {
 
                 Sensor.TYPE_GYROSCOPE -> {
 
-                    var current = e.timestamp
+                    val current = e.timestamp
                     
-                    var dt = if (oldGyroTime != 0L) (current - oldGyroTime) * 10f.pow(-9) else 0f
+                    val dt = if (oldGyroTime != 0L) (current - oldGyroTime) * 10f.pow(-9) else 0f
                     oldGyroTime = current
                     
                     for (i in 0..2) rotation[i] += e.values[i] * dt
@@ -373,7 +373,7 @@ class DistanceTrackerActivity : ComponentActivity(), SensorEventListener {
     override fun onAccuracyChanged(p0: Sensor?, p1: Int) {}
 
 
-    fun getTotalAcceleration(): Float {
+    private fun getTotalAcceleration(): Float {
         return sqrt(acceleration[0].pow(2) + acceleration[1].pow(2) + acceleration[2].pow(2))
     }
 

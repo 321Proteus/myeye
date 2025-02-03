@@ -5,16 +5,12 @@ import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -23,10 +19,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.remember
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.util.fastJoinToString
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
@@ -46,7 +40,7 @@ import me.proteus.myeye.ui.theme.MyEyeTheme
 
 class PlaceDetailsActivity : ComponentActivity() {
 
-    lateinit var placesClient: PlacesClient
+    private lateinit var placesClient: PlacesClient
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -130,7 +124,18 @@ class PlaceDetailsActivity : ComponentActivity() {
             modifier = Modifier
                 .fillMaxSize(),
             cameraPositionState = cps,
-            uiSettings = MapUiSettings(false, false, false, false, false, false, false, false, false, false),
+            uiSettings = MapUiSettings(
+                compassEnabled = false,
+                indoorLevelPickerEnabled = false,
+                mapToolbarEnabled = false,
+                myLocationButtonEnabled = false,
+                rotationGesturesEnabled = false,
+                scrollGesturesEnabled = false,
+                scrollGesturesEnabledDuringRotateOrZoom = false,
+                tiltGesturesEnabled = false,
+                zoomControlsEnabled = false,
+                zoomGesturesEnabled = false
+            ),
             properties = MapProperties(
                 isBuildingEnabled = true,
             )
@@ -143,7 +148,7 @@ class PlaceDetailsActivity : ComponentActivity() {
         }
     }
 
-    fun getPlace(id: String, callback: (Place) -> Unit) {
+    private fun getPlace(id: String, callback: (Place) -> Unit) {
 
         val types = listOf(
             Place.Field.DISPLAY_NAME,

@@ -41,8 +41,8 @@ class BuildTest : VisionTest {
 
     override fun getExampleAnswers(): Array<String> {
 
-        var random = Random()
-        return Array<String>(4) { random.nextInt().toString() }
+        val random = Random()
+        return Array(4) { random.nextInt().toString() }
 
     }
 

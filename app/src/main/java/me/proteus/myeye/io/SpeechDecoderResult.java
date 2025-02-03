@@ -3,14 +3,13 @@ package me.proteus.myeye.io;
 import com.google.gson.*;
 
 import java.util.ArrayList;
-import java.util.Map;
 
 public class SpeechDecoderResult {
 
-    public float confidence;
-    public float start;
-    public float end;
-    public String word;
+    public final float confidence;
+    public final float start;
+    public final float end;
+    public final String word;
 
 
     public SpeechDecoderResult(float c, float s, float e, String w) {

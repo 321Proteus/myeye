@@ -147,7 +147,7 @@ class ASRViewModel(application: Application) : AndroidViewModel(application) {
 
     }
 
-    fun initModel(startRecognizer: Boolean) {
+    private fun initModel(startRecognizer: Boolean) {
 
         val context = getApplication<Application>().applicationContext
 

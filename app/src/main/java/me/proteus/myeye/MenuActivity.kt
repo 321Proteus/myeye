@@ -220,7 +220,7 @@ fun MenuScreen(scope: CoroutineScope, state: DrawerState) {
 @Composable
 fun ExpandableGrid() {
     var expanded by remember { mutableStateOf(false) }
-    var list = mutableListOf("TEST_BUILD", "TEST_CIRCLE", "SNELLEN_CHART", "TEST_INFO", "COLOR_ARRANGE", "REACTION_TEST")
+    val list = mutableListOf("TEST_BUILD", "TEST_CIRCLE", "SNELLEN_CHART", "TEST_INFO", "COLOR_ARRANGE", "REACTION_TEST")
 
     Column(modifier = Modifier.fillMaxSize()) {
 
@@ -299,11 +299,11 @@ fun ExpandableGrid() {
 @Composable
 fun VisionTestDrawerItem(testID: String, activity: MenuActivity) {
 
-    var icon = VisionTestUtils().getTestByID(testID).testIcon
+    val icon = VisionTestUtils().getTestByID(testID).testIcon
 
     println()
 
-    var description = VisionTestUtils().getTestTypeByID(testID) + " " + VisionTestUtils().getTestNameByID(testID)
+    val description = VisionTestUtils().getTestTypeByID(testID) + " " + VisionTestUtils().getTestNameByID(testID)
 
     NavigationDrawerItem(
         icon = { Icon(icon, null) },

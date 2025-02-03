@@ -78,7 +78,7 @@ class SimpleDistanceActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        registerForActivityResult(ActivityResultContracts.RequestPermission()) { permission ->
+        registerForActivityResult(ActivityResultContracts.RequestPermission()) { _ ->
             return@registerForActivityResult
         }.launch(Manifest.permission.CAMERA)
 
@@ -192,7 +192,7 @@ class SimpleDistanceActivity : ComponentActivity() {
 
         var measurementCount by remember { mutableIntStateOf(0) }
 
-        var inputTestId = intent.getStringExtra("TEST_ID")
+        val inputTestId = intent.getStringExtra("TEST_ID")
 
         camera.bindToLifecycle(LocalLifecycleOwner.current)
         camera.cameraSelector = CameraSelector.DEFAULT_FRONT_CAMERA
@@ -220,7 +220,7 @@ class SimpleDistanceActivity : ComponentActivity() {
 //                    FaceCanvas(faces.value, canvasWidth, canvasHeight)
                 }
 
-                var text: String
+                val text: String
 
                 if (faces.value.isNotEmpty()) {
 
@@ -285,7 +285,7 @@ class SimpleDistanceActivity : ComponentActivity() {
         }
 
     }
-    fun toMetric(ogniskowa: Float, sensorWidth: Float): Float {
+    private fun toMetric(ogniskowa: Float, sensorWidth: Float): Float {
 
         val imageWidth = faces.value[0].boundingBox.width().toFloat()
         val sensorSize = imageWidth * sensorWidth / imageSize.first
@@ -312,10 +312,10 @@ class SimpleDistanceActivity : ComponentActivity() {
     @Composable
     fun getDeviceSize(): Pair<Float, Float> {
 
-        var config = LocalConfiguration.current
-        var density = LocalDensity.current.density
-        var widthDp: Int
-        var heightDp: Int
+        val config = LocalConfiguration.current
+        val density = LocalDensity.current.density
+        val widthDp: Int
+        val heightDp: Int
 
         if (config.orientation == Configuration.ORIENTATION_LANDSCAPE) {
             widthDp = config.screenWidthDp
@@ -335,7 +335,7 @@ class SimpleDistanceActivity : ComponentActivity() {
         camera.unbind()
     }
 
-    fun cameraInfo(context: Context): Pair<Float, Float> {
+    private fun cameraInfo(context: Context): Pair<Float, Float> {
         try {
             val cameraManager = context.getSystemService(CAMERA_SERVICE) as CameraManager
 
@@ -347,7 +347,7 @@ class SimpleDistanceActivity : ComponentActivity() {
 
             val characteristics = cameraManager.getCameraCharacteristics(cameraId)
             val focalLength = characteristics.get(CameraCharacteristics.LENS_INFO_AVAILABLE_FOCAL_LENGTHS)?.firstOrNull() ?: 0f
-            val sensorSize = characteristics.get(CameraCharacteristics.SENSOR_INFO_PHYSICAL_SIZE)!!.width.toFloat()
+            val sensorSize = characteristics.get(CameraCharacteristics.SENSOR_INFO_PHYSICAL_SIZE)!!.width
             return Pair(focalLength, sensorSize)
         } catch (e: CameraAccessException) {
             e.printStackTrace()
