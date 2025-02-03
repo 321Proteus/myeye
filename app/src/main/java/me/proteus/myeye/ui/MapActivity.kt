@@ -6,17 +6,25 @@ import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Scaffold
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import com.google.android.gms.maps.model.BitmapDescriptorFactory
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.unit.dp
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.libraries.places.api.Places
@@ -26,20 +34,22 @@ import com.google.android.libraries.places.api.net.PlacesClient
 import com.google.android.libraries.places.api.net.SearchByTextRequest
 import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.Marker
+import com.google.maps.android.compose.MarkerComposable
 import com.google.maps.android.compose.Polygon
 import com.google.maps.android.compose.rememberCameraPositionState
 import com.google.maps.android.compose.rememberUpdatedMarkerState
 import me.proteus.myeye.BuildConfig
 import me.proteus.myeye.ui.theme.MyEyeTheme
+import me.proteus.myeye.R
 import kotlin.math.cos
 
 class MapActivity : ComponentActivity() {
 
     private lateinit var placesClient: PlacesClient
-    private var uniquePlaces = mutableListOf<Place>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         Places.initializeWithNewPlacesApiEnabled(applicationContext, BuildConfig.MAPS_API_KEY)
 
         placesClient = Places.createClient(this)
@@ -72,49 +82,97 @@ class MapActivity : ComponentActivity() {
                         cameraPositionState = cameraPositionState,
                         onMapClick = { markerPos = it }
                     ) {
-                        Marker(
-                            state = rememberUpdatedMarkerState(position = markerPos),
-                            icon = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_CYAN)
+                        Marker (
+                            state = rememberUpdatedMarkerState(position = markerPos)
                         )
 
-                        places.forEach { place ->
-                            if (!uniquePlaces.contains(place)) {
-                                uniquePlaces.add(place)
-                                println("Nowe miejsce: ${place.displayName}")
-                            }
-                            place.location?.let {
-                                Marker(
-                                    state = rememberUpdatedMarkerState(position = it),
-                                    icon = BitmapDescriptorFactory.defaultMarker(
-                                        BitmapDescriptorFactory.HUE_YELLOW),
-                                    title = place.displayName,
-                                    onClick = {
-                                        val intent = Intent(this, PlaceDetailsActivity::class.java)
-                                        intent.putExtra("PLACE_ID", place.id)
-                                        startActivity(intent)
-                                        false
-                                    }
-                                )
-                            }
-                        }
+                        places.forEach { place -> PlaceMarker(place) }
+                        RangeDisplay(markerPos)
 
-                        val bounds = getRectangularBounds(markerPos, 1.0)
-                        val sw = bounds.southwest
-                        val ne = bounds.northeast
-                        val nw = LatLng(ne.latitude, sw.longitude)
-                        val se = LatLng(sw.latitude, ne.longitude)
-
-
-                        Polygon(
-                            points = listOf(sw, nw, ne, se, sw),
-                            strokeColor = Color.Blue,
-                            strokeWidth = 5f,
-                            fillColor = Color(0x5500FF00)
-                        )
                     }
                 }
             }
         }
+    }
+
+
+
+    @Composable
+    fun PlaceMarker(place: Place) {
+        if (place.location != null) {
+            MarkerComposable(
+                state = rememberUpdatedMarkerState(position = place.location!!),
+                title = place.displayName,
+                onClick = {
+                    val intent = Intent(this, PlaceDetailsActivity::class.java)
+                    intent.putExtra("PLACE_ID", place.id)
+                    startActivity(intent)
+                    false
+                }
+            ) {
+                Box(
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(48.dp))
+                        .size(48.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Image(painterResource(R.drawable.myeye_logo_white_playstore), null)
+                }
+            }
+
+        }
+    }
+
+//        val shape = RoundedCornerShape(20.dp, 20.dp, 20.dp, 0.dp)
+//        val painter = rememberAsyncImagePainter(
+//            ImageRequest.Builder(LocalContext.current)
+//                .data(imageUrl)
+//                .allowHardware(false)
+//                .build()
+//        )
+//
+//            Box(
+//                modifier = Modifier
+//                    .size(48.dp)
+//                    .clip(shape)
+//                    .background(Color.LightGray)
+//                    .padding(4.dp),
+//                contentAlignment = Alignment.Center
+//            ) {
+//                if (!imageUrl.isNullOrEmpty()) {
+//                    Image(
+//                        painter = painter,
+//                        contentDescription = "Profile Image",
+//                        modifier = Modifier.fillMaxSize(),
+//                        contentScale = ContentScale.Crop
+//                    )
+//                } else {
+//                    Text(
+//                        text = fullName.take(1).uppercase(),
+//                        color = Color.White,
+//                        style = MaterialTheme.typography.body2,
+//                        modifier = Modifier.align(Alignment.Center)
+//                    )
+//                }
+//            }
+//        }
+//    }
+
+    @Composable
+    private fun RangeDisplay(position: LatLng) {
+        val bounds = getRectangularBounds(position, 1.0)
+        val sw = bounds.southwest
+        val ne = bounds.northeast
+        val nw = LatLng(ne.latitude, sw.longitude)
+        val se = LatLng(sw.latitude, ne.longitude)
+
+
+        Polygon(
+            points = listOf(sw, nw, ne, se, sw),
+            strokeColor = Color.Blue,
+            strokeWidth = 5f,
+            fillColor = Color(0x5500FF00)
+        )
     }
 
     override fun onDestroy() {
@@ -129,7 +187,7 @@ class MapActivity : ComponentActivity() {
         val placeFields: List<Place.Field> = listOf(Place.Field.ID, Place.Field.DISPLAY_NAME)
 
         val request =
-            SearchByTextRequest.builder("Gabinet okulistyczny", placeFields)
+            SearchByTextRequest.builder("okulistyczny", placeFields)
 //                .setMaxResultCount(10)
                 .setLocationRestriction(bounds)
                 .setPlaceFields(listOf(Place.Field.LOCATION, Place.Field.DISPLAY_NAME, Place.Field.ID))

@@ -21,7 +21,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.sp
-import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.libraries.places.api.Places
@@ -32,9 +31,7 @@ import com.google.maps.android.compose.CameraPositionState
 import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.MapProperties
 import com.google.maps.android.compose.MapUiSettings
-import com.google.maps.android.compose.Marker
 import com.google.maps.android.compose.rememberCameraPositionState
-import com.google.maps.android.compose.rememberUpdatedMarkerState
 import me.proteus.myeye.BuildConfig
 import me.proteus.myeye.ui.theme.MyEyeTheme
 
@@ -80,7 +77,11 @@ class PlaceDetailsActivity : ComponentActivity() {
                                 .weight(1f)
                                 .fillMaxWidth()
                         ) {
-                            MapView(cameraPositionState)
+                            MapView(cameraPositionState) {
+                                if (place != null) {
+                                    MapActivity().PlaceMarker(place!!)
+                                }
+                            }
                         }
 
                         Column(
@@ -119,7 +120,7 @@ class PlaceDetailsActivity : ComponentActivity() {
     }
 
     @Composable
-    fun MapView(cps: CameraPositionState) {
+    fun MapView(cps: CameraPositionState, marker: @Composable () -> Unit) {
         GoogleMap(
             modifier = Modifier
                 .fillMaxSize(),
@@ -141,10 +142,12 @@ class PlaceDetailsActivity : ComponentActivity() {
             )
 
         ) {
-            Marker(
-                state = rememberUpdatedMarkerState(position = cps.position.target),
-                icon = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED)
-            )
+//            Marker(
+//                state = rememberUpdatedMarkerState(position = cps.position.target),
+//                icon = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED)
+//            )
+            marker()
+
         }
     }
 
