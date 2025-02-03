@@ -57,6 +57,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.Font
@@ -262,7 +263,9 @@ fun ExpandableGrid() {
                                 VisionTestIcon(
                                     modifier = Modifier,
                                     testID = id,
-                                    size = 0.4f
+                                    size = 0.4f,
+                                    clickable = true,
+                                    context = LocalContext.current
                                 )
                             }
                             Text(VisionTestUtils().getTestNameByID(id), fontSize = 12.sp)
@@ -283,7 +286,9 @@ fun ExpandableGrid() {
                                 VisionTestIcon(
                                     modifier = Modifier,
                                     testID = id,
-                                    size = 0.4f
+                                    size = 0.4f,
+                                    clickable = true,
+                                    context = LocalContext.current
                                 )
                             }
                             Text(VisionTestUtils().getTestNameByID(id), fontSize = 12.sp)
