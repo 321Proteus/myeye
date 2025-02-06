@@ -3,7 +3,6 @@ package me.proteus.myeye.visiontests
 import android.Manifest
 import android.content.pm.PackageManager
 import android.content.res.Configuration
-import androidx.activity.result.ActivityResultLauncher
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -45,6 +44,7 @@ class SnellenChart : VisionTest {
 
     override val testID: String = "SNELLEN_CHART"
     override val testIcon: ImageVector = Icons.TwoTone.Face
+    override val needsMicrophone: Boolean = true
     override val stageCount: Int = 10
     override val resultCollector: ResultDataCollector = ResultDataCollector()
     override var distance: Float = 0f
@@ -53,12 +53,12 @@ class SnellenChart : VisionTest {
 
     private lateinit var asr: ASRViewModel
 
-    fun stageToCentimeters(stage: Int): Float {
+    private fun stageToCentimeters(stage: Int): Float {
 
-        var marBase = ((PI/180) / 60) * 5  // 5 minut katowych
-        var marCurrent = marBase * 10f.pow(-stage * 0.1f)
+        val marBase = ((PI/180) / 60) * 5  // 5 minut katowych
+        val marCurrent = marBase * 10f.pow(-stage * 0.1f)
 
-        var height = distance * tan(marCurrent / 2)
+        val height = distance * tan(marCurrent / 2)
 
         return height.toFloat()
 
@@ -70,10 +70,10 @@ class SnellenChart : VisionTest {
         val config = LocalConfiguration.current
         val opticianSansFamily = FontFamily(Font(R.font.opticiansans))
 
-        var screenDensity = getScreenInfo(LocalContext.current).densityDpi / 2.54f
-        var calculatedSize = stageToCentimeters(stage)
+        val screenDensity = getScreenInfo(LocalContext.current).densityDpi / 2.54f
+        val calculatedSize = stageToCentimeters(stage)
         println(calculatedSize)
-        var pixelSize = with(LocalDensity.current) { (screenDensity * calculatedSize).toSp() }
+        val pixelSize = with(LocalDensity.current) { (screenDensity * calculatedSize).toSp() }
 
         if (config.orientation == Configuration.ORIENTATION_LANDSCAPE) {
             Row(
@@ -81,7 +81,7 @@ class SnellenChart : VisionTest {
                     .fillMaxWidth(),
                 horizontalArrangement = Arrangement.Center
             ) {
-                for (i in 0..<text.length) {
+                for (i in text.indices) {
                     Text(
                         text = text[i].toString(),
                         color = (if (key != null) (if (text[i] == key[i]) Color.Green else Color.Red) else Color.Black),
@@ -98,7 +98,7 @@ class SnellenChart : VisionTest {
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                for (i in 0..<text.length) {
+                for (i in text.indices) {
                     Text(
                         text = text[i].toString(),
                         color = (if (key != null) (if (text[i] == key[i]) Color.Green else Color.Red) else Color.Black),
@@ -150,12 +150,12 @@ class SnellenChart : VisionTest {
 
                 if (data.isEmpty()) return@observe
 
-                println("Data: ${data.map { it -> it.word }.joinToString(",")}")
+                println("Data: ${data.joinToString(",") { it.word }}")
 
-                val mapped = data.map { it -> mapping.entries.first { key -> key.value == it.word} }
+                val mapped = data.map { mapping.entries.first { key -> key.value == it.word} }
 
                 if (mapped.size == 5) {
-                    onUpdate(mapped.map { it -> it.key }.joinToString("").uppercase())
+                    onUpdate(mapped.joinToString("") { it.key }.uppercase())
                     asr.clearBuffer()
                 }
             }
@@ -202,7 +202,7 @@ class SnellenChart : VisionTest {
                 ButtonRow(
                     onRegenerate = { onUpdate("REGENERATE") },
                     onSizeDecrease = {
-                        onUpdate(randomText(5))
+                        onUpdate(randomText())
                     }
                 )
             } else {
@@ -229,8 +229,7 @@ class SnellenChart : VisionTest {
     override fun BeginTest(
         activity: VisionTestLayoutActivity,
         isResult: Boolean,
-        result: TestResult?,
-        rpl: ActivityResultLauncher<String>?
+        result: TestResult?
     ) {
 
         if (!isResult) {
@@ -241,18 +240,18 @@ class SnellenChart : VisionTest {
 
             if (activity.checkSelfPermission(Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED) {
                 asr.initialize(GrammarType.LETTERS_LOGMAR)
-            } else {
-                rpl?.launch(Manifest.permission.RECORD_AUDIO)
             }
+        } else {
+            distance = result!!.distance
         }
 
-        super.BeginTest(activity, isResult, result, null)
+        super.BeginTest(activity, isResult, result)
 
     }
 
     override fun generateQuestion(stage: Int?): String {
 
-        var question: String = randomText(5)
+        val question: String = randomText()
 
         correctAnswer = question
         return question
@@ -265,30 +264,30 @@ class SnellenChart : VisionTest {
 
     override fun getExampleAnswers(): Array<String> {
 
-        var random = Random()
+        val random = Random()
 
-        var arr = Array<String>(4) { "" }
+        val arr = Array(4) { "" }
         for (i in 0..3) {
             arr[i] = correctAnswer
-            while (arr[i] == correctAnswer) arr[i] = randomText(5)
+            while (arr[i] == correctAnswer) arr[i] = randomText()
         }
-        arr[abs(random.nextInt()) % 4] = correctAnswer.toString()
+        arr[abs(random.nextInt()) % 4] = correctAnswer
 
         return arr
 
     }
 
-    fun randomText(n: Int): String {
+    private fun randomText(): String {
 
-        var all = GrammarType.LETTERS_LOGMAR.items.shuffled()
+        val all = GrammarType.LETTERS_LOGMAR.items.shuffled()
 
-        var random = Random()
+        val random = Random()
 
-        var text: String = ""
-        var i: Int = 0
+        var text = ""
+        var i = 0
         var j: Int = random.nextInt(all.size)
 
-        while(i++ < n)  {
+        while(i++ < 5)  {
             text += all[j]
             j++; j %= all.size
         }

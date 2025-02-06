@@ -128,7 +128,7 @@ class SpeechDecoderActivity : ComponentActivity() {
 
                     } else {
                         LazyColumn {
-                            itemsIndexed(result) { index, item ->
+                            itemsIndexed(result) { _, item ->
 
                                 Box {
                                     Text(
@@ -151,7 +151,7 @@ class SpeechDecoderActivity : ComponentActivity() {
 
     }
 
-    fun getProbabilityColor(p: Float): Color {
+    private fun getProbabilityColor(p: Float): Color {
         return Color(ColorUtils.blendARGB(Color.Red.toArgb(), Color.Green.toArgb(), p))
     }
 

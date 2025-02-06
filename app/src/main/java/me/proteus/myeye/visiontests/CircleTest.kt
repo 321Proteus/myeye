@@ -3,7 +3,6 @@ package me.proteus.myeye.visiontests
 import android.Manifest
 import android.content.pm.PackageManager
 import android.content.res.Configuration
-import androidx.activity.result.ActivityResultLauncher
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -46,6 +45,7 @@ class CircleTest : VisionTest {
 
     override val testID: String = "TEST_CIRCLE"
     override val testIcon: ImageVector = Icons.Outlined.AccountCircle
+    override val needsMicrophone: Boolean = true
 
     override val stageCount: Int = 10
 
@@ -57,12 +57,12 @@ class CircleTest : VisionTest {
 
     override val resultCollector: ResultDataCollector = ResultDataCollector()
 
-    fun stageToCentimeters(stage: Int): Float {
+    private fun stageToCentimeters(stage: Int): Float {
 
-        var marBase = ((PI/180) / 60) * 5  // 5 minut katowych
-        var marCurrent = marBase * 10f.pow(-stage * 0.1f)
+        val marBase = ((PI/180) / 60) * 5  // 5 minut katowych
+        val marCurrent = marBase * 10f.pow(-stage * 0.1f)
 
-        var height = distance * tan(marCurrent / 2)
+        val height = distance * tan(marCurrent / 2)
 
         return height.toFloat()
 
@@ -74,10 +74,10 @@ class CircleTest : VisionTest {
         val config = LocalConfiguration.current
         val opticianSansFamily = FontFamily(Font(R.font.opticiansans))
 
-        var screenDensity = getScreenInfo(LocalContext.current).densityDpi / 2.54f
-        var calculatedSize = stageToCentimeters(currentStage)
+        val screenDensity = getScreenInfo(LocalContext.current).densityDpi / 2.54f
+        val calculatedSize = stageToCentimeters(currentStage)
         println(calculatedSize)
-        var pixelSize = with(LocalDensity.current) { (screenDensity * calculatedSize).toSp() }
+        val pixelSize = with(LocalDensity.current) { (screenDensity * calculatedSize).toSp() }
 
         if (config.orientation == Configuration.ORIENTATION_LANDSCAPE) {
             Row(
@@ -86,7 +86,7 @@ class CircleTest : VisionTest {
                 horizontalArrangement = Arrangement.Center,
 
             ) {
-                for (i in 0..<directions.length) {
+                for (i in directions.indices) {
                     Text(
                         text = "C",
                         modifier = modifier
@@ -104,7 +104,7 @@ class CircleTest : VisionTest {
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                for (i in 0..<directions.length) {
+                for (i in directions.indices) {
                     Text(
                         text = "C",
                         modifier = modifier
@@ -158,10 +158,10 @@ class CircleTest : VisionTest {
 
                 if (data.isEmpty()) return@observe
 
-                println("Data: ${data.map { it -> it.word }.joinToString(",")}")
+                println("Data: ${data.joinToString(",") { it.word }}")
 
-                val mapped = data.map { it -> mapping.entries.first { key -> key.value == it.word} }
-                val directions = mapped.map { it ->
+                val mapped = data.map { mapping.entries.first { key -> key.value == it.word} }
+                val directions = mapped.map {
                     when (it.key) {
                         "right" -> 0
                         "bottom" -> 1
@@ -248,8 +248,7 @@ class CircleTest : VisionTest {
     override fun BeginTest(
         activity: VisionTestLayoutActivity,
         isResult: Boolean,
-        result: TestResult?,
-        rpl: ActivityResultLauncher<String>?
+        result: TestResult?
     ) {
 
         if (!isResult) {
@@ -260,31 +259,32 @@ class CircleTest : VisionTest {
 
             if (activity.checkSelfPermission(Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED) {
                 asr.initialize(GrammarType.SIDES)
-            } else {
-                rpl?.launch(Manifest.permission.RECORD_AUDIO)
             }
+
+        } else {
+            distance = result!!.distance
         }
 
-        super.BeginTest(activity, isResult, result, null)
+        super.BeginTest(activity, isResult, result)
 
     }
 
     override fun generateQuestion(stage: Int?): String {
 
-        var question: String = generateDirections()
+        val question: String = generateDirections()
 
         correctAnswer = question
         return question
 
     }
 
-    fun generateDirections(): String {
+    private fun generateDirections(): String {
 
-        var directions = "0123"
-        var text: String = ""
-        var i: Int = 0
+        val directions = "0123"
+        var text = ""
+        var i = 0
 
-        var random = Random()
+        val random = Random()
 
         while(i++ < 5)  {
             text += directions[abs(random.nextInt() % 4)]
@@ -300,9 +300,9 @@ class CircleTest : VisionTest {
 
     override fun getExampleAnswers(): Array<String> {
 
-        var random = Random()
+        val random = Random()
 
-        var arr = Array<String>(4) { "" }
+        val arr = Array(4) { "" }
         for (i in 0..3) {
             arr[i] = correctAnswer
             while (arr[i] == correctAnswer) arr[i] = generateDirections()

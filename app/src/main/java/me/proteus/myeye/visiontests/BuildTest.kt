@@ -14,6 +14,7 @@ class BuildTest : VisionTest {
 
     override val testID: String = "TEST_BUILD"
     override val testIcon: ImageVector = Icons.Outlined.Build
+    override val needsMicrophone: Boolean = false
     override val stageCount: Int = 5
     override val resultCollector: ResultDataCollector = ResultDataCollector()
     override var distance: Float = -1f
@@ -40,8 +41,8 @@ class BuildTest : VisionTest {
 
     override fun getExampleAnswers(): Array<String> {
 
-        var random = Random()
-        return Array<String>(4) { random.nextInt().toString() }
+        val random = Random()
+        return Array(4) { random.nextInt().toString() }
 
     }
 

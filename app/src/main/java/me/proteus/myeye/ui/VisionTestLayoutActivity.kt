@@ -1,7 +1,9 @@
 package me.proteus.myeye.ui
 
+import android.Manifest
 import android.content.Intent
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -19,52 +21,55 @@ import me.proteus.myeye.TestResult
 
 class VisionTestLayoutActivity : ComponentActivity() {
 
-    private lateinit var rpl: ActivityResultLauncher<String>
+    private lateinit var launcher: ActivityResultLauncher<Array<String>>
     private lateinit var testObject: VisionTest
+
+    private var isResult: Boolean? = null
+    private var resultData: TestResult? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
 
-        rpl =
-            registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted: Boolean ->
-                if (isGranted) {
-                    println("Uprawnienia przyznane")
-                } else {
-                    println("Brak uprawnień")
-                }
-            }
+        isResult = intent.getBooleanExtra("IS_RESULT", false)
+        resultData = IntentCompat.getParcelableExtra(intent, "RESULT_PARCEL", TestResult::class.java)
 
-        val isResult: Boolean = intent.getBooleanExtra("IS_RESULT", false)
-        val resultData: TestResult? = IntentCompat.getParcelableExtra(intent, "RESULT_PARCEL", TestResult::class.java)
+        println(if (resultData != null) "Znaleziono TestResult o ID ${resultData!!.resultID}" else "Nie przekazano TestResult")
 
-        println(if (resultData != null) "Znaleziono TestResult o ID ${resultData.resultID}" else "Nie przekazano TestResult")
-
-        var testID: String? = if (isResult && resultData != null) {
-            resultData.testID
+        val testID: String? = if (isResult == true && resultData != null) {
+            resultData!!.testID
         } else {
             intent.getStringExtra("TEST_ID")
         }
 
-        testObject = VisionTestUtils().getTestByID(testID)
 
-        if (testObject.distance != -1f) {
+        val vtu = VisionTestUtils()
+        testObject = vtu.getTestByID(testID)
 
-            if (intent.hasExtra("DISTANCE")) {
-                val distance: Float = intent.getFloatExtra("DISTANCE", 2f)
-                println("Distance $distance")
-                testObject.distance = distance
+        val permissionList = mutableListOf<String>()
+
+        if (testObject.needsMicrophone) permissionList.add(Manifest.permission.RECORD_AUDIO)
+        if (testObject.distance != -1f) permissionList.add(Manifest.permission.CAMERA)
+
+        launcher = registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
+
+            val isMicGranted = permissions[Manifest.permission.RECORD_AUDIO] == true
+            val isCamGranted = permissions[Manifest.permission.CAMERA] == true
+            println("$isCamGranted $isMicGranted")
+            if (isCamGranted && isMicGranted) {
+                getDistance()
             } else {
-                val distanceIntent = Intent(this@VisionTestLayoutActivity, SimpleDistanceActivity::class.java)
-                distanceIntent.putExtra("TEST_ID", testID)
-                startActivity(distanceIntent)
-                return
+                Toast.makeText(this, "Brak wymaganych uprawnień", Toast.LENGTH_SHORT).show()
             }
-
         }
 
-        setContent {
+        if (permissionList.isNotEmpty() && isResult == false) launcher.launch(permissionList.toTypedArray())
+        else showTestScreen()
 
+    }
+
+    private fun showTestScreen() {
+        setContent {
             MyEyeTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
 
@@ -76,15 +81,29 @@ class VisionTestLayoutActivity : ComponentActivity() {
                     ) {
                         testObject.BeginTest(
                             activity = this@VisionTestLayoutActivity,
-                            isResult = isResult,
-                            result = resultData,
-                            rpl = rpl
+                            isResult = isResult!!,
+                            result = resultData
                         )
                     }
-
                 }
             }
+        }
+    }
 
+    private fun getDistance() {
+        if (intent.hasExtra("DISTANCE")) {
+            val distance: Float = intent.getFloatExtra("DISTANCE", 2f)
+            println("Distance $distance")
+            testObject.distance = distance
+
+            showTestScreen()
+
+        } else {
+            val distanceIntent = Intent(this@VisionTestLayoutActivity, SimpleDistanceActivity::class.java)
+            distanceIntent.putExtra("TEST_ID", testObject.testID)
+            startActivity(distanceIntent)
+            finish()
+            return
         }
     }
 

@@ -1,6 +1,6 @@
 package me.proteus.myeye.io
 
-import androidx.lifecycle.SavedStateHandle
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import io.netty.handler.codec.http.HttpHeaders
 import kotlinx.coroutines.Dispatchers
@@ -38,9 +38,9 @@ class HTTPRequestViewModel : ViewModel() {
         _showDialog.value = value
     }
 
-    suspend fun download(url: String?, output: File): CompletableFuture<Void?> {
+    suspend fun download(url: String?, output: File, post: File = output): CompletableFuture<Void?> {
         return withContext(Dispatchers.IO) {
-            println(url)
+            Log.i("HTTPRequestViewModel", "download: $url")
 
             val promise = CompletableFuture<Void?>()
 
@@ -50,7 +50,15 @@ class HTTPRequestViewModel : ViewModel() {
                 throw RuntimeException("Sciezka do katalogu nie istnieje i nie mogla zostac utworzona")
             }
 
+            if (post.exists()) {
+                promise.completeExceptionally(Throwable("Plik juz istnieje"))
+                return@withContext promise
+            } else {
+                Log.e("HTTPRequestViewModel", "download: lecim dalej")
+            }
+
             try {
+
                 val fos = FileOutputStream(output)
 
                 client!!.prepareGet(url).execute(object : AsyncHandler<Void?> {
@@ -59,13 +67,14 @@ class HTTPRequestViewModel : ViewModel() {
 
                     override fun onStatusReceived(responseStatus: HttpResponseStatus): AsyncHandler.State {
                         println("Status: " + responseStatus.statusCode)
+                        Log.d("HTTPRequestViewModel", "onStatusReceived: " + responseStatus.statusCode.toString())
                         return AsyncHandler.State.CONTINUE
                     }
 
                     override fun onHeadersReceived(headers: HttpHeaders): AsyncHandler.State {
                         if (headers.contains("Content-Length")) {
                             total = headers["Content-Length"].toLong()
-                            println("Do pobrania: $total")
+                            Log.d("HTTPRequestViewModel", "onHeadersReceived: Do pobrania $total")
                         }
                         return AsyncHandler.State.CONTINUE
                     }
@@ -90,6 +99,7 @@ class HTTPRequestViewModel : ViewModel() {
                     @Throws(Exception::class)
                     override fun onCompleted(): Void? {
                         fos.close()
+                        Log.e("HTTPRequestViewModel", "onCompleted: Pobrano!!!")
                         promise.complete(null)
                         return null
                     }

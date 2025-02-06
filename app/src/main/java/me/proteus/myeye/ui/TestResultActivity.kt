@@ -6,33 +6,27 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.biometric.BiometricPrompt
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.util.fastRoundToInt
 import androidx.core.content.ContextCompat
 import androidx.core.content.IntentCompat
 import androidx.fragment.app.FragmentActivity
 import me.proteus.myeye.TestResult
 import me.proteus.myeye.ui.theme.MyEyeTheme
-import me.proteus.myeye.visiontests.VisionTestUtils
 
 class TestResultActivity : FragmentActivity() {
 
@@ -55,7 +49,7 @@ class TestResultActivity : FragmentActivity() {
 
     fun openTest(data: TestResult?) {
 
-        val detailsIntent: Intent = Intent(this, VisionTestLayoutActivity::class.java)
+        val detailsIntent = Intent(this, VisionTestLayoutActivity::class.java)
         detailsIntent.putExtra("IS_RESULT", true)
         detailsIntent.putExtra("RESULT_PARCEL", data)
         this.startActivity(detailsIntent)
@@ -73,7 +67,7 @@ fun TestResultScreen(
     ) {
 
     val resultData = IntentCompat.getParcelableExtra(inputIntent, "RESULT_PARCEL", TestResult::class.java)
-    if (resultData == null) return;
+        ?: return
 
     val isAfterTest = inputIntent.getBooleanExtra("IS_AFTER", false)
 
@@ -98,24 +92,13 @@ fun TestResultScreen(
 
                     Text(text = resultData.fullTestName, fontSize = 24.sp)
 
-                    Box(
+                    VisionTestIcon(
                         modifier = Modifier
                             .padding(start = 100.dp, end = 100.dp)
-                            .weight(0.65f)
-                            .aspectRatio(1.0f)
-                            .clip(shape = RoundedCornerShape(15.dp))
-                            .background(MaterialTheme.colorScheme.primary),
-                        contentAlignment = Alignment.Center
-                    ) {
-
-                        Icon(
-                            modifier = Modifier.fillMaxSize(0.4f),
-                            imageVector = VisionTestUtils().getTestByID(resultData.testID).testIcon,
-                            contentDescription = null,
-                            tint = MaterialTheme.colorScheme.onPrimary
-                        )
-
-                    }
+                            .weight(0.65f),
+                        testID = resultData.testID,
+                        size = 0.4f
+                    )
                 }
 
                 Column(
@@ -124,8 +107,14 @@ fun TestResultScreen(
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
 
-                    Box() {
+                    Box {
                         Text("Data wykonania: " + resultData.formattedTimestamp)
+                    }
+
+                    if (resultData.distance != -1f) {
+                        Box {
+                            Text("Odległość: " + resultData.distance.fastRoundToInt() + " cm")
+                        }
                     }
 
                     if (isAfterTest) {
@@ -145,9 +134,9 @@ fun TestResultScreen(
                             modifier = Modifier,
                             onClick = {
 
-                                val debug_auth = false
+                                val debugAuth = false
 
-                                if (debug_auth == true) {
+                                if (debugAuth) {
                                     if (viewModel.isAuthorized) {
                                         navigate(resultData)
                                     } else {

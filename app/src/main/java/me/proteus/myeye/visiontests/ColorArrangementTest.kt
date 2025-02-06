@@ -2,7 +2,6 @@ package me.proteus.myeye.visiontests
 
 import android.graphics.Color.parseColor
 import android.graphics.Color.colorToHSV
-import androidx.activity.result.ActivityResultLauncher
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.gestures.Orientation
@@ -60,6 +59,7 @@ class ColorArrangementTest : VisionTest {
 
     override val testID: String = "COLOR_ARRANGE"
     override val testIcon: ImageVector = Icons.AutoMirrored.Outlined.List
+    override val needsMicrophone: Boolean = false
     override val stageCount: Int = 6
     override val resultCollector: ResultDataCollector = ResultDataCollector()
     override var distance: Float = -1f
@@ -72,10 +72,10 @@ class ColorArrangementTest : VisionTest {
     @Composable
     fun FarnsworthItem(modifier: Modifier, item: String, index: Int, cd: Int?) {
 
-        var isTopEdge = (index == 0)
-        var isBottomEdge = (index == 9)
+        val isTopEdge = (index == 0)
+        val isBottomEdge = (index == 9)
 
-        var edgeShape: Shape = RoundedCornerShape(
+        val edgeShape: Shape = RoundedCornerShape(
             topStart = (if (isTopEdge) 15.dp else 0.dp),
             topEnd = (if (isTopEdge) 15.dp else 0.dp),
             bottomEnd = (if (isBottomEdge) 15.dp else 0.dp),
@@ -182,10 +182,10 @@ class ColorArrangementTest : VisionTest {
                     ) {
                         itemsIndexed(stageColors) { index, item ->
 
-                            var isTopEdge = (index == 0)
-                            var isBottomEdge = (index == 9)
+                            val isTopEdge = (index == 0)
+                            val isBottomEdge = (index == 9)
 
-                            var movableModifier: Modifier = Modifier
+                            val movableModifier: Modifier = Modifier
                                 .offset { IntOffset(0, if (currentlyDragged == index) currentOffset.toInt() else 0) }
                                 .scale(if (index == currentlyDragged) 1.5f else 1f, 1f)
                                 .zIndex((if (index == currentlyDragged) 1f else 0f))
@@ -231,8 +231,8 @@ class ColorArrangementTest : VisionTest {
                 }
 
                 if (isResult) {
-                    var startX: Float = 0f
-                    var startY: Float = 0f
+                    var startX = 0f
+                    var startY = 0f
 
                     Column (
                         modifier = Modifier
@@ -289,7 +289,7 @@ class ColorArrangementTest : VisionTest {
                 ) {
                     Button(
                         onClick = {
-                            var ans = stageColors.joinToString(" ")
+                            val ans = stageColors.joinToString(" ")
                             println(getScore(ans, "RELATIVE"))
                             onUpdate(ans)
                         }
@@ -323,8 +323,7 @@ class ColorArrangementTest : VisionTest {
     override fun BeginTest(
         activity: VisionTestLayoutActivity,
         isResult: Boolean,
-        result: TestResult?,
-        rpl: ActivityResultLauncher<String>?
+        result: TestResult?
     ) {
         colors = activity.resources.getStringArray(R.array.farnsworth_colors)
 
@@ -353,63 +352,67 @@ class ColorArrangementTest : VisionTest {
 
     }
 
-    fun getScore(answer: String, measurementMode: String): Int {
+    private fun getScore(answer: String, measurementMode: String): Int {
 
-        var answeredArray = answer.split(' ').map { getHue(it) }
-        var orderedArray = answeredArray.sorted()
+        val answeredArray = answer.split(' ').map { getHue(it) }
+        val orderedArray = answeredArray.sorted()
         val size = answeredArray.size
 
         var percent = 0
 
-        if (measurementMode == "ABSOLUTE") {
+        when (measurementMode) {
+            "ABSOLUTE" -> {
 
-            for (i in 0..<size) {
-                if (i == orderedArray.indexOf(answeredArray[i])) percent += 10
+                for (i in 0..<size) {
+                    if (i == orderedArray.indexOf(answeredArray[i])) percent += 10
+                }
+
             }
+            "RELATIVE" -> {
 
-        } else if (measurementMode == "RELATIVE") {
+                for (i in 1..<size) {
+                    if (answeredArray[i] > answeredArray[i - 1]) percent += 10
+                }
 
-            for (i in 1..<size) {
-                if (answeredArray[i] > answeredArray[i - 1]) percent += 10
+                percent += 10
+
             }
+            "LEVENSHTEIN" -> {
 
-            percent += 10
+                val lengths = MutableList(size) { 0 }
+                var i = 0
 
-        } else if (measurementMode == "LEVENSHTEIN") {
+                while (i < size - 1) {
 
-            val lengths = MutableList(size) { 0 }
-            var i = 0
+                    var j = 1
+                    while (i + j < size && isSubArray(
+                            orderedArray.slice(i..i + j),
+                            answeredArray.slice(i..i + j)
+                        )
+                    ) j++
+                    lengths[i] = j
+                    i += j
+                }
+                for (l in lengths) {
+                    if (l > 1) percent += 10 * l
+                }
 
-            while (i < size - 1) {
-
-                var j = 1
-                while (i + j < size && isSubArray(
-                        orderedArray.slice(i..i + j),
-                        answeredArray.slice(i..i + j)
-                    )
-                ) j++
-                lengths[i] = j
-                i += j
             }
-            for (l in lengths) {
-                if (l > 1) percent += 10 * l
-            }
-
         }
 
         return percent
 
     }
 
-    fun getCorrectnessMapping(a: List<String>, b: List<String>): Map<Int, Int> {
+    private fun getCorrectnessMapping(a: List<String>, b: List<String>): Map<Int, Int> {
 
-        var map: MutableMap<Int, Int> = HashMap()
-        var connected = b.joinToString(" ")
+        val map: MutableMap<Int, Int> = HashMap()
+        val connected = b.joinToString(" ")
 
         var i = 1
         while (i < a.size - 1) {
 
-            var idx = b.indexOf(a[i])
+            val idx = b.indexOf(a[i])
             var j = 0
 
             while(idx + j < a.size && connected.indexOf(a.subList(idx, idx+j).joinToString(" ")) != -1) j++
@@ -425,7 +428,7 @@ class ColorArrangementTest : VisionTest {
 
     }
 
-    inline fun <reified T> isSubArray(a: List<T>, b: List<T>): Boolean {
+    private inline fun <reified T> isSubArray(a: List<T>, b: List<T>): Boolean {
 
         return a.windowed(b.size).any {
             it.toTypedArray().contentEquals(b.toTypedArray())
@@ -433,17 +436,17 @@ class ColorArrangementTest : VisionTest {
 
     }
 
-    fun getHue(color: String): Float {
+    private fun getHue(color: String): Float {
 
-        var hsv = FloatArray(3)
-        var a = Color(parseColor(color)).toArgb()
+        val hsv = FloatArray(3)
+        val a = Color(parseColor(color)).toArgb()
 
         colorToHSV(a, hsv)
 
         return hsv[0]
     }
 
-    fun prepareArray(old: List<String>, freq: Int, count: Int, offset: Int = 0): ArrayList<String> {
+    private fun prepareArray(old: List<String>, freq: Int, count: Int, offset: Int = 0): ArrayList<String> {
 
         var new = ArrayList<String>()
         var i: Int = offset
@@ -454,8 +457,8 @@ class ColorArrangementTest : VisionTest {
         }
 
         new = ArrayList(new.subList(0, count))
-        var begin = new.first()
-        var end = new.last()
+        val begin = new.first()
+        val end = new.last()
 
         new = ArrayList(new.subList(1, count - 1))
 

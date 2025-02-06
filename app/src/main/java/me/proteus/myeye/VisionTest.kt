@@ -1,7 +1,6 @@
 package me.proteus.myeye
 
 import android.content.Intent
-import androidx.activity.result.ActivityResultLauncher
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.getValue
@@ -33,6 +32,8 @@ interface VisionTest {
      */
     var distance: Float
 
+    val needsMicrophone: Boolean
+
     /**
      * Display the test stage as Composable in the target activity context
      * @param activity The canvas activity to display the layout
@@ -46,7 +47,7 @@ interface VisionTest {
     )
 
     @Composable
-    fun BeginTest(activity: VisionTestLayoutActivity, isResult: Boolean, result: TestResult?, rpl: ActivityResultLauncher<String>?) {
+    fun BeginTest(activity: VisionTestLayoutActivity, isResult: Boolean, result: TestResult?) {
         BeginTestImpl(activity, isResult, result)
     }
 
@@ -57,9 +58,9 @@ interface VisionTest {
             var i by remember { mutableIntStateOf(0) }
 
             val resultData = ResultDataCollector.deserializeResult(result!!.result)
-            var stageList = remember { resultData }
+            val stageList = remember { resultData }
 
-            var currentResultStage = stageList[i]
+            val currentResultStage = stageList[i]
 
             DisplayStage(activity, currentResultStage, true) { answer ->
 
@@ -68,7 +69,7 @@ interface VisionTest {
                 } else if (answer == "NEXT") {
                     if (i < stageList.size - 1) i++
                     else {
-                        var exitIntent = Intent(activity, MenuActivity::class.java)
+                        val exitIntent = Intent(activity, MenuActivity::class.java)
                         // TODO: Dodac podsumowanie testu
                         activity.startActivity(exitIntent)
                     }
@@ -109,7 +110,7 @@ interface VisionTest {
 
     fun generateStage(difficulty: Int): SerializableStage {
         return SerializableStage(
-            generateQuestion(difficulty).toString(),
+            generateQuestion(difficulty),
             getExampleAnswers().joinToString(" "),
             difficulty
         )
@@ -128,10 +129,10 @@ interface VisionTest {
      fun endTest(activity: VisionTestLayoutActivity, isExit: Boolean) {
 
          if (!isExit) {
-             var localSaver = ResultDataSaver(activity.applicationContext)
+             val localSaver = ResultDataSaver(activity.applicationContext)
 
-             var timestamp = LocalDateTime.now().toEpochSecond(ZoneOffset.UTC)
-             localSaver.insert(this.testID, this.resultCollector.stages, timestamp)
+             val timestamp = LocalDateTime.now().toEpochSecond(ZoneOffset.UTC)
+             localSaver.insert(this.testID, this.resultCollector.stages, timestamp, this.distance)
 
              val testLeavingIntent = Intent(activity, TestResultActivity::class.java)
              testLeavingIntent.putExtra("IS_AFTER", true)

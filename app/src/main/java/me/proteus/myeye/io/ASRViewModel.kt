@@ -14,7 +14,6 @@ import android.os.Looper
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
 import me.proteus.myeye.GrammarType
@@ -148,7 +147,7 @@ class ASRViewModel(application: Application) : AndroidViewModel(application) {
 
     }
 
-    fun initModel(startRecognizer: Boolean) {
+    private fun initModel(startRecognizer: Boolean) {
 
         val context = getApplication<Application>().applicationContext
 
@@ -163,7 +162,8 @@ class ASRViewModel(application: Application) : AndroidViewModel(application) {
                 val rootUrl = "https://alphacephei.com/vosk/models/"
                 val downloaderPromise = downloaderModel.download(
                     "$rootUrl$modelName.zip",
-                    File(modelDir.path + ".zip")
+                    File(modelDir.path + ".zip"),
+                    File(modelDir.path + ".zip"),
                 )
 
                 downloaderPromise.thenRun {

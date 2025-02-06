@@ -12,11 +12,10 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.OptIn
+import android.util.Size
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ExperimentalGetImage
 import androidx.camera.core.ImageAnalysis
-import androidx.camera.core.resolutionselector.ResolutionSelector
-import androidx.camera.core.resolutionselector.ResolutionStrategy
 import androidx.camera.view.LifecycleCameraController
 import androidx.camera.view.PreviewView
 import androidx.compose.foundation.layout.Arrangement
@@ -62,6 +61,7 @@ import com.google.mlkit.vision.face.FaceDetectorOptions
 import kotlinx.coroutines.delay
 import java.util.concurrent.Executors
 import me.proteus.myeye.R
+import me.proteus.myeye.io.CameraUtils
 
 class SimpleDistanceActivity : ComponentActivity() {
 
@@ -71,17 +71,19 @@ class SimpleDistanceActivity : ComponentActivity() {
     private lateinit var imageSize: Pair<Float, Float>
     private val executor = Executors.newSingleThreadExecutor()
     private val faces = mutableStateOf<List<Face>>(emptyList())
+    private var isBeforeTest: Boolean = true
 
     private val measurements: MutableList<Float> = mutableListOf()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        registerForActivityResult(ActivityResultContracts.RequestPermission()) { permission ->
+        registerForActivityResult(ActivityResultContracts.RequestPermission()) { _ ->
             return@registerForActivityResult
         }.launch(Manifest.permission.CAMERA)
 
         camera = LifecycleCameraController(this)
+        isBeforeTest = intent.hasExtra("TEST_ID")
 
         setContent {
             StartView()
@@ -97,7 +99,9 @@ class SimpleDistanceActivity : ComponentActivity() {
         imageSize = getDeviceSize()
 
         camera.imageAnalysisBackpressureStrategy = ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST
-        camera.imageAnalysisResolutionSelector = createSelector()
+        camera.imageAnalysisResolutionSelector = CameraUtils.createSelector(Size(
+            imageSize.first.toInt(), imageSize.second.toInt()
+        ))
 
         val introText = "Umieść urządzenie w odległości 2-6 metrów od siebie, na lub trochę poniżej linii wzroku, a następnie stań lub usiądź"
 
@@ -161,7 +165,7 @@ class SimpleDistanceActivity : ComponentActivity() {
             isTimeOver = true
         }
 
-        if (isTimeOver) CameraView()
+        if (isTimeOver || !isBeforeTest) CameraView()
         else {
             Box(
                 modifier = Modifier.fillMaxSize(),
@@ -188,7 +192,7 @@ class SimpleDistanceActivity : ComponentActivity() {
 
         var measurementCount by remember { mutableIntStateOf(0) }
 
-        var inputTestId = intent.getStringExtra("TEST_ID")
+        val inputTestId = intent.getStringExtra("TEST_ID")
 
         camera.bindToLifecycle(LocalLifecycleOwner.current)
         camera.cameraSelector = CameraSelector.DEFAULT_FRONT_CAMERA
@@ -216,7 +220,7 @@ class SimpleDistanceActivity : ComponentActivity() {
 //                    FaceCanvas(faces.value, canvasWidth, canvasHeight)
                 }
 
-                var text: String
+                val text: String
 
                 if (faces.value.isNotEmpty()) {
 
@@ -256,15 +260,20 @@ class SimpleDistanceActivity : ComponentActivity() {
 
                         if (measurements.size >= 25) {
 
-                            val average = measurements.sum() / 25
+                            if (isBeforeTest) {
 
-                            val intent = Intent(this@SimpleDistanceActivity, VisionTestLayoutActivity::class.java)
-                            intent.putExtra("TEST_ID", inputTestId)
-                            intent.putExtra("DISTANCE", average)
-                            startActivity(intent)
+                                val average = measurements.sum() / 25
 
-                            finish()
-                            return@detectFaces
+                                val intent = Intent(this@SimpleDistanceActivity, VisionTestLayoutActivity::class.java)
+                                intent.putExtra("TEST_ID", inputTestId)
+                                intent.putExtra("DISTANCE", average)
+                                startActivity(intent)
+
+                                finish()
+                                return@detectFaces
+                            } else {
+                                measurements.removeAt(0)
+                            }
 
                         }
                         imageProxy.close()
@@ -276,20 +285,12 @@ class SimpleDistanceActivity : ComponentActivity() {
         }
 
     }
-    fun toMetric(ogniskowa: Float, sensorWidth: Float): Float {
+    private fun toMetric(ogniskowa: Float, sensorWidth: Float): Float {
 
         val imageWidth = faces.value[0].boundingBox.width().toFloat()
         val sensorSize = imageWidth * sensorWidth / imageSize.first
 
         return sredniaSzerokoscTwarzy * ogniskowa / sensorSize / 10f
-    }
-
-    fun createSelector(): ResolutionSelector {
-//        val devSize = Size(width, height)
-//        val strategy = ResolutionStrategy(boundSize = devSize, fallbackRule = ResolutionStrategy.FALLBACK_RULE_CLOSEST_HIGHER)
-        val rs = ResolutionSelector.Builder().setResolutionStrategy(ResolutionStrategy.HIGHEST_AVAILABLE_STRATEGY).build()
-
-        return rs
     }
 
     private fun detectFaces(image: InputImage, callback: (List<Face>) -> Unit) {
@@ -311,10 +312,10 @@ class SimpleDistanceActivity : ComponentActivity() {
     @Composable
     fun getDeviceSize(): Pair<Float, Float> {
 
-        var config = LocalConfiguration.current
-        var density = LocalDensity.current.density
-        var widthDp: Int
-        var heightDp: Int
+        val config = LocalConfiguration.current
+        val density = LocalDensity.current.density
+        val widthDp: Int
+        val heightDp: Int
 
         if (config.orientation == Configuration.ORIENTATION_LANDSCAPE) {
             widthDp = config.screenWidthDp
@@ -334,7 +335,7 @@ class SimpleDistanceActivity : ComponentActivity() {
         camera.unbind()
     }
 
-    fun cameraInfo(context: Context): Pair<Float, Float> {
+    private fun cameraInfo(context: Context): Pair<Float, Float> {
         try {
             val cameraManager = context.getSystemService(CAMERA_SERVICE) as CameraManager
 
@@ -346,7 +347,7 @@ class SimpleDistanceActivity : ComponentActivity() {
 
             val characteristics = cameraManager.getCameraCharacteristics(cameraId)
             val focalLength = characteristics.get(CameraCharacteristics.LENS_INFO_AVAILABLE_FOCAL_LENGTHS)?.firstOrNull() ?: 0f
-            val sensorSize = characteristics.get(CameraCharacteristics.SENSOR_INFO_PHYSICAL_SIZE)!!.width.toFloat()
+            val sensorSize = characteristics.get(CameraCharacteristics.SENSOR_INFO_PHYSICAL_SIZE)!!.width
             return Pair(focalLength, sensorSize)
         } catch (e: CameraAccessException) {
             e.printStackTrace()

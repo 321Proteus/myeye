@@ -18,12 +18,14 @@ public class TestResult implements Parcelable {
     public final int resultID;
     public final String testID;
     public final long timestamp;
+    public final float distance;
     public final byte[] result;
-    public TestResult(int resultID, String testID, long timestamp, byte[] result) {
+    public TestResult(int resultID, String testID, long timestamp, float distance, byte[] result) {
 
         this.resultID = resultID;
         this.testID = testID;
         this.timestamp = timestamp;
+        this.distance = distance;
         this.result = result;
 
     }
@@ -32,6 +34,7 @@ public class TestResult implements Parcelable {
         resultID = inputParcel.readInt();
         testID = inputParcel.readString();
         timestamp = inputParcel.readLong();
+        distance = inputParcel.readFloat();
         result = inputParcel.createByteArray();
 
     }
@@ -39,9 +42,8 @@ public class TestResult implements Parcelable {
         LocalDateTime date = LocalDateTime.ofEpochSecond(this.timestamp, 0, ZoneOffset.UTC);
 
         DateTimeFormatter fmt = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm", Locale.getDefault());
-        String formattedDate = date.format(fmt);
 
-        return formattedDate;
+        return date.format(fmt);
     }
 
     public String getFullTestName() {
@@ -75,6 +77,7 @@ public class TestResult implements Parcelable {
         parcel.writeInt(resultID);
         parcel.writeString(testID);
         parcel.writeLong(timestamp);
+        parcel.writeFloat(distance);
         parcel.writeByteArray(result);
 
     }
