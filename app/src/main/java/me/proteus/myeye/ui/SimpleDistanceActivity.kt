@@ -35,6 +35,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.remember
@@ -66,7 +67,7 @@ import me.proteus.myeye.R
 import me.proteus.myeye.util.CameraUtils
 import me.proteus.myeye.ui.theme.MyEyeTheme
 
-val sredniaSzerokoscTwarzy = 150f
+const val sredniaSzerokoscTwarzy = 150f
 
 @Composable
 fun DistanceMeasurement(
@@ -142,7 +143,9 @@ fun StartView(
             contentAlignment = Alignment.Center
         ) {
             Column(
-                modifier = Modifier.fillMaxWidth().fillMaxHeight(0.6f),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .fillMaxHeight(0.6f),
                 verticalArrangement = Arrangement.SpaceEvenly,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
@@ -240,7 +243,7 @@ fun CameraView(
 
     var faces by remember { mutableStateOf<List<Face>>(emptyList()) }
 
-    val measurements: MutableList<Float> = mutableListOf()
+    val measurements = remember { mutableStateListOf<Float>() }
 
     val context = LocalContext.current
     val preview = remember { PreviewView(context) }
@@ -317,6 +320,8 @@ fun CameraView(
                         if (isBeforeTest) {
 
                             val average = measurements.sum() / 25
+                            println(average)
+                            println(measurements)
 
 //                                val intent = Intent(this@SimpleDistanceActivity, VisionTestLayoutActivity::class.java)
 //                                intent.putExtra("TEST_ID", inputTestId)
