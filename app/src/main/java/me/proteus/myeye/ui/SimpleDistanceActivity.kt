@@ -63,7 +63,7 @@ import com.google.mlkit.vision.face.FaceDetectorOptions
 import kotlinx.coroutines.delay
 import java.util.concurrent.Executors
 import me.proteus.myeye.R
-import me.proteus.myeye.io.CameraUtils
+import me.proteus.myeye.util.CameraUtils
 import me.proteus.myeye.ui.theme.MyEyeTheme
 
 val sredniaSzerokoscTwarzy = 150f

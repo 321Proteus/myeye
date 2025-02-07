@@ -32,7 +32,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import me.proteus.myeye.GrammarType
 import me.proteus.myeye.R
-import me.proteus.myeye.ScreenScalingUtils.getScreenInfo
+import me.proteus.myeye.util.ScreenScalingUtils.getScreenInfo
 import me.proteus.myeye.SerializableStage
 import me.proteus.myeye.TestResult
 import me.proteus.myeye.VisionTest

@@ -1,4 +1,4 @@
-package me.proteus.myeye;
+package me.proteus.myeye.util;
 
 import android.content.Context;
 import android.content.SharedPreferences;

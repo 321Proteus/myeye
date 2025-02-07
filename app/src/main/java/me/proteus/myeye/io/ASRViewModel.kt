@@ -11,14 +11,13 @@ import android.media.AudioTrack
 import android.media.MediaRecorder
 import android.os.Handler
 import android.os.Looper
-import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
 import me.proteus.myeye.GrammarType
-import me.proteus.myeye.LanguageUtils
+import me.proteus.myeye.util.LanguageUtils
 import org.vosk.Model
 import org.vosk.Recognizer
 import java.io.File

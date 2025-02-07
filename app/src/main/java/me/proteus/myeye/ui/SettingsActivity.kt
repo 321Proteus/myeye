@@ -30,7 +30,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.launch
-import me.proteus.myeye.LanguageUtils
+import me.proteus.myeye.util.LanguageUtils
 import me.proteus.myeye.MyEyeApplication
 import me.proteus.myeye.R
 import me.proteus.myeye.io.FileSaver
