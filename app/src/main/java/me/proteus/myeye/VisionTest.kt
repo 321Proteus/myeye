@@ -34,7 +34,7 @@ interface VisionTest {
 
     /**
      * Display the test stage as Composable in the target activity context
-     * @param activity The canvas activity to display the layout
+     * @param controller the Navigation Controller used to move to menu after the test ends
      */
     @Composable
     fun DisplayStage(
