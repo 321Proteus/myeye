@@ -69,6 +69,7 @@ fun VisionTestScreen(
             }
         } else {
             isDistance = true
+            isGranted = true
         }
 
     }
@@ -82,6 +83,7 @@ fun VisionTestScreen(
                     .fillMaxSize(),
                 contentAlignment = Alignment.Center
             ) {
+                Log.e("VTLA", "$isDistance $isGranted")
                 if (isGranted && isDistance) {
                     testObject.BeginTest(
                         controller = controller,
