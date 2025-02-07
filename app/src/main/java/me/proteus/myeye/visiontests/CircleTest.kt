@@ -40,6 +40,7 @@ import me.proteus.myeye.TestResult
 import me.proteus.myeye.VisionTest
 import me.proteus.myeye.io.ASRViewModel
 import me.proteus.myeye.io.ResultDataCollector
+import me.proteus.myeye.util.ASRViewModelFactory
 import java.util.Random
 import kotlin.math.*
 
@@ -258,7 +259,7 @@ class CircleTest : VisionTest {
 
         if (!isResult) {
 
-            asr = viewModel(factory = ViewModelProvider.AndroidViewModelFactory.getInstance(app))
+            asr = viewModel(factory = ASRViewModelFactory(app))
 
             if (context.checkSelfPermission(Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED) {
                 asr.initialize(GrammarType.SIDES)

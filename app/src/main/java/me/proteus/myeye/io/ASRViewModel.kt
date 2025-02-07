@@ -14,6 +14,7 @@ import android.os.Looper
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
 import me.proteus.myeye.GrammarType
@@ -24,9 +25,10 @@ import java.io.File
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 import me.proteus.myeye.R
+import kotlin.collections.toList
 import kotlin.math.sin
 
-class ASRViewModel(application: Application) : AndroidViewModel(application) {
+class ASRViewModel(private val application: Application) : ViewModel() {
 
     private lateinit var recognizer: Recognizer
     private lateinit var model: Model
@@ -49,7 +51,7 @@ class ASRViewModel(application: Application) : AndroidViewModel(application) {
 
     private fun getLocalizedContext(): Context {
 
-        val appContext = getApplication<Application>().applicationContext
+        val appContext = application.applicationContext
         val currentLang = LanguageUtils.getCurrentLanguage(appContext)
         val localizedContext = LanguageUtils.setLocale(appContext, currentLang)
 
@@ -149,7 +151,7 @@ class ASRViewModel(application: Application) : AndroidViewModel(application) {
 
     private fun initModel(startRecognizer: Boolean) {
 
-        val context = getApplication<Application>().applicationContext
+        val context = application.applicationContext
 
         val modelName = getLocalizedContext().getString(R.string.modelName)
         println("updated modelName to $modelName")
@@ -264,7 +266,7 @@ class ASRViewModel(application: Application) : AndroidViewModel(application) {
             samples[i] = (sin(2.0 * Math.PI * i / (sampleRate / frequency)) * Short.MAX_VALUE).toInt().toShort()
         }
 
-        val audioManager = getApplication<Application>().applicationContext.getSystemService(Context.AUDIO_SERVICE) as AudioManager
+        val audioManager = application.applicationContext.getSystemService(Context.AUDIO_SERVICE) as AudioManager
         val rate = audioManager.getProperty(AudioManager.PROPERTY_OUTPUT_SAMPLE_RATE)
 
         val audioAttributes = AudioAttributes.Builder()

@@ -28,7 +28,6 @@ import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import me.proteus.myeye.GrammarType
@@ -39,6 +38,7 @@ import me.proteus.myeye.TestResult
 import me.proteus.myeye.VisionTest
 import me.proteus.myeye.io.ASRViewModel
 import me.proteus.myeye.io.ResultDataCollector
+import me.proteus.myeye.util.ASRViewModelFactory
 import java.util.Random
 import kotlin.math.*
 
@@ -239,7 +239,7 @@ class SnellenChart : VisionTest {
 
         if (!isResult) {
 
-            asr = viewModel(factory = ViewModelProvider.AndroidViewModelFactory.getInstance(app))
+            asr = viewModel(factory = ASRViewModelFactory(app))
 
             if (context.checkSelfPermission(Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED) {
                 asr.initialize(GrammarType.SIDES)
