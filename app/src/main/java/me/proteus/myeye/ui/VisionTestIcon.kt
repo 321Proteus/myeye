@@ -16,6 +16,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import me.proteus.myeye.visiontests.VisionTestUtils
 
 @Composable
@@ -24,17 +25,17 @@ fun VisionTestIcon(
     testID: String,
     size: Float = 0f,
     clickable: Boolean = false,
-    context: Context? = null
+    controller: NavController? = null
 ) {
     Box(
         modifier = modifier
             .aspectRatio(1.0f)
             .clip(shape = RoundedCornerShape(15.dp))
             .clickable(enabled = clickable) {
-                val activity = context!! as Activity
-                val intent = Intent(activity, VisionTestLayoutActivity::class.java)
-                intent.putExtra("TEST_ID", testID)
-                activity.startActivity(intent)
+                controller!!.currentBackStackEntry?.savedStateHandle?.apply {
+                    set("isResult", false)
+                }
+                controller.navigate("visiontest/$testID")
             }
             .background(MaterialTheme.colorScheme.primary),
         contentAlignment = Alignment.Center
