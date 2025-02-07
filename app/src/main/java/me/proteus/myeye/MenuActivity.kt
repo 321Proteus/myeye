@@ -1,6 +1,5 @@
 package me.proteus.myeye
 
-import android.content.Intent
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable

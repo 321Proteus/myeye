@@ -4,10 +4,10 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Build
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.navigation.NavController
 import me.proteus.myeye.SerializableStage
 import me.proteus.myeye.VisionTest
 import me.proteus.myeye.io.ResultDataCollector
-import me.proteus.myeye.ui.VisionTestLayoutActivity
 import java.util.Random
 
 class BuildTest : VisionTest {
@@ -21,7 +21,7 @@ class BuildTest : VisionTest {
 
     @Composable
     override fun DisplayStage(
-        activity: VisionTestLayoutActivity,
+        controller: NavController,
         stage: SerializableStage,
         isResult: Boolean,
         onUpdate: (String) -> Unit

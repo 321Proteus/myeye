@@ -1,6 +1,7 @@
 package me.proteus.myeye.visiontests
 
 import android.Manifest
+import android.app.Application
 import android.content.pm.PackageManager
 import android.content.res.Configuration
 import androidx.compose.foundation.layout.Arrangement
@@ -29,6 +30,8 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
 import me.proteus.myeye.GrammarType
 import me.proteus.myeye.R
 import me.proteus.myeye.ScreenScalingUtils.getScreenInfo
@@ -37,7 +40,6 @@ import me.proteus.myeye.TestResult
 import me.proteus.myeye.VisionTest
 import me.proteus.myeye.io.ASRViewModel
 import me.proteus.myeye.io.ResultDataCollector
-import me.proteus.myeye.ui.VisionTestLayoutActivity
 import java.util.Random
 import kotlin.math.*
 
@@ -144,7 +146,7 @@ class CircleTest : VisionTest {
 
     @Composable
     override fun DisplayStage(
-        activity: VisionTestLayoutActivity,
+        controller: NavController,
         stage: SerializableStage,
         isResult: Boolean,
         onUpdate: (String) -> Unit
@@ -246,18 +248,19 @@ class CircleTest : VisionTest {
 
     @Composable
     override fun BeginTest(
-        activity: VisionTestLayoutActivity,
+        controller: NavController,
         isResult: Boolean,
         result: TestResult?
     ) {
 
-        if (!isResult) {
-            asr = ViewModelProvider(
-                activity,
-                ViewModelProvider.AndroidViewModelFactory.getInstance(activity.application)
-            )[ASRViewModel::class]
+        val context = LocalContext.current
+        val app = context.applicationContext as Application
 
-            if (activity.checkSelfPermission(Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED) {
+        if (!isResult) {
+
+            asr = viewModel(factory = ViewModelProvider.AndroidViewModelFactory.getInstance(app))
+
+            if (context.checkSelfPermission(Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED) {
                 asr.initialize(GrammarType.SIDES)
             }
 
@@ -265,7 +268,7 @@ class CircleTest : VisionTest {
             distance = result!!.distance
         }
 
-        super.BeginTest(activity, isResult, result)
+        super.BeginTest(controller, isResult, result)
 
     }
 
@@ -313,9 +316,9 @@ class CircleTest : VisionTest {
 
     }
 
-    override fun endTest(activity: VisionTestLayoutActivity, isExit: Boolean) {
+    override fun endTest(controller: NavController, isExit: Boolean) {
 
-        super.endTest(activity, isExit)
+        super.endTest(controller, isExit)
         if (::asr.isInitialized) asr.close()
 
     }

@@ -24,12 +24,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import kotlinx.coroutines.delay
 import me.proteus.myeye.R
 import me.proteus.myeye.SerializableStage
 import me.proteus.myeye.VisionTest
 import me.proteus.myeye.io.ResultDataCollector
-import me.proteus.myeye.ui.VisionTestLayoutActivity
 import kotlin.random.Random
 
 class ReactionTest : VisionTest {
@@ -44,7 +44,7 @@ class ReactionTest : VisionTest {
 
     @Composable
     override fun DisplayStage(
-        activity: VisionTestLayoutActivity,
+        controller: NavController,
         stage: SerializableStage,
         isResult: Boolean,
         onUpdate: (String) -> Unit
