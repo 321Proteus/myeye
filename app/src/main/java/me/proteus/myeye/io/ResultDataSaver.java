@@ -100,10 +100,30 @@ public class ResultDataSaver {
     }
 
     @SuppressLint("Range")
-    public TestResult getLastResult() {
+    public int getLastID() {
+        SupportSQLiteDatabase db = this.dbHelper.getWritableDatabase();
+        String testFinderQuery = "SELECT ID FROM RESULTS ORDER BY TIMESTAMP DESC;";
+
+        try (Cursor cursor = db.query(testFinderQuery)) {
+
+            if (cursor.moveToFirst()) {
+
+                return cursor.getInt(cursor.getColumnIndex("ID"));
+
+            } else {
+                System.out.println("Bledna kolumna w tabeli RESULTS");
+            }
+
+        }
+
+        return -1;
+    }
+
+    @SuppressLint("Range")
+    public TestResult getResult(int sessionID) {
 
         SupportSQLiteDatabase db = this.dbHelper.getWritableDatabase();
-        String testFinderQuery = "SELECT * FROM RESULTS ORDER BY TIMESTAMP DESC LIMIT 1";
+        String testFinderQuery = "SELECT * FROM RESULTS WHERE ID=" + sessionID + ";";
 
         try (Cursor cursor = db.query(testFinderQuery)) {
 

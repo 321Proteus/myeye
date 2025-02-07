@@ -2,17 +2,16 @@ package me.proteus.myeye.ui
 
 import android.Manifest
 import android.content.Context
-import android.content.Intent
+import android.content.Context.CAMERA_SERVICE
+import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.hardware.camera2.CameraAccessException
 import android.hardware.camera2.CameraCharacteristics
 import android.hardware.camera2.CameraManager
-import android.os.Bundle
-import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.OptIn
 import android.util.Size
+import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ExperimentalGetImage
 import androidx.camera.core.ImageAnalysis
@@ -30,6 +29,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -53,7 +53,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.compose.ui.zIndex
+import androidx.core.content.ContextCompat.checkSelfPermission
 import androidx.lifecycle.compose.LocalLifecycleOwner
+import androidx.navigation.NavController
 import com.google.mlkit.vision.common.InputImage
 import com.google.mlkit.vision.face.Face
 import com.google.mlkit.vision.face.FaceDetection
@@ -62,298 +64,356 @@ import kotlinx.coroutines.delay
 import java.util.concurrent.Executors
 import me.proteus.myeye.R
 import me.proteus.myeye.io.CameraUtils
+import me.proteus.myeye.ui.theme.MyEyeTheme
 
-class SimpleDistanceActivity : ComponentActivity() {
+val sredniaSzerokoscTwarzy = 150f
 
-    private val sredniaSzerokoscTwarzy = 150f
+@Composable
+fun DistanceMeasurement(
+    controller: NavController,
+    countdown: Boolean,
+    testID: String
+) {
 
-    private lateinit var camera: LifecycleCameraController
-    private lateinit var imageSize: Pair<Float, Float>
-    private val executor = Executors.newSingleThreadExecutor()
-    private val faces = mutableStateOf<List<Face>>(emptyList())
-    private var isBeforeTest: Boolean = true
+    val context = LocalContext.current
 
-    private val measurements: MutableList<Float> = mutableListOf()
+    val camera = LifecycleCameraController(context)
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
+    var isGranted by remember { mutableStateOf(false) }
 
-        registerForActivityResult(ActivityResultContracts.RequestPermission()) { _ ->
-            return@registerForActivityResult
-        }.launch(Manifest.permission.CAMERA)
-
-        camera = LifecycleCameraController(this)
-        isBeforeTest = intent.hasExtra("TEST_ID")
-
-        setContent {
-            StartView()
-        }
-
+    val launcher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission()
+    ) { result ->
+        isGranted = result
     }
 
-    @Composable
-    private fun StartView() {
-
-        var isStarted by remember { mutableStateOf(false) }
-
-        imageSize = getDeviceSize()
-
-        camera.imageAnalysisBackpressureStrategy = ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST
-        camera.imageAnalysisResolutionSelector = CameraUtils.createSelector(Size(
-            imageSize.first.toInt(), imageSize.second.toInt()
-        ))
-
-        val introText = "Umieść urządzenie w odległości 2-6 metrów od siebie, na lub trochę poniżej linii wzroku, a następnie stań lub usiądź"
-
-        if (isStarted) {
-            Counter()
-        } else {
-            Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
-            ) {
-                Column(
-                    modifier = Modifier.fillMaxWidth().fillMaxHeight(0.6f),
-                    verticalArrangement = Arrangement.SpaceEvenly,
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    Text(
-                        modifier = Modifier
-                            .weight(3f)
-                            .padding(24.dp),
-                        fontSize = 24.sp,
-                        text = introText,
-                        textAlign = TextAlign.Center
-                    )
-                    Button(
-                        modifier = Modifier
-                            .weight(1f)
-                            .aspectRatio(1f)
-                            .zIndex(3f),
-                        colors = ButtonColors(Color.Red, Color.White, Color.DarkGray, Color.Gray),
-                        shape = CircleShape,
-                        onClick = { isStarted = !isStarted },
-                        contentPadding = PaddingValues(0.dp)
-                    ) {
-                        Box(
-                            contentAlignment = Alignment.Center,
-                            modifier = Modifier.fillMaxSize()
-                        ) {
-                            Text(
-                                text = "START",
-                                textAlign = TextAlign.Center,
-                                fontSize = 24.sp,
-                                fontWeight = FontWeight.Bold
-                            )
-                        }
-                    }
-                }
-            }
+    LaunchedEffect(Unit) {
+        if (checkSelfPermission(
+                context,
+                Manifest.permission.CAMERA
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            launcher.launch(Manifest.permission.CAMERA)
         }
     }
 
-    @Composable
-    private fun Counter() {
-        var timeLeft by remember { mutableIntStateOf(5) }
-        var isTimeOver by remember { mutableStateOf(false) }
-
-        LaunchedEffect(Unit) {
-            while (timeLeft > 0) {
-                delay(1000)
-                timeLeft--
-            }
-            isTimeOver = true
+    MyEyeTheme {
+        Scaffold { innerPadding ->
+            StartView(
+                modifier = Modifier
+                    .padding(innerPadding)
+                    .fillMaxSize(),
+                controller = controller,
+                camera = camera,
+                isBeforeTest = countdown,
+                testID = testID
+            )
         }
+    }
 
-        if (isTimeOver || !isBeforeTest) CameraView()
-        else {
-            Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
+}
+
+
+@Composable
+fun StartView(
+    modifier: Modifier,
+    controller: NavController,
+    camera: LifecycleCameraController,
+    isBeforeTest: Boolean,
+    testID: String
+) {
+
+    var isStarted by remember { mutableStateOf(false) }
+
+    val imageSize = getDeviceSize()
+
+    camera.imageAnalysisBackpressureStrategy = ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST
+    camera.imageAnalysisResolutionSelector = CameraUtils.createSelector(Size(
+        imageSize.first.toInt(), imageSize.second.toInt()
+    ))
+
+    val introText = "Umieść urządzenie w odległości 2-6 metrów od siebie, na lub trochę poniżej linii wzroku, a następnie stań lub usiądź"
+
+    if (isStarted) {
+        Counter(modifier, controller, camera, isBeforeTest, imageSize, testID)
+    } else {
+        Box(
+            modifier = modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center
+        ) {
+            Column(
+                modifier = Modifier.fillMaxWidth().fillMaxHeight(0.6f),
+                verticalArrangement = Arrangement.SpaceEvenly,
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
-                    fontFamily = FontFamily(Font(R.font.opticiansans)),
-                    fontSize = 256.sp,
-                    text = timeLeft.toString()
+                    modifier = Modifier
+                        .weight(3f)
+                        .padding(24.dp),
+                    fontSize = 24.sp,
+                    text = introText,
+                    textAlign = TextAlign.Center
                 )
+                Button(
+                    modifier = Modifier
+                        .weight(1f)
+                        .aspectRatio(1f)
+                        .zIndex(3f),
+                    colors = ButtonColors(Color.Red, Color.White, Color.DarkGray, Color.Gray),
+                    shape = CircleShape,
+                    onClick = { isStarted = !isStarted },
+                    contentPadding = PaddingValues(0.dp)
+                ) {
+                    Box(
+                        contentAlignment = Alignment.Center,
+                        modifier = Modifier.fillMaxSize()
+                    ) {
+                        Text(
+                            text = "START",
+                            textAlign = TextAlign.Center,
+                            fontSize = 24.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
+                }
             }
+        }
+    }
+}
 
+@Composable
+fun Counter(
+    modifier: Modifier,
+    controller: NavController,
+    camera: LifecycleCameraController,
+    isBeforeTest: Boolean,
+    imageSize: Pair<Float, Float>,
+    testID: String
+) {
+    var timeLeft by remember { mutableIntStateOf(5) }
+    var isTimeOver by remember { mutableStateOf(false) }
+
+    LaunchedEffect(Unit) {
+        while (timeLeft > 0) {
+            delay(1000)
+            timeLeft--
+        }
+        isTimeOver = true
+    }
+
+    if (isTimeOver || !isBeforeTest) CameraView(
+        modifier = modifier,
+        controller = controller,
+        camera = camera,
+        isBeforeTest = isBeforeTest,
+        imageSize = imageSize,
+        testID = testID
+    )
+    else {
+        Box(
+            modifier = modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center
+        ) {
+            Text(
+                fontFamily = FontFamily(Font(R.font.opticiansans)),
+                fontSize = 256.sp,
+                text = timeLeft.toString()
+            )
         }
 
     }
 
-    @OptIn(ExperimentalGetImage::class)
-    @Composable
-    private fun CameraView() {
+}
 
-        val context = LocalContext.current
-        val preview = remember { PreviewView(context) }
-        val camInfo by remember { mutableStateOf(cameraInfo(context)) }
+@OptIn(ExperimentalGetImage::class)
+@Composable
+fun CameraView(
+    modifier: Modifier,
+    controller: NavController,
+    camera: LifecycleCameraController,
+    isBeforeTest: Boolean,
+    imageSize: Pair<Float, Float>,
+    testID: String
+) {
 
-        var measurementCount by remember { mutableIntStateOf(0) }
+    val executor = Executors.newSingleThreadExecutor()
 
-        val inputTestId = intent.getStringExtra("TEST_ID")
+    var faces by remember { mutableStateOf<List<Face>>(emptyList()) }
 
-        camera.bindToLifecycle(LocalLifecycleOwner.current)
-        camera.cameraSelector = CameraSelector.DEFAULT_FRONT_CAMERA
-        preview.controller = camera
+    val measurements: MutableList<Float> = mutableListOf()
 
-        Box(modifier = Modifier.fillMaxSize()) {
-            Column(
-                modifier = Modifier.fillMaxSize(),
-                verticalArrangement = Arrangement.SpaceEvenly
+    val context = LocalContext.current
+    val preview = remember { PreviewView(context) }
+    val camInfo by remember { mutableStateOf(cameraInfo(context)) }
+
+    var measurementCount by remember { mutableIntStateOf(0) }
+
+    camera.bindToLifecycle(LocalLifecycleOwner.current)
+    camera.cameraSelector = CameraSelector.DEFAULT_FRONT_CAMERA
+    preview.controller = camera
+
+    Box(modifier = modifier.fillMaxSize()) {
+        Column(
+            modifier = Modifier.fillMaxSize(),
+            verticalArrangement = Arrangement.SpaceEvenly
+        ) {
+
+            var canvasWidth by remember { mutableIntStateOf(0) }
+            var canvasHeight by remember { mutableIntStateOf(0) }
+
+            Box(
+                modifier = Modifier
+                    .weight(0.8f)
+                    .fillMaxSize()
+                    .onGloballyPositioned { pos ->
+                        canvasWidth = pos.size.width
+                        canvasHeight = pos.size.height
+                    }
             ) {
-
-                var canvasWidth by remember { mutableIntStateOf(0) }
-                var canvasHeight by remember { mutableIntStateOf(0) }
-
-                Box(
-                    modifier = Modifier
-                        .weight(0.8f)
-                        .fillMaxSize()
-                        .onGloballyPositioned { pos ->
-                            canvasWidth = pos.size.width
-                            canvasHeight = pos.size.height
-                        }
-                ) {
-                    AndroidView(factory = { preview }, modifier = Modifier.fillMaxSize())
+                AndroidView(factory = { preview }, modifier = Modifier.fillMaxSize())
 //                    FaceCanvas(faces.value, canvasWidth, canvasHeight)
-                }
-
-                val text: String
-
-                if (faces.value.isNotEmpty()) {
-
-                    val ogniskowa = camInfo.first
-                    val sensorWidth = camInfo.second
-
-                    val imageWidth = faces.value[0].boundingBox.width().toFloat()
-                    val sensorSize = imageWidth * sensorWidth / imageSize.first
-
-                    text = (sredniaSzerokoscTwarzy * ogniskowa / sensorSize / 10).toString()
-
-                } else {
-                    text = "Oczekiwanie na wykrycie twarzy"
-                }
-
-                Text("$text ($measurementCount)", modifier = Modifier.weight(0.2f), fontSize = 48.sp)
             }
 
-            camera.setImageAnalysisAnalyzer(executor) { imageProxy ->
-                val rotationDegrees = imageProxy.imageInfo.rotationDegrees
-                val mediaImage = imageProxy.image
+            val text: String
 
-                if (mediaImage != null) {
+            if (faces.isNotEmpty()) {
 
-                    imageSize = Pair(mediaImage.width.toFloat(), mediaImage.height.toFloat())
+                val ogniskowa = camInfo.first
+                val sensorWidth = camInfo.second
 
-                    val inputImage = InputImage.fromMediaImage(mediaImage, rotationDegrees)
+                val imageWidth = faces[0].boundingBox.width().toFloat()
+                val sensorSize = imageWidth * sensorWidth / imageSize.first
 
-                    detectFaces(inputImage) { detectedFaces ->
+                text = (sredniaSzerokoscTwarzy * ogniskowa / sensorSize / 10).toString()
 
-                        faces.value = detectedFaces
+            } else {
+                text = "Oczekiwanie na wykrycie twarzy"
+            }
 
-                        if (detectedFaces.isNotEmpty()) {
-                            measurements.add(toMetric(camInfo.first, camInfo.second))
-                            measurementCount++
-                        }
+            Text("$text ($measurementCount)", modifier = Modifier.weight(0.2f), fontSize = 48.sp)
+        }
 
-                        if (measurements.size >= 25) {
+        camera.setImageAnalysisAnalyzer(executor) { imageProxy ->
+            val rotationDegrees = imageProxy.imageInfo.rotationDegrees
+            val mediaImage = imageProxy.image
 
-                            if (isBeforeTest) {
+            if (mediaImage != null) {
 
-                                val average = measurements.sum() / 25
+                val imgSize = Pair(mediaImage.width.toFloat(), mediaImage.height.toFloat())
 
-                                val intent = Intent(this@SimpleDistanceActivity, VisionTestLayoutActivity::class.java)
-                                intent.putExtra("TEST_ID", inputTestId)
-                                intent.putExtra("DISTANCE", average)
-                                startActivity(intent)
+                val inputImage = InputImage.fromMediaImage(mediaImage, rotationDegrees)
 
-                                finish()
-                                return@detectFaces
-                            } else {
-                                measurements.removeAt(0)
-                            }
+                detectFaces(inputImage) { detectedFaces ->
 
-                        }
-                        imageProxy.close()
+                    faces = detectedFaces
+
+                    if (detectedFaces.isNotEmpty()) {
+                        measurements.add(toMetric(camInfo.first, camInfo.second, faces[0], imgSize))
+                        measurementCount++
                     }
-                } else {
+
+                    if (measurementCount >= 25) {
+
+                        if (isBeforeTest) {
+
+                            val average = measurements.sum() / 25
+
+//                                val intent = Intent(this@SimpleDistanceActivity, VisionTestLayoutActivity::class.java)
+//                                intent.putExtra("TEST_ID", inputTestId)
+//                                intent.putExtra("DISTANCE", average)
+//                                startActivity(intent)
+                            controller.currentBackStackEntry?.savedStateHandle?.apply {
+                                set("distance", average)
+                                set("isResult", false)
+                            }
+                            println(testID)
+                            controller.navigate("visiontest/$testID")
+
+                            return@detectFaces
+
+                        } else {
+                            measurements.removeAt(0)
+                        }
+
+                    }
                     imageProxy.close()
                 }
+            } else {
+                imageProxy.close()
             }
         }
-
-    }
-    private fun toMetric(ogniskowa: Float, sensorWidth: Float): Float {
-
-        val imageWidth = faces.value[0].boundingBox.width().toFloat()
-        val sensorSize = imageWidth * sensorWidth / imageSize.first
-
-        return sredniaSzerokoscTwarzy * ogniskowa / sensorSize / 10f
     }
 
-    private fun detectFaces(image: InputImage, callback: (List<Face>) -> Unit) {
-        val options = FaceDetectorOptions.Builder()
-            .setPerformanceMode(FaceDetectorOptions.PERFORMANCE_MODE_ACCURATE)
-            .build()
+}
+fun toMetric(ogniskowa: Float, sensorWidth: Float, twarz: Face, size: Pair<Float, Float>): Float {
 
-        val detector = FaceDetection.getClient(options)
+    val imageWidth = twarz.boundingBox.width().toFloat()
+    val sensorSize = imageWidth * sensorWidth / size.first
 
-        detector.process(image)
-            .addOnSuccessListener { faces ->
-                callback(faces)
-            }
-            .addOnFailureListener { e ->
-                e.printStackTrace()
-            }
-    }
+    return sredniaSzerokoscTwarzy * ogniskowa / sensorSize / 10f
+}
 
-    @Composable
-    fun getDeviceSize(): Pair<Float, Float> {
+fun detectFaces(image: InputImage, callback: (List<Face>) -> Unit) {
+    val options = FaceDetectorOptions.Builder()
+        .setPerformanceMode(FaceDetectorOptions.PERFORMANCE_MODE_ACCURATE)
+        .build()
 
-        val config = LocalConfiguration.current
-        val density = LocalDensity.current.density
-        val widthDp: Int
-        val heightDp: Int
+    val detector = FaceDetection.getClient(options)
 
-        if (config.orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            widthDp = config.screenWidthDp
-            heightDp = config.screenHeightDp
-        } else {
-            widthDp = config.screenHeightDp
-            heightDp = config.screenWidthDp
+    detector.process(image)
+        .addOnSuccessListener { faces ->
+            callback(faces)
         }
-
-        return Pair(widthDp/density, heightDp/density)
-
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        executor.shutdown()
-        camera.unbind()
-    }
-
-    private fun cameraInfo(context: Context): Pair<Float, Float> {
-        try {
-            val cameraManager = context.getSystemService(CAMERA_SERVICE) as CameraManager
-
-            val cameraId = cameraManager.cameraIdList.firstOrNull { cameraId ->
-                val characteristics = cameraManager.getCameraCharacteristics(cameraId)
-                val facing = characteristics.get(CameraCharacteristics.LENS_FACING)
-                facing == CameraCharacteristics.LENS_FACING_FRONT
-            } ?: cameraManager.cameraIdList[0]
-
-            val characteristics = cameraManager.getCameraCharacteristics(cameraId)
-            val focalLength = characteristics.get(CameraCharacteristics.LENS_INFO_AVAILABLE_FOCAL_LENGTHS)?.firstOrNull() ?: 0f
-            val sensorSize = characteristics.get(CameraCharacteristics.SENSOR_INFO_PHYSICAL_SIZE)!!.width
-            return Pair(focalLength, sensorSize)
-        } catch (e: CameraAccessException) {
+        .addOnFailureListener { e ->
             e.printStackTrace()
-            return Pair(-1f, -1f)
         }
+}
+
+@Composable
+fun getDeviceSize(): Pair<Float, Float> {
+
+    val config = LocalConfiguration.current
+    val density = LocalDensity.current.density
+    val widthDp: Int
+    val heightDp: Int
+
+    if (config.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+        widthDp = config.screenWidthDp
+        heightDp = config.screenHeightDp
+    } else {
+        widthDp = config.screenHeightDp
+        heightDp = config.screenWidthDp
     }
+
+    return Pair(widthDp/density, heightDp/density)
+
+}
+
+//override fun onDestroy() {
+//    super.onDestroy()
+//    executor.shutdown()
+//    camera.unbind()
+//}
+
+fun cameraInfo(context: Context): Pair<Float, Float> {
+    try {
+        val cameraManager = context.getSystemService(CAMERA_SERVICE) as CameraManager
+
+        val cameraId = cameraManager.cameraIdList.firstOrNull { cameraId ->
+            val characteristics = cameraManager.getCameraCharacteristics(cameraId)
+            val facing = characteristics.get(CameraCharacteristics.LENS_FACING)
+            facing == CameraCharacteristics.LENS_FACING_FRONT
+        } ?: cameraManager.cameraIdList[0]
+
+        val characteristics = cameraManager.getCameraCharacteristics(cameraId)
+        val focalLength = characteristics.get(CameraCharacteristics.LENS_INFO_AVAILABLE_FOCAL_LENGTHS)?.firstOrNull() ?: 0f
+        val sensorSize = characteristics.get(CameraCharacteristics.SENSOR_INFO_PHYSICAL_SIZE)!!.width
+        return Pair(focalLength, sensorSize)
+    } catch (e: CameraAccessException) {
+        e.printStackTrace()
+        return Pair(-1f, -1f)
+    }
+}
 
 //    @Composable
 //    fun FaceCanvas(faces: List<Face>, width: Int, height: Int) {
@@ -381,5 +441,3 @@ class SimpleDistanceActivity : ComponentActivity() {
 //            }
 //        }
 //    }
-
-}
