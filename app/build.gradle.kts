@@ -97,6 +97,7 @@ dependencies {
     implementation(libs.places.compose)
     implementation(libs.places)
     implementation(libs.material)
+    implementation(libs.androidx.navigation.compose)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

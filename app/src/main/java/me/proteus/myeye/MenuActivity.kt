@@ -1,11 +1,6 @@
 package me.proteus.myeye
 
-import android.content.Context
 import android.content.Intent
-import android.os.Bundle
-import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -30,143 +25,117 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Create
 import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material.icons.filled.Menu
-import androidx.compose.material.icons.outlined.Call
-import androidx.compose.material.icons.outlined.Settings
-import androidx.compose.material.icons.twotone.Check
-import androidx.compose.material.icons.twotone.LocationOn
 import androidx.compose.material3.CenterAlignedTopAppBar
-import androidx.compose.material3.DrawerState
-import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.ModalDrawerSheet
-import androidx.compose.material3.ModalNavigationDrawer
-import androidx.compose.material3.NavigationDrawerItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
-import me.proteus.myeye.ui.MapActivity
-import me.proteus.myeye.ui.ResultBrowserActivity
-import me.proteus.myeye.ui.SettingsActivity
-import me.proteus.myeye.ui.SimpleDistanceActivity
-import me.proteus.myeye.ui.SpeechDecoderActivity
+import androidx.navigation.NavController
 import me.proteus.myeye.ui.VisionTestIcon
-import me.proteus.myeye.ui.VisionTestLayoutActivity
 import me.proteus.myeye.ui.theme.MyEyeTheme
 import me.proteus.myeye.visiontests.VisionTestUtils
 
-class MenuActivity : ComponentActivity() {
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
-        setContent {
-            MyEyeTheme {
-                val drawerState = rememberDrawerState(DrawerValue.Closed)
-                val scope = rememberCoroutineScope()
+@Composable
+fun MainMenu(controller: NavController) {
 
-                ModalNavigationDrawer(
-                    drawerState = drawerState,
-                    drawerContent = {
-                        ModalDrawerSheet {
+    MyEyeTheme {
+//        val drawerState = rememberDrawerState(DrawerValue.Closed)
+//        val scope = rememberCoroutineScope()
+//
+//        ModalNavigationDrawer(
+//            drawerState = drawerState,
+//            drawerContent = {
+//                ModalDrawerSheet {
+//
+//                    VisionTestDrawerItem("TEST_CIRCLE", this@MenuActivity)
+//                    VisionTestDrawerItem("TEST_BUILD", this@MenuActivity)
+//                    VisionTestDrawerItem("TEST_INFO", this@MenuActivity)
+//                    VisionTestDrawerItem("SNELLEN_CHART", this@MenuActivity)
+//                    VisionTestDrawerItem("COLOR_ARRANGE", this@MenuActivity)
+//                    VisionTestDrawerItem("REACTION_TEST", this@MenuActivity)
+//
+//                    NavigationDrawerItem(
+//                        icon = { Icon(Icons.TwoTone.Check, contentDescription = null) },
+//                        label = { Text("Przeglądaj wyniki") },
+//                        selected = false,
+//                        onClick = {
+//                            val intent = Intent(this@MenuActivity, ResultBrowserActivity::class.java)
+//                            startActivity(intent)
+//                        },
+//                    )
+//
+//                    NavigationDrawerItem(
+//                        icon = { Icon(Icons.Outlined.Call, contentDescription = null) },
+//                        label = { Text("Vosk Test") },
+//                        selected = false,
+//                        onClick = {
+//                            val intent = Intent(this@MenuActivity, SpeechDecoderActivity::class.java)
+//                            startActivity(intent)
+//                        },
+//                    )
+//
+//                    NavigationDrawerItem(
+//                        icon = { Icon(Icons.TwoTone.LocationOn, contentDescription = null) },
+//                        label = { Text("Pomiar dystansu") },
+//                        selected = false,
+//                        onClick = {
+//                            val intent = Intent(this@MenuActivity, SimpleDistanceActivity::class.java)
+//                            startActivity(intent)
+//                        },
+//                    )
+//
+//                    NavigationDrawerItem(
+//                        icon = { Icon(Icons.TwoTone.LocationOn, contentDescription = null) },
+//                        label = { Text("Mapa") },
+//                        selected = false,
+//                        onClick = {
+//                            val intent = Intent(this@MenuActivity, MapActivity::class.java)
+//                            startActivity(intent)
+//                        },
+//                    )
+//
+//                    NavigationDrawerItem(
+//                        icon = { Icon(Icons.Outlined.Settings, contentDescription = null) },
+//                        label = { Text("Ustawienia") },
+//                        selected = false,
+//                        onClick = {
+//                            val intent = Intent(this@MenuActivity, SettingsActivity::class.java)
+//                            startActivity(intent)
+//                        }
+//                    )
+//
+//                }
+//            }
+//        ) {
+//            MenuScreen(scope = scope, state = drawerState)
+//        }
+//    }
 
-                            VisionTestDrawerItem("TEST_CIRCLE", this@MenuActivity)
-                            VisionTestDrawerItem("TEST_BUILD", this@MenuActivity)
-                            VisionTestDrawerItem("TEST_INFO", this@MenuActivity)
-                            VisionTestDrawerItem("SNELLEN_CHART", this@MenuActivity)
-                            VisionTestDrawerItem("COLOR_ARRANGE", this@MenuActivity)
-                            VisionTestDrawerItem("REACTION_TEST", this@MenuActivity)
+        MenuScreen(controller)
 
-                            NavigationDrawerItem(
-                                icon = { Icon(Icons.TwoTone.Check, contentDescription = null) },
-                                label = { Text("Przeglądaj wyniki") },
-                                selected = false,
-                                onClick = {
-                                    val intent = Intent(this@MenuActivity, ResultBrowserActivity::class.java)
-                                    startActivity(intent)
-                                },
-                            )
-
-                            NavigationDrawerItem(
-                                icon = { Icon(Icons.Outlined.Call, contentDescription = null) },
-                                label = { Text("Vosk Test") },
-                                selected = false,
-                                onClick = {
-                                    val intent = Intent(this@MenuActivity, SpeechDecoderActivity::class.java)
-                                    startActivity(intent)
-                                },
-                            )
-
-                            NavigationDrawerItem(
-                                icon = { Icon(Icons.TwoTone.LocationOn, contentDescription = null) },
-                                label = { Text("Pomiar dystansu") },
-                                selected = false,
-                                onClick = {
-                                    val intent = Intent(this@MenuActivity, SimpleDistanceActivity::class.java)
-                                    startActivity(intent)
-                                },
-                            )
-
-                            NavigationDrawerItem(
-                                icon = { Icon(Icons.TwoTone.LocationOn, contentDescription = null) },
-                                label = { Text("Mapa") },
-                                selected = false,
-                                onClick = {
-                                    val intent = Intent(this@MenuActivity, MapActivity::class.java)
-                                    startActivity(intent)
-                                },
-                            )
-
-                            NavigationDrawerItem(
-                                icon = { Icon(Icons.Outlined.Settings, contentDescription = null) },
-                                label = { Text("Ustawienia") },
-                                selected = false,
-                                onClick = {
-                                    val intent = Intent(this@MenuActivity, SettingsActivity::class.java)
-                                    startActivity(intent)
-                                }
-                            )
-
-                        }
-                    }
-                ) {
-                    MenuScreen(scope = scope, state = drawerState)
-                }
-            }
-        }
-    }
-
-    override fun attachBaseContext(newBase: Context?) {
-        val currentLanguage = LanguageUtils.getCurrentLanguage(newBase)
-        val newContext = LanguageUtils.setLocale(newBase, currentLanguage)
-        super.attachBaseContext(newContext)
     }
 
 }
 
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)
-fun MenuScreen(scope: CoroutineScope, state: DrawerState) {
+fun MenuScreen(controller: NavController) {
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
@@ -177,11 +146,11 @@ fun MenuScreen(scope: CoroutineScope, state: DrawerState) {
                         text = stringResource(R.string.app_name)
                     )
                 },
-                navigationIcon = {
-                    IconButton(onClick = { scope.launch { state.open() }}) {
-                        Icon(Icons.Filled.Menu, null)
-                    }
-                },
+//                navigationIcon = {
+//                    IconButton(onClick = { scope.launch { state.open() }}) {
+//                        Icon(Icons.Filled.Menu, null)
+//                    }
+//                },
                 actions = {
 
                     IconButton(onClick = { }) {
@@ -210,7 +179,7 @@ fun MenuScreen(scope: CoroutineScope, state: DrawerState) {
 
                 Spacer(Modifier.padding(16.dp))
 
-                ExpandableGrid()
+                ExpandableGrid(controller)
 
 
             }
@@ -219,7 +188,7 @@ fun MenuScreen(scope: CoroutineScope, state: DrawerState) {
 }
 
 @Composable
-fun ExpandableGrid() {
+fun ExpandableGrid(controller: NavController) {
     var expanded by remember { mutableStateOf(false) }
     val list = mutableListOf("TEST_BUILD", "TEST_CIRCLE", "SNELLEN_CHART", "TEST_INFO", "COLOR_ARRANGE", "REACTION_TEST")
 
@@ -265,7 +234,7 @@ fun ExpandableGrid() {
                                     testID = id,
                                     size = 0.4f,
                                     clickable = true,
-                                    context = LocalContext.current
+                                    controller = controller
                                 )
                             }
                             Text(VisionTestUtils().getTestNameByID(id), fontSize = 12.sp)
@@ -288,7 +257,7 @@ fun ExpandableGrid() {
                                     testID = id,
                                     size = 0.4f,
                                     clickable = true,
-                                    context = LocalContext.current
+                                    controller = controller
                                 )
                             }
                             Text(VisionTestUtils().getTestNameByID(id), fontSize = 12.sp)
@@ -301,25 +270,25 @@ fun ExpandableGrid() {
     }
 }
 
-@Composable
-fun VisionTestDrawerItem(testID: String, activity: MenuActivity) {
-
-    val icon = VisionTestUtils().getTestByID(testID).testIcon
-
-    println()
-
-    val description = VisionTestUtils().getTestTypeByID(testID) + " " + VisionTestUtils().getTestNameByID(testID)
-
-    NavigationDrawerItem(
-        icon = { Icon(icon, null) },
-        label = { Text(description) },
-        selected = false,
-        onClick = {
-            val intent = Intent(activity, VisionTestLayoutActivity::class.java)
-            intent.putExtra("TEST_ID", testID)
-            activity.startActivity(intent)
-        },
-    )
-
-}
+//@Composable
+//fun VisionTestDrawerItem(testID: String, activity: MenuActivity) {
+//
+//    val icon = VisionTestUtils().getTestByID(testID).testIcon
+//
+//    println()
+//
+//    val description = VisionTestUtils().getTestTypeByID(testID) + " " + VisionTestUtils().getTestNameByID(testID)
+//
+//    NavigationDrawerItem(
+//        icon = { Icon(icon, null) },
+//        label = { Text(description) },
+//        selected = false,
+//        onClick = {
+//            val intent = Intent(activity, VisionTestLayoutActivity::class.java)
+//            intent.putExtra("TEST_ID", testID)
+//            activity.startActivity(intent)
+//        },
+//    )
+//
+//}
 
