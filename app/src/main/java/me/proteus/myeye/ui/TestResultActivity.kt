@@ -1,10 +1,6 @@
 package me.proteus.myeye.ui
 
-import android.content.Intent
-import android.os.Bundle
-import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
-import androidx.activity.viewModels
+import android.annotation.SuppressLint
 import androidx.biometric.BiometricPrompt
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -23,154 +19,139 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.util.fastRoundToInt
 import androidx.core.content.ContextCompat
-import androidx.core.content.IntentCompat
 import androidx.fragment.app.FragmentActivity
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
 import me.proteus.myeye.TestResult
+import me.proteus.myeye.io.ResultDataSaver
 import me.proteus.myeye.ui.theme.MyEyeTheme
-
-class TestResultActivity : FragmentActivity() {
-
-    private val viewModel: AuthorizationViewModel by viewModels()
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
-        setContent {
-            MyEyeTheme {
-                TestResultScreen(
-                    intent,
-                    viewModel,
-                    navigate = { data -> openTest(data) },
-                    this
-                )
-            }
-        }
-    }
-
-    fun openTest(data: TestResult?) {
-
-        val detailsIntent = Intent(this, VisionTestLayoutActivity::class.java)
-        detailsIntent.putExtra("IS_RESULT", true)
-        detailsIntent.putExtra("RESULT_PARCEL", data)
-        this.startActivity(detailsIntent)
-
-    }
-
-}
 
 @Composable
 fun TestResultScreen(
-    inputIntent: Intent,
-    viewModel: AuthorizationViewModel,
-    navigate: (TestResult?) -> Unit,
-    activity: TestResultActivity
-    ) {
+    controller: NavController,
+    sessionID: Int,
+    isAfterTest: Boolean
+) {
 
-    val resultData = IntentCompat.getParcelableExtra(inputIntent, "RESULT_PARCEL", TestResult::class.java)
-        ?: return
+    val viewModel: AuthorizationViewModel = viewModel()
 
-    val isAfterTest = inputIntent.getBooleanExtra("IS_AFTER", false)
+    MyEyeTheme {
 
-    Scaffold(
-        content = { innerPadding ->
+        val resultData = ResultDataSaver(controller.context)
+            .getResult(sessionID)
 
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(innerPadding),
-                verticalArrangement = Arrangement.SpaceEvenly,
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
+        Scaffold(
+            content = { innerPadding ->
 
                 Column(
                     modifier = Modifier
-                        .fillMaxHeight(0.5f)
-                        .padding(top = 16.dp),
+                        .fillMaxSize()
+                        .padding(innerPadding),
                     verticalArrangement = Arrangement.SpaceEvenly,
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
 
-                    Text(text = resultData.fullTestName, fontSize = 24.sp)
-
-                    VisionTestIcon(
+                    Column(
                         modifier = Modifier
-                            .padding(start = 100.dp, end = 100.dp)
-                            .weight(0.65f),
-                        testID = resultData.testID,
-                        size = 0.4f
-                    )
-                }
+                            .fillMaxHeight(0.5f)
+                            .padding(top = 16.dp),
+                        verticalArrangement = Arrangement.SpaceEvenly,
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
 
-                Column(
-                    modifier = Modifier.weight(0.8f),
-                    verticalArrangement = Arrangement.SpaceEvenly,
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
+                        Text(text = resultData.fullTestName, fontSize = 24.sp)
 
-                    Box {
-                        Text("Data wykonania: " + resultData.formattedTimestamp)
-                    }
-
-                    if (resultData.distance != -1f) {
-                        Box {
-                            Text("Odległość: " + resultData.distance.fastRoundToInt() + " cm")
-                        }
-                    }
-
-                    if (isAfterTest) {
-                        Text(
+                        VisionTestIcon(
                             modifier = Modifier
-                                .padding(top = 32.dp, bottom = 16.dp),
-                            text = "Dziękujemy za wykonanie testu!",
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 24.sp
+                                .padding(start = 100.dp, end = 100.dp)
+                                .weight(0.65f),
+                            testID = resultData.testID,
+                            size = 0.4f
                         )
                     }
 
-                    Box(
-                        contentAlignment = Alignment.Center
+                    Column(
+                        modifier = Modifier.weight(0.8f),
+                        verticalArrangement = Arrangement.SpaceEvenly,
+                        horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        Button(
-                            modifier = Modifier,
-                            onClick = {
 
-                                val debugAuth = false
+                        Box {
+                            Text("Data wykonania: " + resultData.formattedTimestamp)
+                        }
 
-                                if (debugAuth) {
-                                    if (viewModel.isAuthorized) {
-                                        navigate(resultData)
-                                    } else {
-                                        authenticateUser(activity,
-                                            onSuccess = {
-                                                viewModel.authenticate()
-                                                activity.openTest(resultData)
-                                            },
-                                            onFailure = { println("Autoryzacja nieudana") }
-                                        )
-                                    }
-                                } else {
-                                    navigate(resultData)
-                                }
-
+                        if (resultData.distance != -1f) {
+                            Box {
+                                Text("Odległość: " + resultData.distance.fastRoundToInt() + " cm")
                             }
+                        }
+
+                        if (isAfterTest) {
+                            Text(
+                                modifier = Modifier
+                                    .padding(top = 32.dp, bottom = 16.dp),
+                                text = "Dziękujemy za wykonanie testu!",
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 24.sp
+                            )
+                        }
+
+                        Box(
+                            contentAlignment = Alignment.Center
                         ) {
-                            Text(text = "Zobacz wyniki", fontSize = 20.sp)
+                            Button(
+                                modifier = Modifier,
+                                onClick = {
+
+                                    val debugAuth = false
+
+                                    if (debugAuth) {
+                                        if (viewModel.isAuthorized) {
+                                            openTest(controller, resultData)
+                                        } else {
+//                                        authenticateUser(activity,
+//                                            onSuccess = {
+//                                                viewModel.authenticate()
+//                                                openTest(controller, resultData)
+//                                            },
+//                                            onFailure = { println("Autoryzacja nieudana") }
+//                                        )
+                                        }
+                                    } else {
+                                        openTest(controller, resultData)
+                                    }
+
+                                }
+                            ) {
+                                Text(text = "Zobacz wyniki", fontSize = 20.sp)
+                            }
                         }
                     }
+
                 }
 
-
             }
+        )
+    }
 
-        }
-    )
 }
 
+@SuppressLint("RestrictedApi")
+fun openTest(controller: NavController, test: TestResult) {
+
+    for (el in controller.currentBackStack.value) println(el)
+
+    controller.currentBackStackEntry?.savedStateHandle?.apply {
+        set("isResult", true)
+        set("sessionId", test.resultID)
+    }
+    controller.navigate("visiontest/${test.testID}")
+
+}
 
 fun authenticateUser(activity: FragmentActivity, onSuccess: () -> Unit, onFailure: () -> Unit) {
 
     val executor = ContextCompat.getMainExecutor(activity)
-
 
     val prompt = BiometricPrompt(activity, executor,
         object : BiometricPrompt.AuthenticationCallback() {
