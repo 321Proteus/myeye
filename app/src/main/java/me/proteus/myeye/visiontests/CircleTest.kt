@@ -101,7 +101,7 @@ class CircleTest : VisionTest {
             Column(
                 modifier = Modifier
                     .fillMaxHeight(),
-                verticalArrangement = Arrangement.Center,
+                verticalArrangement = Arrangement.SpaceEvenly,//Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 for (i in directions.indices) {
