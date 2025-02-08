@@ -12,7 +12,8 @@ class VisionTestUtils {
         ColorArrangementTest(),
         ReactionTest(),
         ConstrastTest(),
-        IshiharaTest()
+        IshiharaTest(),
+        OpacityTest()
     )
 
     /**
@@ -42,6 +43,7 @@ class VisionTestUtils {
             "TEST_MISC_REACTION" -> "Czas reakcji"
             "TEST_COLOR_CONTRAST" -> "Kolory - konstrast"
             "TEST_COLOR_PLATE" -> "Ishihary"
+            "TEST_SIGHT_GAP" -> "Znajdź lukę"
             else -> throw IllegalArgumentException("Nie znaleziono testu o podanym ID")
         }
 

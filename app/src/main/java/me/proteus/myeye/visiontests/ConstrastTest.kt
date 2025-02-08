@@ -60,7 +60,7 @@ class ConstrastTest : VisionTest {
         var sliderPos by remember { mutableFloatStateOf(0f) }
 
         val stageColor = Color(android.graphics.Color.parseColor(stage.first))
-        val finalColor = ColorUtils.blendARGB(Color.Black.toArgb(), stageColor.toArgb(), 1-sliderPos / 30)
+        val finalColor = ColorUtils.blendARGB(Color.Black.toArgb(), stageColor.toArgb(), 1-sliderPos / 5)
 
         Column(
             modifier = Modifier
