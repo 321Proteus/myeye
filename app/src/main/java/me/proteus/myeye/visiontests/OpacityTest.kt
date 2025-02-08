@@ -11,14 +11,12 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.twotone.AddCircle
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.geometry.center
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.rotate
 import androidx.compose.ui.input.pointer.pointerInput
@@ -41,7 +39,7 @@ class OpacityTest : VisionTest {
     override var distance = -1f
     override val needsMicrophone = false
     override val resultCollector = ResultDataCollector()
-    override val stageCount = 8
+    override val stageCount = 20
     override val testIcon = Icons.TwoTone.AddCircle
 
     @Composable
@@ -51,8 +49,6 @@ class OpacityTest : VisionTest {
         isResult: Boolean,
         onUpdate: (String) -> Unit
     ) {
-
-        var showAnswer by remember { mutableStateOf(false) }
 
         Column(
             modifier = Modifier
@@ -74,7 +70,7 @@ class OpacityTest : VisionTest {
 
                 Text(
                     text = "C",
-                    color = Color.Black.copy(alpha = 0.8f),
+                    color = Color.Black.copy(alpha = (10-stage.difficulty) / 250f),
                     fontFamily = FontFamily(Font(R.font.opticiansans)),
                     fontSize = 256.sp,
                     modifier = Modifier
@@ -82,27 +78,48 @@ class OpacityTest : VisionTest {
                 )
             }
 
-            Canvas(modifier = Modifier
-                .pointerInput(Unit) {
-                    detectTapGestures { offset ->
-                        val segment = getSegment(offset, size.width / 4f, Offset(size.width / 2f, size.height / 2f))
-                        println("Kliknięto segment: $segment")
-                    }
-                }) {
-                val radius = size.minDimension / 4
-                val center = Offset(size.width / 2, size.height / 2)
-                val angle = 360f / 8
+            Box(
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(bottom = 32.dp),
+                contentAlignment = Alignment.Center,
+            ) {
 
-                for (i in 0 until 8) {
-                    rotate(360f, pivot = center) {
-                        drawArc(
-                            color = Color.Black,
-                            startAngle = 0f,
-                            sweepAngle = angle,
-                            useCenter = false,
-                            topLeft = Offset(center.x - radius, center.y - radius),
-                            size = androidx.compose.ui.geometry.Size(radius * 2, radius * 2)
-                        )
+                Canvas(modifier = Modifier
+                    .fillMaxSize()
+                    .pointerInput(Unit) {
+                        detectTapGestures { offset ->
+                            val segment = getSegment(
+                                offset,
+                                size.width / 4f,
+                                Offset(size.width / 2f, size.height / 2f)
+                            )
+                            onUpdate(segment.toString())
+                        }
+                    }) {
+                    val radius = size.minDimension / 2
+                    val center = size.center//Offset(size.width / 2, size.height / 2)
+
+                    drawArc(
+                        color = Color.Black,
+                        startAngle = 0f,
+                        sweepAngle = 360f,
+                        useCenter = true,
+                        topLeft = Offset(center.x - radius/2, center.y - radius/2),
+                        size = size.div(2f)
+                    )
+
+                    for (i in 0 until 8) {
+                        rotate(i * 45f + 22.5f, pivot = center) {
+                            drawArc(
+                                color = Color.Black,
+                                startAngle = 5f,
+                                sweepAngle = 40f,
+                                useCenter = false,
+                                topLeft = Offset(center.x - radius, center.y - radius),
+                                size = Size(radius * 2, radius * 2)
+                            )
+                        }
                     }
                 }
             }
@@ -110,14 +127,14 @@ class OpacityTest : VisionTest {
         }
     }
 
-    fun getSegment(clickPosition: Offset, radius: Float, center: Offset): Int {
+    private fun getSegment(clickPosition: Offset, radius: Float, center: Offset): Int {
         val x = clickPosition.x - center.x
         val y = clickPosition.y - center.y
         val distance = sqrt((x * x + y * y).toDouble())
 
-        if (distance > radius) return -1
+        if (distance > radius * 2) return -1
 
-        val angle = Math.toDegrees(atan2(y.toDouble(), x.toDouble()))
+        val angle = Math.toDegrees(atan2(y.toDouble(), x.toDouble())) + 22.5f
         val adjustedAngle = if (angle < 0) angle + 360 else angle
 
         val segmentAngle = 360 / 8
@@ -125,7 +142,6 @@ class OpacityTest : VisionTest {
     }
 
     override fun generateQuestion(stage: Int?): String {
-        println(stage)
         return Random.nextInt().mod(8).toString()
     }
 
