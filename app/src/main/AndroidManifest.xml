@@ -39,6 +39,7 @@
         <activity android:name=".ui.ResultBrowserActivity" />
         <activity android:name=".ui.SimpleDistanceActivity" />
         <activity android:name=".ui.SettingsActivity" />
+        <activity android:name=".ui.TestSelectorActivity" />
 
         <activity android:name=".ui.MapActivity" />
         <activity android:name=".ui.PlaceDetailsActivity" />
