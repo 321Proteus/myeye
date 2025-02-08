@@ -11,7 +11,8 @@ class VisionTestUtils {
         ExampleTest(),
         ColorArrangementTest(),
         ReactionTest(),
-        ConstrastTest()
+        ConstrastTest(),
+        IshiharaTest()
     )
 
     /**
@@ -40,6 +41,7 @@ class VisionTestUtils {
             "TEST_COLOR_ARRANGE" -> "Farnsworth"
             "TEST_MISC_REACTION" -> "Czas reakcji"
             "TEST_COLOR_CONTRAST" -> "Kolory - konstrast"
+            "TEST_COLOR_PLATE" -> "Ishihary"
             else -> throw IllegalArgumentException("Nie znaleziono testu o podanym ID")
         }
 
