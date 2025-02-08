@@ -43,7 +43,7 @@ class ASRViewModel(private val application: Application) : ViewModel() {
     private var isOpen: Boolean = false
     private var samplerate: Int = 0
 
-    lateinit var grammarMapping: MutableMap<String, String>
+    var grammarMapping: MutableMap<String, String>? = null
 
     private val _wordBuffer = MutableLiveData<List<SpeechDecoderResult>>(emptyList())
     val wordBuffer: LiveData<List<SpeechDecoderResult>> get() = _wordBuffer
@@ -195,8 +195,8 @@ class ASRViewModel(private val application: Application) : ViewModel() {
             setPartialWords(true)
 //            setMaxAlternatives(2)
 
-            if (grammarMapping.isNotEmpty()) {
-                setGrammar("[\"" + grammarMapping.values.joinToString(
+            if (grammarMapping!!.isNotEmpty()) {
+                setGrammar("[\"" + grammarMapping!!.values.joinToString(
                     separator = "\",\"",
                 ) + "\"]")
             }

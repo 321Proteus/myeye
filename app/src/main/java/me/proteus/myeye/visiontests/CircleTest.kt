@@ -17,6 +17,7 @@ import androidx.compose.material.icons.outlined.AccountCircle
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
@@ -154,15 +155,13 @@ class CircleTest : VisionTest {
 
         if (!isResult) {
             val context = LocalContext.current
-            val mapping = asr.grammarMapping
 
             asr.wordBuffer.observe(context as LifecycleOwner) { data ->
 
                 if (data.isEmpty()) return@observe
 
                 println("Data: ${data.joinToString(",") { it.word }}")
-
-                val mapped = data.map { mapping.entries.first { key -> key.value == it.word} }
+                val mapped = data.map { asr.grammarMapping!!.entries.first { key -> key.value == it.word } }
                 val directions = mapped.map {
                     when (it.key) {
                         "right" -> 0
@@ -252,24 +251,29 @@ class CircleTest : VisionTest {
         isResult: Boolean,
         result: TestResult?
     ) {
-
         val context = LocalContext.current
         val app = context.applicationContext as Application
 
-        if (!isResult) {
+        asr = viewModel(factory = ASRViewModelFactory(app))
 
-            asr = viewModel(factory = ASRViewModelFactory(app))
+        LaunchedEffect(Unit) {
 
-            if (context.checkSelfPermission(Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED) {
-                asr.initialize(GrammarType.SIDES)
+            println("Init launch")
+            if (!isResult) {
+
+                if (context.checkSelfPermission(Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED) {
+                    asr.initialize(GrammarType.SIDES)
+                    println("Init model")
+                }
+
+            } else {
+                distance = result!!.distance
             }
-
-        } else {
-            distance = result!!.distance
         }
 
-        super.BeginTest(controller, isResult, result)
+        println("Done lauch")
 
+        super.BeginTest(controller, isResult, result)
     }
 
     override fun generateQuestion(stage: Int?): String {

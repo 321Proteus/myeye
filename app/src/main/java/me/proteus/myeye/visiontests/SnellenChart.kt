@@ -17,6 +17,7 @@ import androidx.compose.material.icons.twotone.Face
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -146,7 +147,6 @@ class SnellenChart : VisionTest {
 
         if (!isResult) {
             val context = LocalContext.current
-            val mapping = asr.grammarMapping
 
             asr.wordBuffer.observe(context as LifecycleOwner) { data ->
 
@@ -154,7 +154,7 @@ class SnellenChart : VisionTest {
 
                 println("Data: ${data.joinToString(",") { it.word }}")
 
-                val mapped = data.map { mapping.entries.first { key -> key.value == it.word} }
+                val mapped = data.map { asr.grammarMapping!!.entries.first { key -> key.value == it.word } }
 
                 if (mapped.size == 5) {
                     onUpdate(mapped.joinToString("") { it.key }.uppercase())
@@ -237,16 +237,17 @@ class SnellenChart : VisionTest {
         val context = LocalContext.current
         val app = context.applicationContext as Application
 
-        if (!isResult) {
+        asr = viewModel(factory = ASRViewModelFactory(app))
 
-            asr = viewModel(factory = ASRViewModelFactory(app))
+        LaunchedEffect(Unit) {
 
-            if (context.checkSelfPermission(Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED) {
-                asr.initialize(GrammarType.SIDES)
+            if (!isResult) {
+                if (context.checkSelfPermission(Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED) {
+                    asr.initialize(GrammarType.LETTERS_LOGMAR)
+                }
+            } else {
+                distance = result!!.distance
             }
-
-        } else {
-            distance = result!!.distance
         }
 
         super.BeginTest(controller, isResult, result)

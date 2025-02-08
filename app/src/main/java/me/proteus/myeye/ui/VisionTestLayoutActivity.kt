@@ -96,9 +96,9 @@ fun VisionTestScreen(
     }
 
     DisposableEffect(Unit) {
-        Log.e("VTLA","Disposable started", )
+        Log.e("VTLA","Disposable started")
         onDispose {
-            Log.e("VTLA", "Disposed view", )
+            Log.e("VTLA", "Disposed view")
             testObject.endTest(controller, true)
         }
     }
