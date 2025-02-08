@@ -28,10 +28,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import me.proteus.myeye.visiontests.VisionTestUtils
+import me.proteus.myeye.R
 
 @Composable
 fun ExpandableGrid(height: Dp, toggleExpand: Boolean) {
@@ -48,13 +50,13 @@ fun ExpandableGrid(height: Dp, toggleExpand: Boolean) {
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Text(
-                    "Odkryj nasze testy wzroku",
+                    stringResource(R.string.menu_discover_tests),
                     fontSize = 14.sp,
                 )
                 Text(
                     modifier = Modifier
                         .clickable { expanded = !expanded },
-                    text = "Zobacz wszystkie",
+                    text = stringResource(R.string.menu_tests_see_all),
                     color = Color.Blue
                 )
             }
