@@ -68,9 +68,11 @@ class OpacityTest : VisionTest {
                 contentAlignment = Alignment.Center,
             ) {
 
+                val alpha = (stageCount-stage.difficulty + 2) / 250f
+
                 Text(
                     text = "C",
-                    color = Color.Black.copy(alpha = (10-stage.difficulty) / 250f),
+                    color = Color.Black.copy(alpha = alpha),
                     fontFamily = FontFamily(Font(R.font.opticiansans)),
                     fontSize = 256.sp,
                     modifier = Modifier
