@@ -57,7 +57,7 @@ import me.proteus.myeye.ui.VisionTestLayoutActivity
 
 class ColorArrangementTest : VisionTest {
 
-    override val testID: String = "COLOR_ARRANGE"
+    override val testID: String = "TEST_COLOR_ARRANGE"
     override val testIcon: ImageVector = Icons.AutoMirrored.Outlined.List
     override val needsMicrophone: Boolean = false
     override val stageCount: Int = 6

@@ -43,7 +43,7 @@ import kotlin.math.*
 
 class CircleTest : VisionTest {
 
-    override val testID: String = "TEST_CIRCLE"
+    override val testID: String = "TEST_SIGHT_CIRCLE"
     override val testIcon: ImageVector = Icons.Outlined.AccountCircle
     override val needsMicrophone: Boolean = true
 

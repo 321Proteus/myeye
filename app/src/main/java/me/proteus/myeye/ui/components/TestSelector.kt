@@ -36,7 +36,7 @@ import me.proteus.myeye.visiontests.VisionTestUtils
 @Composable
 fun ExpandableGrid(height: Dp, toggleExpand: Boolean) {
     var expanded by remember { mutableStateOf(toggleExpand) }
-    val list = mutableListOf("TEST_BUILD", "TEST_CIRCLE", "SNELLEN_CHART", "TEST_INFO", "COLOR_ARRANGE", "REACTION_TEST")
+    val list = VisionTestUtils().testList
 
     Column(modifier = Modifier.fillMaxSize()) {
 
@@ -79,13 +79,13 @@ fun ExpandableGrid(height: Dp, toggleExpand: Boolean) {
                             Box(Modifier.width(80.dp)) {
                                 VisionTestIcon(
                                     modifier = Modifier,
-                                    testID = id,
+                                    testID = id.testID,
                                     size = 0.4f,
                                     clickable = true,
                                     context = LocalContext.current
                                 )
                             }
-                            Text(VisionTestUtils().getTestNameByID(id), fontSize = 12.sp)
+                            Text(VisionTestUtils().getTestNameByID(id.testID), fontSize = 12.sp)
                         }
 
                     }
@@ -102,13 +102,13 @@ fun ExpandableGrid(height: Dp, toggleExpand: Boolean) {
                             Box(Modifier.width(80.dp)) {
                                 VisionTestIcon(
                                     modifier = Modifier,
-                                    testID = id,
+                                    testID = id.testID,
                                     size = 0.4f,
                                     clickable = true,
                                     context = LocalContext.current
                                 )
                             }
-                            Text(VisionTestUtils().getTestNameByID(id), fontSize = 12.sp)
+                            Text(VisionTestUtils().getTestNameByID(id.testID), fontSize = 12.sp)
                         }
 
                     }

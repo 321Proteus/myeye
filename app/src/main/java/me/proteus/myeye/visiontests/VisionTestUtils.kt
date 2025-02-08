@@ -4,6 +4,16 @@ import me.proteus.myeye.VisionTest
 
 class VisionTestUtils {
 
+    val testList = listOf(
+        SnellenChart(),
+        CircleTest(),
+        BuildTest(),
+        ExampleTest(),
+        ColorArrangementTest(),
+        ReactionTest(),
+        ConstrastTest()
+    )
+
     /**
      * Tutaj dodajemy wejscia do wszystkich klas testow
      * z interfejsu VisionTest i odpowiadajace im ID
@@ -11,27 +21,25 @@ class VisionTestUtils {
      */
     fun getTestByID(testID: String?): VisionTest {
 
-        return when (testID) {
-            "SNELLEN_CHART" -> SnellenChart()
-            "TEST_CIRCLE" -> CircleTest()
-            "TEST_BUILD" -> BuildTest()
-            "TEST_INFO" -> ExampleTest()
-            "COLOR_ARRANGE" -> ColorArrangementTest()
-            "REACTION_TEST" -> ReactionTest()
-            else -> throw IllegalArgumentException("Nie znaleziono testu o podanym ID")
+        val found = testList.find {
+            it.testID == testID
         }
+
+        if (found == null) throw IllegalArgumentException("Nie znaleziono testu o podanym ID")
+        else return found
 
     }
 
     fun getTestNameByID(testID: String?): String {
 
         return when (testID) {
-            "SNELLEN_CHART" -> "LogMAR"
-            "TEST_CIRCLE" -> "Landolt C"
-            "TEST_BUILD" -> "TODO"
-            "TEST_INFO" -> "Przykładowy"
-            "COLOR_ARRANGE" -> "Farnsworth"
-            "REACTION_TEST" -> "czasu reakcji"
+            "TEST_SIGHT_LOGMAR" -> "LogMAR"
+            "TEST_SIGHT_CIRCLE" -> "Landolt C"
+            "TEST_TODO_BUILD" -> "TODO"
+            "TEST_SIGHT_INFO" -> "Przykładowy"
+            "TEST_COLOR_ARRANGE" -> "Farnsworth"
+            "TEST_MISC_REACTION" -> "Czas reakcji"
+            "TEST_COLOR_CONTRAST" -> "Kolory - konstrast"
             else -> throw IllegalArgumentException("Nie znaleziono testu o podanym ID")
         }
 
@@ -39,9 +47,9 @@ class VisionTestUtils {
 
     fun getTestTypeByID(testID: String): String {
 
-        return when (testID.split('_')[0]) {
-            "TEST" -> "Test ostrości"
-            "COLOR" -> "Test kolorów"
+        return when (testID.split('_')[1]) {
+            "TEST" -> "Test ostrości wzroku"
+            "COLOR" -> "Test widzenia kolorów"
             else -> "Test"
 
         }

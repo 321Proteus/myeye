@@ -46,6 +46,7 @@ import me.proteus.myeye.ui.SimpleDistanceActivity
 import me.proteus.myeye.ui.SpeechDecoderActivity
 import me.proteus.myeye.ui.VisionTestLayoutActivity
 import me.proteus.myeye.ui.components.BottomBar
+import me.proteus.myeye.ui.components.NavBar
 import me.proteus.myeye.ui.components.TopBar
 import me.proteus.myeye.ui.theme.MyEyeTheme
 import me.proteus.myeye.visiontests.VisionTestUtils
@@ -61,68 +62,7 @@ class MenuActivity : ComponentActivity() {
 
                 ModalNavigationDrawer(
                     drawerState = drawerState,
-                    drawerContent = {
-                        ModalDrawerSheet {
-
-                            VisionTestDrawerItem("TEST_CIRCLE", this@MenuActivity)
-                            VisionTestDrawerItem("TEST_BUILD", this@MenuActivity)
-                            VisionTestDrawerItem("TEST_INFO", this@MenuActivity)
-                            VisionTestDrawerItem("SNELLEN_CHART", this@MenuActivity)
-                            VisionTestDrawerItem("COLOR_ARRANGE", this@MenuActivity)
-                            VisionTestDrawerItem("REACTION_TEST", this@MenuActivity)
-
-                            NavigationDrawerItem(
-                                icon = { Icon(Icons.TwoTone.Check, contentDescription = null) },
-                                label = { Text("Przeglądaj wyniki") },
-                                selected = false,
-                                onClick = {
-                                    val intent = Intent(this@MenuActivity, ResultBrowserActivity::class.java)
-                                    startActivity(intent)
-                                },
-                            )
-
-                            NavigationDrawerItem(
-                                icon = { Icon(Icons.Outlined.Call, contentDescription = null) },
-                                label = { Text("Vosk Test") },
-                                selected = false,
-                                onClick = {
-                                    val intent = Intent(this@MenuActivity, SpeechDecoderActivity::class.java)
-                                    startActivity(intent)
-                                },
-                            )
-
-                            NavigationDrawerItem(
-                                icon = { Icon(Icons.TwoTone.LocationOn, contentDescription = null) },
-                                label = { Text("Pomiar dystansu") },
-                                selected = false,
-                                onClick = {
-                                    val intent = Intent(this@MenuActivity, SimpleDistanceActivity::class.java)
-                                    startActivity(intent)
-                                },
-                            )
-
-                            NavigationDrawerItem(
-                                icon = { Icon(Icons.TwoTone.LocationOn, contentDescription = null) },
-                                label = { Text("Mapa") },
-                                selected = false,
-                                onClick = {
-                                    val intent = Intent(this@MenuActivity, MapActivity::class.java)
-                                    startActivity(intent)
-                                },
-                            )
-
-                            NavigationDrawerItem(
-                                icon = { Icon(Icons.Outlined.Settings, contentDescription = null) },
-                                label = { Text("Ustawienia") },
-                                selected = false,
-                                onClick = {
-                                    val intent = Intent(this@MenuActivity, SettingsActivity::class.java)
-                                    startActivity(intent)
-                                }
-                            )
-
-                        }
-                    }
+                    drawerContent = { NavBar(this) }
                 ) {
                     MenuScreen(this)//scope = scope, state = drawerState)
                 }
@@ -152,7 +92,10 @@ fun MenuScreen(/*scope: CoroutineScope, state: DrawerState*/activity: ComponentA
             ) {
                 Text(
                     fontSize = 12.sp,
-                    text = String.format(stringResource(R.string.menu_description), stringResource(R.string.app_name)),
+                    text = String.format(
+                        stringResource(R.string.menu_description),
+                        stringResource(R.string.app_name)
+                    ),
                     textAlign = TextAlign.Center
                 )
 
@@ -164,43 +107,5 @@ fun MenuScreen(/*scope: CoroutineScope, state: DrawerState*/activity: ComponentA
         },
         bottomBar = { BottomBar(activity) }
     )
-}
-
-@Composable
-fun BottomBarIcon(modifier: Modifier, icon: ImageVector, text: String, onclick: () -> Unit) {
-    Box(
-        modifier.clickable { onclick() },
-        contentAlignment = Alignment.Center
-    ) {
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
-        ) {
-            Icon(icon, "")
-            Text(text, fontSize = 10.sp)
-        }
-    }
-}
-
-@Composable
-fun VisionTestDrawerItem(testID: String, activity: MenuActivity) {
-
-    val icon = VisionTestUtils().getTestByID(testID).testIcon
-
-    println()
-
-    val description = VisionTestUtils().getTestTypeByID(testID) + " " + VisionTestUtils().getTestNameByID(testID)
-
-    NavigationDrawerItem(
-        icon = { Icon(icon, null) },
-        label = { Text(description) },
-        selected = false,
-        onClick = {
-            val intent = Intent(activity, VisionTestLayoutActivity::class.java)
-            intent.putExtra("TEST_ID", testID)
-            activity.startActivity(intent)
-        },
-    )
-
 }
 

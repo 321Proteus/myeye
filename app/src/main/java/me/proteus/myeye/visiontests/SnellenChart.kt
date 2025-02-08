@@ -42,7 +42,7 @@ import kotlin.math.*
 
 class SnellenChart : VisionTest {
 
-    override val testID: String = "SNELLEN_CHART"
+    override val testID: String = "TEST_SIGHT_LOGMAR"
     override val testIcon: ImageVector = Icons.TwoTone.Face
     override val needsMicrophone: Boolean = true
     override val stageCount: Int = 10
