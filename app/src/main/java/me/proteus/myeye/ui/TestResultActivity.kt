@@ -26,6 +26,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.content.IntentCompat
 import androidx.fragment.app.FragmentActivity
 import me.proteus.myeye.TestResult
+import me.proteus.myeye.ui.components.VisionTestIcon
 import me.proteus.myeye.ui.theme.MyEyeTheme
 
 class TestResultActivity : FragmentActivity() {
