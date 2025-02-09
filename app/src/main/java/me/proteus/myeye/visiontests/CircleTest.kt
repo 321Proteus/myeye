@@ -56,7 +56,7 @@ class CircleTest : VisionTest {
 
     override var distance: Float = 0f
 
-    private lateinit var asr: ASRViewModel
+    private var asr: ASRViewModel? = null
 
     override val resultCollector: ResultDataCollector = ResultDataCollector()
 
@@ -156,12 +156,12 @@ class CircleTest : VisionTest {
         if (!isResult) {
             val context = LocalContext.current
 
-            asr.wordBuffer.observe(context as LifecycleOwner) { data ->
+            asr!!.wordBuffer.observe(context as LifecycleOwner) { data ->
 
                 if (data.isEmpty()) return@observe
 
                 println("Data: ${data.joinToString(",") { it.word }}")
-                val mapped = data.map { asr.grammarMapping!!.entries.first { key -> key.value == it.word } }
+                val mapped = data.map { asr!!.grammarMapping!!.entries.first { key -> key.value == it.word } }
                 val directions = mapped.map {
                     when (it.key) {
                         "right" -> 0
@@ -174,7 +174,7 @@ class CircleTest : VisionTest {
 
                 if (mapped.size == 5) {
                     onUpdate(directions)
-                    asr.clearBuffer()
+                    asr!!.clearBuffer()
                 }
             }
 
@@ -254,7 +254,9 @@ class CircleTest : VisionTest {
         val context = LocalContext.current
         val app = context.applicationContext as Application
 
-        asr = viewModel(factory = ASRViewModelFactory(app))
+        if (!isResult) {
+            asr = viewModel(factory = ASRViewModelFactory(app))
+        }
 
         LaunchedEffect(Unit) {
 
@@ -262,7 +264,7 @@ class CircleTest : VisionTest {
             if (!isResult) {
 
                 if (context.checkSelfPermission(Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED) {
-                    asr.initialize(GrammarType.SIDES)
+                    asr?.initialize(GrammarType.SIDES)
                     println("Init model")
                 }
 
@@ -323,7 +325,7 @@ class CircleTest : VisionTest {
     override fun endTest(controller: NavController, isExit: Boolean) {
 
         super.endTest(controller, isExit)
-        if (::asr.isInitialized) asr.close()
+        asr?.close()
 
     }
 

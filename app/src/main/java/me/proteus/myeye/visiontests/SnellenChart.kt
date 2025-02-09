@@ -54,7 +54,7 @@ class SnellenChart : VisionTest {
 
     private var correctAnswer: String = ""
 
-    private lateinit var asr: ASRViewModel
+    private var asr: ASRViewModel? = null
 
     private fun stageToCentimeters(stage: Int): Float {
 
@@ -148,17 +148,17 @@ class SnellenChart : VisionTest {
         if (!isResult) {
             val context = LocalContext.current
 
-            asr.wordBuffer.observe(context as LifecycleOwner) { data ->
+            asr!!.wordBuffer.observe(context as LifecycleOwner) { data ->
 
                 if (data.isEmpty()) return@observe
 
                 println("Data: ${data.joinToString(",") { it.word }}")
 
-                val mapped = data.map { asr.grammarMapping!!.entries.first { key -> key.value == it.word } }
+                val mapped = data.map { asr!!.grammarMapping!!.entries.first { key -> key.value == it.word } }
 
                 if (mapped.size == 5) {
                     onUpdate(mapped.joinToString("") { it.key }.uppercase())
-                    asr.clearBuffer()
+                    asr!!.clearBuffer()
                 }
             }
 
@@ -237,13 +237,15 @@ class SnellenChart : VisionTest {
         val context = LocalContext.current
         val app = context.applicationContext as Application
 
-        asr = viewModel(factory = ASRViewModelFactory(app))
+        if (!isResult) {
+            asr = viewModel(factory = ASRViewModelFactory(app))
+        }
 
         LaunchedEffect(Unit) {
 
             if (!isResult) {
                 if (context.checkSelfPermission(Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED) {
-                    asr.initialize(GrammarType.LETTERS_LOGMAR)
+                    asr?.initialize(GrammarType.LETTERS_LOGMAR)
                 }
             } else {
                 distance = result!!.distance
@@ -303,7 +305,7 @@ class SnellenChart : VisionTest {
     override fun endTest(controller: NavController, isExit: Boolean) {
 
         super.endTest(controller, isExit)
-        if (::asr.isInitialized) asr.close()
+        asr?.close()
 
     }
 
