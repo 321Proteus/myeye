@@ -77,8 +77,7 @@ class MainActivity : ComponentActivity() {
                 )
             ) { backStackEntry ->
                 val sessionId = backStackEntry.arguments?.getInt("sessionId") ?: -1
-                val isAfter = backStackEntry.arguments?.getBoolean("isResult") ?: false
-
+                val isAfter = backStackEntry.arguments?.getBoolean("isAfter") ?: false
                 TestResultScreen(controller, sessionId, isAfter)
             }
             composable(

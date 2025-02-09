@@ -5,8 +5,10 @@ import androidx.biometric.BiometricPrompt
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.Scaffold
@@ -96,19 +98,23 @@ fun TestResultScreen(
                             )
                         }
 
-                        Box(
-                            contentAlignment = Alignment.Center
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceEvenly
                         ) {
-                            Button(
-                                modifier = Modifier,
-                                onClick = {
+                            Box(
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Button(
+                                    modifier = Modifier,
+                                    onClick = {
 
-                                    val debugAuth = false
+                                        val debugAuth = false
 
-                                    if (debugAuth) {
-                                        if (viewModel.isAuthorized) {
-                                            openTest(controller, resultData)
-                                        } else {
+                                        if (debugAuth) {
+                                            if (viewModel.isAuthorized) {
+                                                openTest(controller, resultData)
+                                            } else {
 //                                        authenticateUser(activity,
 //                                            onSuccess = {
 //                                                viewModel.authenticate()
@@ -116,16 +122,23 @@ fun TestResultScreen(
 //                                            },
 //                                            onFailure = { println("Autoryzacja nieudana") }
 //                                        )
+                                            }
+                                        } else {
+                                            openTest(controller, resultData)
                                         }
-                                    } else {
-                                        openTest(controller, resultData)
-                                    }
 
+                                    }
+                                ) {
+                                    Text(text = "Zobacz wyniki", fontSize = 20.sp)
                                 }
-                            ) {
-                                Text(text = "Zobacz wyniki", fontSize = 20.sp)
+                            }
+                            Button(onClick = {
+                                controller.popBackStack("menu", false)
+                            }) {
+                                Text("Wyjdź", fontSize = 20.sp)
                             }
                         }
+
                     }
 
                 }
