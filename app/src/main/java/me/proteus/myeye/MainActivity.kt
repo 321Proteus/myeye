@@ -97,21 +97,18 @@ class MainActivity : ComponentActivity() {
                 val sessionId = controller.previousBackStackEntry
                     ?.savedStateHandle?.get<Int>("sessionId")
 
-                println(isResult)
-                println(sessionId)
+                println("isResult: $isResult")
 
                 VisionTestScreen(controller, testID, isResult, sessionId, distance)
             }
             composable(
-                route = "distance/{countdown}",
+                route = "distance/{countdown}/{testID}",
                 arguments = listOf(
                     navArgument("countdown") { type = NavType.BoolType }
                 )
             ) { backStackEntry ->
                 val countdown = backStackEntry.arguments?.getBoolean("countdown") ?: true
-                val testID = controller.previousBackStackEntry
-                    ?.savedStateHandle?.get<String>("testID") ?: "null"
-                Log.w("Nav", "SetupNavigation: testID $testID")
+                val testID = backStackEntry.arguments?.getString("testID") ?: "error"
                 DistanceMeasurement(controller, countdown, testID)
             }
         }

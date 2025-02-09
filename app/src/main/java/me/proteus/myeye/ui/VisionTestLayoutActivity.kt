@@ -58,14 +58,15 @@ fun VisionTestScreen(
         if (permissionList.isNotEmpty() && !isResult) {
             launcher.launch(permissionList.toTypedArray())
         }
-        if (testObject.distance != -1f) {
+        if (testObject.distance != -1f && !isResult) {
             if (distance != 0f) {
                 println("Distance $distance")
                 testObject.distance = distance
                 isDistance = true
             } else {
-                controller.currentBackStackEntry?.savedStateHandle?.set("testID", testID)
-                controller.navigate("distance/true")
+                controller.navigate("distance/true/$testID") {
+                    popUpTo("menu")
+                }
             }
         } else {
             isDistance = true
