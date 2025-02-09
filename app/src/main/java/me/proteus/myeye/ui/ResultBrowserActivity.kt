@@ -23,6 +23,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import me.proteus.myeye.io.ResultDataSaver
+import me.proteus.myeye.ui.components.BottomBar
+import me.proteus.myeye.ui.components.TopBar
+import me.proteus.myeye.ui.components.VisionTestIcon
 import me.proteus.myeye.ui.theme.MyEyeTheme
 
 @Composable

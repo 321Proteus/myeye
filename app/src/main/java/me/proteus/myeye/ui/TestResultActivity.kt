@@ -26,6 +26,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import me.proteus.myeye.TestResult
 import me.proteus.myeye.io.ResultDataSaver
+import me.proteus.myeye.ui.components.VisionTestIcon
 import me.proteus.myeye.ui.theme.MyEyeTheme
 
 @Composable

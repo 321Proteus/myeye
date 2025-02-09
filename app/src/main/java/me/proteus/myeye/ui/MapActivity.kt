@@ -41,6 +41,8 @@ import com.google.maps.android.compose.rememberUpdatedMarkerState
 import me.proteus.myeye.BuildConfig
 import me.proteus.myeye.ui.theme.MyEyeTheme
 import me.proteus.myeye.R
+import me.proteus.myeye.ui.components.BottomBar
+import me.proteus.myeye.ui.components.TopBar
 import kotlin.math.cos
 
 class MapActivity : ComponentActivity() {
@@ -58,7 +60,10 @@ class MapActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             MyEyeTheme {
-                Scaffold { innerPadding ->
+                Scaffold(
+                    topBar = { TopBar() },
+                    bottomBar = { BottomBar(this) }
+                ) { innerPadding ->
 
                     val cameraPositionState = rememberCameraPositionState {
                         position = CameraPosition.fromLatLngZoom(startPos, 15f)

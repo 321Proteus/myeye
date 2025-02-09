@@ -34,6 +34,7 @@
         </activity>
         <activity android:name=".ui.SpeechDecoderActivity"/>
         <activity android:name=".ui.SettingsActivity" />
+        <activity android:name=".ui.TestSelectorActivity" />
 
         <activity android:name=".ui.MapActivity" />
         <activity android:name=".ui.PlaceDetailsActivity" />

@@ -110,6 +110,9 @@ class MainActivity : ComponentActivity() {
                 val testID = backStackEntry.arguments?.getString("testID") ?: "error"
                 DistanceMeasurement(controller, countdown, testID)
             }
+            composable(
+
+            ) {  }
         }
     }
 

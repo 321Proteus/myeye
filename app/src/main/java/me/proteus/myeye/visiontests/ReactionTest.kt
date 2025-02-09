@@ -34,7 +34,7 @@ import kotlin.random.Random
 
 class ReactionTest : VisionTest {
 
-    override val testID = "REACTION_TEST"
+    override val testID = "TEST_MISC_REACTION"
     override var distance = -1f
     override val testIcon = Icons.TwoTone.Warning
     override val needsMicrophone = false

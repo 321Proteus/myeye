@@ -36,6 +36,7 @@ import me.proteus.myeye.R
 import me.proteus.myeye.io.FileSaver
 import me.proteus.myeye.io.HTTPDownloaderDialog
 import me.proteus.myeye.io.HTTPRequestViewModel
+import me.proteus.myeye.ui.components.BottomBar
 import me.proteus.myeye.ui.theme.MyEyeTheme
 import java.io.File
 
@@ -59,6 +60,7 @@ class SettingsActivity : ComponentActivity() {
                             }
                         )
                     },
+                    bottomBar = { BottomBar(this) },
                     content = { innerPadding ->
                         Box(
                             modifier = Modifier

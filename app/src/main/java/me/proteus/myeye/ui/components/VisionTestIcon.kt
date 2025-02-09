@@ -1,4 +1,4 @@
-package me.proteus.myeye.ui
+package me.proteus.myeye.ui.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable

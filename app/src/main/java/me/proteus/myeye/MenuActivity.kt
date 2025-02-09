@@ -6,19 +6,9 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -26,27 +16,39 @@ import androidx.compose.material.icons.filled.Create
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material.icons.outlined.Call
+import androidx.compose.material.icons.outlined.Settings
+import androidx.compose.material.icons.twotone.Check
+import androidx.compose.material.icons.twotone.LocationOn
+import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.ModalDrawerSheet
+import androidx.compose.material3.ModalNavigationDrawer
+import androidx.compose.material3.NavigationDrawerItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import me.proteus.myeye.ui.components.ExpandableGrid
+import me.proteus.myeye.ui.MapActivity
+import me.proteus.myeye.ui.components.BottomBar
+import me.proteus.myeye.ui.components.NavBar
+import me.proteus.myeye.ui.components.TopBar
 import androidx.navigation.NavController
-import me.proteus.myeye.ui.VisionTestIcon
+import me.proteus.myeye.ui.components.VisionTestIcon
 import me.proteus.myeye.ui.theme.MyEyeTheme
 import me.proteus.myeye.visiontests.VisionTestUtils
 
@@ -136,32 +138,7 @@ fun MainMenu(controller: NavController) {
 @OptIn(ExperimentalMaterial3Api::class)
 fun MenuScreen(controller: NavController) {
     Scaffold(
-        topBar = {
-            CenterAlignedTopAppBar(
-                title = {
-                    Text(
-                        fontSize = 36.sp,
-                        fontFamily = FontFamily(Font(R.font.opticiansans)),
-                        text = stringResource(R.string.app_name)
-                    )
-                },
-//                navigationIcon = {
-//                    IconButton(onClick = { scope.launch { state.open() }}) {
-//                        Icon(Icons.Filled.Menu, null)
-//                    }
-//                },
-                actions = {
-
-                    IconButton(onClick = { }) {
-                        Icon(Icons.Filled.Favorite, null)
-                    }
-                    IconButton(onClick = { }) {
-                        Icon(Icons.Filled.Create, null)
-                    }
-
-                }
-            )
-        },
+        topBar = { TopBar() },
         content = { innerPadding ->
             Column(
                 modifier = Modifier
@@ -172,122 +149,20 @@ fun MenuScreen(controller: NavController) {
             ) {
                 Text(
                     fontSize = 12.sp,
-                    text = String.format(stringResource(R.string.menu_description), stringResource(R.string.app_name)),
+                    text = String.format(
+                        stringResource(R.string.menu_description),
+                        stringResource(R.string.app_name)
+                    ),
                     textAlign = TextAlign.Center
                 )
 
                 Spacer(Modifier.padding(16.dp))
 
-                ExpandableGrid(controller)
-
+                ExpandableGrid(height = (LocalConfiguration.current.screenHeightDp / 2).dp, false)
 
             }
-        }
+        },
+        bottomBar = { BottomBar(activity) }
     )
 }
-
-@Composable
-fun ExpandableGrid(controller: NavController) {
-    var expanded by remember { mutableStateOf(false) }
-    val list = mutableListOf("TEST_BUILD", "TEST_CIRCLE", "SNELLEN_CHART", "TEST_INFO", "COLOR_ARRANGE", "REACTION_TEST")
-
-    Column(modifier = Modifier.fillMaxSize()) {
-
-        Row(
-            modifier = Modifier
-                .padding(8.dp)
-                .fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            Text(
-                "Odkryj nasze testy wzroku",
-                fontSize = 14.sp,
-            )
-            Text(
-                modifier = Modifier
-                    .clickable { expanded = !expanded },
-                text = "Zobacz wszystkie",
-                color = Color.Blue
-            )
-        }
-
-        AnimatedContent(targetState = expanded, label = "Grid Transition") { isExpanded ->
-            if (isExpanded) {
-
-                LazyVerticalGrid(
-                    columns = GridCells.Fixed(3),
-                    modifier = Modifier
-                        .weight(1f)
-                        .height((LocalConfiguration.current.screenHeightDp / 2).dp)
-                        .padding(8.dp)
-                        .background(Color.LightGray),
-                    contentPadding = PaddingValues(8.dp),
-                    verticalArrangement = Arrangement.spacedBy(8.dp),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    items(list) { id ->
-                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                            Box(Modifier.width(80.dp)) {
-                                VisionTestIcon(
-                                    modifier = Modifier,
-                                    testID = id,
-                                    size = 0.4f,
-                                    clickable = true,
-                                    controller = controller
-                                )
-                            }
-                            Text(VisionTestUtils().getTestNameByID(id), fontSize = 12.sp)
-                        }
-
-                    }
-                }
-            } else {
-
-                LazyRow(
-                    modifier = Modifier.fillMaxWidth().padding(8.dp),
-                    contentPadding = PaddingValues(horizontal = 8.dp),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    items(list) { id ->
-                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                            Box(Modifier.width(80.dp)) {
-                                VisionTestIcon(
-                                    modifier = Modifier,
-                                    testID = id,
-                                    size = 0.4f,
-                                    clickable = true,
-                                    controller = controller
-                                )
-                            }
-                            Text(VisionTestUtils().getTestNameByID(id), fontSize = 12.sp)
-                        }
-
-                    }
-                }
-            }
-        }
-    }
-}
-
-//@Composable
-//fun VisionTestDrawerItem(testID: String, activity: MenuActivity) {
-//
-//    val icon = VisionTestUtils().getTestByID(testID).testIcon
-//
-//    println()
-//
-//    val description = VisionTestUtils().getTestTypeByID(testID) + " " + VisionTestUtils().getTestNameByID(testID)
-//
-//    NavigationDrawerItem(
-//        icon = { Icon(icon, null) },
-//        label = { Text(description) },
-//        selected = false,
-//        onClick = {
-//            val intent = Intent(activity, VisionTestLayoutActivity::class.java)
-//            intent.putExtra("TEST_ID", testID)
-//            activity.startActivity(intent)
-//        },
-//    )
-//
-//}
 
