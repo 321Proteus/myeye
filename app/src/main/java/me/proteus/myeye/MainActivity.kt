@@ -1,5 +1,6 @@
 package me.proteus.myeye
 
+import android.content.Context
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
@@ -19,10 +20,15 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import me.proteus.myeye.ui.DistanceMeasurement
+import me.proteus.myeye.ui.MapScreen
+import me.proteus.myeye.ui.PlaceDetailsScreen
 import me.proteus.myeye.ui.ResultBrowserScreen
+import me.proteus.myeye.ui.SettingsScreen
 import me.proteus.myeye.ui.TestResultScreen
 import me.proteus.myeye.ui.VisionTestScreen
+import me.proteus.myeye.ui.components.TestSelector
 import me.proteus.myeye.ui.theme.MyEyeTheme
+import me.proteus.myeye.util.LanguageUtils
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -38,7 +44,7 @@ class MainActivity : ComponentActivity() {
     @Composable
     fun MainScreen(controller: NavController) {
         MyEyeTheme {
-            Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
+            Scaffold { innerPadding ->
 
                 Box(
                     modifier = Modifier
@@ -110,10 +116,28 @@ class MainActivity : ComponentActivity() {
                 val testID = backStackEntry.arguments?.getString("testID") ?: "error"
                 DistanceMeasurement(controller, countdown, testID)
             }
+            composable("map") { MapScreen(controller) }
             composable(
+                "place/{placeID}",
+                listOf(
+                    navArgument("placeID") { type = NavType.StringType }
+                )
+            ) { backStackEntry ->
+                val placeID = backStackEntry.arguments?.getString("placeID")
+                PlaceDetailsScreen(controller, placeID!!)
+            }
+            composable("test_selector") {
+                TestSelector(controller)
+            }
+            composable("tools") { SettingsScreen(controller) }
 
-            ) {  }
         }
+    }
+
+    override fun attachBaseContext(newBase: Context?) {
+        val currentLanguage = LanguageUtils.getCurrentLanguage(newBase)
+        val newContext = LanguageUtils.setLocale(newBase, currentLanguage)
+        super.attachBaseContext(newContext)
     }
 
 }

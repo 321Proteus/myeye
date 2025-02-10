@@ -1,10 +1,6 @@
 package me.proteus.myeye.ui
 
-import android.os.Bundle
 import android.util.Log
-import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -14,6 +10,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -21,6 +18,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.libraries.places.api.Places
@@ -35,142 +33,145 @@ import com.google.maps.android.compose.rememberCameraPositionState
 import me.proteus.myeye.BuildConfig
 import me.proteus.myeye.ui.theme.MyEyeTheme
 
-class PlaceDetailsActivity : ComponentActivity() {
+@Composable
+fun PlaceDetailsScreen(controller: NavController, placeID: String) {
 
-    private lateinit var placesClient: PlacesClient
+    val context = controller.context
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
+    Places.initializeWithNewPlacesApiEnabled(context, BuildConfig.MAPS_API_KEY)
+    val placesClient = Places.createClient(context)
 
-        Places.initializeWithNewPlacesApiEnabled(applicationContext, BuildConfig.MAPS_API_KEY)
-        placesClient = Places.createClient(this)
+    MyEyeTheme {
+        Scaffold { innerPadding ->
 
-        enableEdgeToEdge()
-        setContent {
-            MyEyeTheme {
-                Scaffold { innerPadding ->
+            var place by remember { mutableStateOf<Place?>(null) }
 
-                    var place by remember { mutableStateOf<Place?>(null) }
+            val cameraPositionState = rememberCameraPositionState {
+                position = CameraPosition.fromLatLngZoom(place?.location ?: LatLng(50.0, 50.0), 20f)
+            }
 
-                    val cameraPositionState = rememberCameraPositionState {
-                        position = CameraPosition.fromLatLngZoom(place?.location ?: LatLng(50.0, 50.0), 20f)
+            LaunchedEffect(Unit) {
+
+                getPlace(placesClient, placeID) {
+                    place = it
+                    cameraPositionState.position = CameraPosition.fromLatLngZoom(it.location!!, 18f)
+                }
+                println("Found place")
+
+            }
+
+            Column(
+                modifier = Modifier
+                    .padding(innerPadding)
+                    .fillMaxSize(),
+            ) {
+                Box(
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxWidth()
+                ) {
+                    MapView(cameraPositionState) {
+                        if (place != null) {
+                            PlaceMarker(controller, place!!)
+                        }
                     }
+                }
 
-                    LaunchedEffect(Unit) {
+                Column(
+                    modifier = Modifier
+                        .weight(4f)
+                        .fillMaxWidth(),
+                    verticalArrangement = Arrangement.SpaceEvenly,
+                ) {
 
-                        val placeId = this@PlaceDetailsActivity.intent.getStringExtra("PLACE_ID")
-                        getPlace(placeId!!) {
-                            place = it
-                            cameraPositionState.position = CameraPosition.fromLatLngZoom(it.location!!, 18f)
-                        }
-                        println("Found place")
+                    if (place != null) {
 
-                    }
+                        val hours = place!!.currentOpeningHours
+                        println(hours)
+                        val lista = hours?.weekdayText?.joinToString("\n", "\n")
 
-                    Column(
-                        modifier = Modifier
-                            .padding(innerPadding)
-                            .fillMaxSize(),
-                    ) {
-                        Box(
-                            modifier = Modifier
-                                .weight(1f)
-                                .fillMaxWidth()
-                        ) {
-                            MapView(cameraPositionState) {
-                                if (place != null) {
-                                    MapActivity().PlaceMarker(place!!)
-                                }
-                            }
-                        }
+                        val numer = place!!.internationalPhoneNumber ?: "Brak informacji"
 
-                        Column(
-                            modifier = Modifier
-                                .weight(4f)
-                                .fillMaxWidth(),
-                            verticalArrangement = Arrangement.SpaceEvenly,
-                        ) {
+                        Text(place!!.displayName!!, fontSize = 28.sp)
+                        Text(place!!.formattedAddress!!, fontSize = 20.sp)
 
-                            if (place != null) {
+                        Text("Godziny otwarcia: ${if (lista == null) "Brak informacji" else ""}", fontSize = 20.sp)
+                        Text(lista ?: "", fontSize = 16.sp)
 
-                                val hours = place!!.currentOpeningHours
-                                println(hours)
-                                val lista = hours?.weekdayText?.joinToString("\n", "\n")
+                        Text("Telefon: $numer", fontSize = 20.sp)
 
-                                val numer = place!!.internationalPhoneNumber ?: "Brak informacji"
-
-                                Text(place!!.displayName!!, fontSize = 28.sp)
-                                Text(place!!.formattedAddress!!, fontSize = 20.sp)
-
-                                Text("Godziny otwarcia: ${if (lista == null) "Brak informacji" else ""}", fontSize = 20.sp)
-                                Text(lista ?: "", fontSize = 16.sp)
-
-                                Text("Telefon: $numer", fontSize = 20.sp)
-
-                            } else {
-                                Text("Ładowanie danych...")
-                            }
-
-                        }
+                    } else {
+                        Text("Ładowanie danych...")
                     }
 
                 }
             }
+
         }
     }
 
-    @Composable
-    fun MapView(cps: CameraPositionState, marker: @Composable () -> Unit) {
-        GoogleMap(
-            modifier = Modifier
-                .fillMaxSize(),
-            cameraPositionState = cps,
-            uiSettings = MapUiSettings(
-                compassEnabled = false,
-                indoorLevelPickerEnabled = false,
-                mapToolbarEnabled = false,
-                myLocationButtonEnabled = false,
-                rotationGesturesEnabled = false,
-                scrollGesturesEnabled = false,
-                scrollGesturesEnabledDuringRotateOrZoom = false,
-                tiltGesturesEnabled = false,
-                zoomControlsEnabled = false,
-                zoomGesturesEnabled = false
-            ),
-            properties = MapProperties(
-                isBuildingEnabled = true,
-            )
+    DisposableEffect(Unit) {
+        onDispose {
+            Places.deinitialize()
+        }
+    }
 
-        ) {
+}
+
+@Composable
+fun MapView(cps: CameraPositionState, marker: @Composable () -> Unit) {
+    GoogleMap(
+        modifier = Modifier
+            .fillMaxSize(),
+        cameraPositionState = cps,
+        uiSettings = MapUiSettings(
+            compassEnabled = false,
+            indoorLevelPickerEnabled = false,
+            mapToolbarEnabled = false,
+            myLocationButtonEnabled = false,
+            rotationGesturesEnabled = false,
+            scrollGesturesEnabled = false,
+            scrollGesturesEnabledDuringRotateOrZoom = false,
+            tiltGesturesEnabled = false,
+            zoomControlsEnabled = false,
+            zoomGesturesEnabled = false
+        ),
+        properties = MapProperties(
+            isBuildingEnabled = true,
+        )
+
+    ) {
 //            Marker(
 //                state = rememberUpdatedMarkerState(position = cps.position.target),
 //                icon = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED)
 //            )
-            marker()
+        marker()
 
-        }
     }
-
-    private fun getPlace(id: String, callback: (Place) -> Unit) {
-
-        val types = listOf(
-            Place.Field.DISPLAY_NAME,
-            Place.Field.LOCATION,
-            Place.Field.CURRENT_OPENING_HOURS,
-            Place.Field.INTERNATIONAL_PHONE_NUMBER,
-            Place.Field.FORMATTED_ADDRESS
-        )
-
-        val request = FetchPlaceRequest.builder(id, types).build()
-
-        placesClient.fetchPlace(request)
-            .addOnSuccessListener { res ->
-                callback(res.place)
-            }
-            .addOnFailureListener { err ->
-                Log.e("PlaceDetailsActivity", "getPlace: ${err.message}")
-            }
-    }
-
-
 }
+
+fun getPlace(
+    client: PlacesClient,
+    id: String,
+    callback: (Place) -> Unit
+) {
+
+    val types = listOf(
+        Place.Field.DISPLAY_NAME,
+        Place.Field.LOCATION,
+        Place.Field.CURRENT_OPENING_HOURS,
+        Place.Field.INTERNATIONAL_PHONE_NUMBER,
+        Place.Field.FORMATTED_ADDRESS
+    )
+
+    val request = FetchPlaceRequest.builder(id, types).build()
+
+    client.fetchPlace(request)
+        .addOnSuccessListener { res ->
+            callback(res.place)
+        }
+        .addOnFailureListener { err ->
+            Log.e("PlaceDetailsActivity", "getPlace: ${err.message}")
+        }
+}
+

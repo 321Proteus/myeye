@@ -83,8 +83,6 @@ class ExampleTest : VisionTest {
                     }
                 }
 
-
-
             }
 
             if (!isResult) {

@@ -31,7 +31,10 @@ import me.proteus.myeye.ui.theme.MyEyeTheme
 @Composable
 fun ResultBrowserScreen(controller: NavController) {
     MyEyeTheme {
-        Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
+        Scaffold(
+            topBar = { TopBar() },
+            bottomBar = { BottomBar(controller) }
+        ) { innerPadding ->
 
             val dbConnector = ResultDataSaver(controller.context)
             dbConnector.select("*")

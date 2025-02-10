@@ -1,11 +1,6 @@
 package me.proteus.myeye.ui
 
-import android.content.Intent
-import android.os.Bundle
 import android.util.Log
-import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -14,6 +9,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -25,6 +21,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.libraries.places.api.Places
@@ -45,88 +42,87 @@ import me.proteus.myeye.ui.components.BottomBar
 import me.proteus.myeye.ui.components.TopBar
 import kotlin.math.cos
 
-class MapActivity : ComponentActivity() {
+@Composable
+fun MapScreen(controller: NavController) {
 
-    private lateinit var placesClient: PlacesClient
+    val context = controller.context
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
+    Places.initializeWithNewPlacesApiEnabled(context, BuildConfig.MAPS_API_KEY)
 
-        Places.initializeWithNewPlacesApiEnabled(applicationContext, BuildConfig.MAPS_API_KEY)
+    val placesClient = Places.createClient(context)
+    val startPos = LatLng(52.41, 16.93)
 
-        placesClient = Places.createClient(this)
-        val startPos = LatLng(52.41, 16.93)
+    MyEyeTheme {
+        Scaffold (
+            topBar = { TopBar() },
+            bottomBar = { BottomBar(controller) }
+        ) { innerPadding ->
 
-        enableEdgeToEdge()
-        setContent {
-            MyEyeTheme {
-                Scaffold(
-                    topBar = { TopBar() },
-                    bottomBar = { BottomBar(this) }
-                ) { innerPadding ->
+            val cameraPositionState = rememberCameraPositionState {
+                position = CameraPosition.fromLatLngZoom(startPos, 15f)
+            }
 
-                    val cameraPositionState = rememberCameraPositionState {
-                        position = CameraPosition.fromLatLngZoom(startPos, 15f)
-                    }
+            var markerPos by remember { mutableStateOf(startPos) }
+            var places by remember { mutableStateOf(emptyList<Place>()) }
 
-                    var markerPos by remember { mutableStateOf(startPos) }
-                    var places by remember { mutableStateOf(emptyList<Place>()) }
-
-                    LaunchedEffect(markerPos) {
-                        search(markerPos) { foundPlaces ->
-                            Log.e("MapActivity", "onCreate: Search over")
-                            Log.e("MapActivity", foundPlaces.size.toString())
-                            places = foundPlaces.toList()
-                        }
-                    }
-
-                    GoogleMap(
-                        modifier = Modifier
-                            .padding(innerPadding)
-                            .fillMaxSize(),
-                        cameraPositionState = cameraPositionState,
-                        onMapClick = { markerPos = it }
-                    ) {
-                        Marker (
-                            state = rememberUpdatedMarkerState(position = markerPos)
-                        )
-
-                        places.forEach { place -> PlaceMarker(place) }
-                        RangeDisplay(markerPos)
-
-                    }
+            LaunchedEffect(markerPos) {
+                search(placesClient, markerPos) { foundPlaces ->
+                    Log.e("MapActivity", "onCreate: Search over")
+                    Log.e("MapActivity", foundPlaces.size.toString())
+                    places = foundPlaces.toList()
                 }
             }
-        }
-    }
 
-
-
-    @Composable
-    fun PlaceMarker(place: Place) {
-        if (place.location != null) {
-            MarkerComposable(
-                state = rememberUpdatedMarkerState(position = place.location!!),
-                title = place.displayName,
-                onClick = {
-                    val intent = Intent(this, PlaceDetailsActivity::class.java)
-                    intent.putExtra("PLACE_ID", place.id)
-                    startActivity(intent)
-                    false
-                }
+            GoogleMap(
+                modifier = Modifier
+                    .padding(innerPadding)
+                    .fillMaxSize(),
+                cameraPositionState = cameraPositionState,
+                onMapClick = { markerPos = it }
             ) {
-                Box(
-                    modifier = Modifier
-                        .clip(RoundedCornerShape(48.dp))
-                        .size(48.dp),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Image(painterResource(R.drawable.myeye_logo_white_playstore), null)
-                }
-            }
+                Marker (
+                    state = rememberUpdatedMarkerState(position = markerPos)
+                )
 
+                places.forEach { place -> PlaceMarker(controller, place) }
+                RangeDisplay(markerPos)
+
+            }
         }
     }
+
+    DisposableEffect(Unit) {
+        onDispose {
+            Places.deinitialize()
+        }
+    }
+
+}
+
+
+@Composable
+fun PlaceMarker(controller: NavController, place: Place) {
+    if (place.location != null) {
+        MarkerComposable(
+            state = rememberUpdatedMarkerState(position = place.location!!),
+            title = place.displayName,
+            onClick = {
+                controller.navigate("place/${place.id}")
+                false
+            }
+        ) {
+            Box(
+                modifier = Modifier
+                    .clip(RoundedCornerShape(48.dp))
+                    .size(48.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                Image(painterResource(R.drawable.myeye_logo_white_playstore), null)
+            }
+        }
+
+    }
+}
 
 //        val shape = RoundedCornerShape(20.dp, 20.dp, 20.dp, 0.dp)
 //        val painter = rememberAsyncImagePainter(
@@ -163,66 +159,59 @@ class MapActivity : ComponentActivity() {
 //        }
 //    }
 
-    @Composable
-    private fun RangeDisplay(position: LatLng) {
-        val bounds = getRectangularBounds(position, 1.0)
-        val sw = bounds.southwest
-        val ne = bounds.northeast
-        val nw = LatLng(ne.latitude, sw.longitude)
-        val se = LatLng(sw.latitude, ne.longitude)
+@Composable
+private fun RangeDisplay(position: LatLng) {
+    val bounds = getRectangularBounds(position, 1.0)
+    val sw = bounds.southwest
+    val ne = bounds.northeast
+    val nw = LatLng(ne.latitude, sw.longitude)
+    val se = LatLng(sw.latitude, ne.longitude)
 
 
-        Polygon(
-            points = listOf(sw, nw, ne, se, sw),
-            strokeColor = Color.Blue,
-            strokeWidth = 5f,
-            fillColor = Color(0x5500FF00)
-        )
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        Places.deinitialize()
-    }
-
-    private fun search(center: LatLng, callback: (List<Place>) -> Unit) {
-
-        val bounds = getRectangularBounds(center, 1.0)
-
-        val placeFields: List<Place.Field> = listOf(Place.Field.ID, Place.Field.DISPLAY_NAME)
-
-        val request =
-            SearchByTextRequest.builder("okulistyczny", placeFields)
-//                .setMaxResultCount(10)
-                .setLocationRestriction(bounds)
-                .setPlaceFields(listOf(Place.Field.LOCATION, Place.Field.DISPLAY_NAME, Place.Field.ID))
-                .build()
-
-        println("Started search")
-
-        placesClient.searchByText(request)
-            .addOnSuccessListener { res ->
-                callback(res.places)
-//                Log.e("MapActivity", "search: $res", )
-//                val places = res.places
-//                for (place in places) println(place.displayName)
-//                foundPlaces = places
-            }
-            .addOnFailureListener { fall ->
-                Log.e("MapActivity", "search: ${fall.message}")
-            }
-    }
-
-    private fun getRectangularBounds(center: LatLng, distance: Double): RectangularBounds {
-        val kilometr = 111.32
-
-        val latOffset = distance / 2 / kilometr
-        val lngOffset = distance / 2 / (kilometr * cos(Math.toRadians(center.latitude)))
-
-        val southwest = LatLng(center.latitude - latOffset, center.longitude - lngOffset)
-        val northeast = LatLng(center.latitude + latOffset, center.longitude + lngOffset)
-
-        return RectangularBounds.newInstance(southwest, northeast)
-    }
-
+    Polygon(
+        points = listOf(sw, nw, ne, se, sw),
+        strokeColor = Color.Blue,
+        strokeWidth = 5f,
+        fillColor = Color(0x5500FF00)
+    )
 }
+
+fun search(
+    client: PlacesClient,
+    center: LatLng,
+    callback: (List<Place>) -> Unit) {
+
+    val bounds = getRectangularBounds(center, 1.0)
+
+    val placeFields: List<Place.Field> = listOf(Place.Field.ID, Place.Field.DISPLAY_NAME)
+
+    val request =
+        SearchByTextRequest.builder("okulistyczny", placeFields)
+//                .setMaxResultCount(10)
+            .setLocationRestriction(bounds)
+            .setPlaceFields(listOf(Place.Field.LOCATION, Place.Field.DISPLAY_NAME, Place.Field.ID))
+            .build()
+
+    println("Started search")
+
+    client.searchByText(request)
+        .addOnSuccessListener { res ->
+            callback(res.places)
+        }
+        .addOnFailureListener { fall ->
+            Log.e("MapActivity", "search: ${fall.message}")
+        }
+}
+
+fun getRectangularBounds(center: LatLng, distance: Double): RectangularBounds {
+    val kilometr = 111.32
+
+    val latOffset = distance / 2 / kilometr
+    val lngOffset = distance / 2 / (kilometr * cos(Math.toRadians(center.latitude)))
+
+    val southwest = LatLng(center.latitude - latOffset, center.longitude - lngOffset)
+    val northeast = LatLng(center.latitude + latOffset, center.longitude + lngOffset)
+
+    return RectangularBounds.newInstance(southwest, northeast)
+}
+

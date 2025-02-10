@@ -76,7 +76,7 @@ fun VisionTestScreen(
     }
 
     MyEyeTheme {
-        Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
+        Scaffold { innerPadding ->
 
             Box(
                 modifier = Modifier
