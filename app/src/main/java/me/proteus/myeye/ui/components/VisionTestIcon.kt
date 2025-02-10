@@ -1,4 +1,4 @@
-package me.proteus.myeye.ui
+package me.proteus.myeye.ui.components
 
 import android.app.Activity
 import android.content.Context
@@ -16,6 +16,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
+import me.proteus.myeye.ui.VisionTestLayoutActivity
 import me.proteus.myeye.visiontests.VisionTestUtils
 
 @Composable

@@ -57,7 +57,7 @@ import me.proteus.myeye.ui.VisionTestLayoutActivity
 
 class ColorArrangementTest : VisionTest {
 
-    override val testID: String = "COLOR_ARRANGE"
+    override val testID: String = "TEST_COLOR_ARRANGE"
     override val testIcon: ImageVector = Icons.AutoMirrored.Outlined.List
     override val needsMicrophone: Boolean = false
     override val stageCount: Int = 6
@@ -105,11 +105,11 @@ class ColorArrangementTest : VisionTest {
 
                 contentAlignment = Alignment.Center
             ) {
-                Text(
-                    modifier = Modifier
-                        .scale(if (index == cd) 0.66f else 1f, 1f),
-                    text = "${getHue(item)}"
-                )
+//                Text(
+//                    modifier = Modifier
+//                        .scale(if (index == cd) 0.66f else 1f, 1f),
+//                    text = "${getHue(item)}"
+//                )
             }
         }
 
@@ -284,8 +284,11 @@ class ColorArrangementTest : VisionTest {
             }
 
             if (!isResult) {
-                Box(
-                    contentAlignment = Alignment.Center
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceEvenly,
+                    verticalAlignment = Alignment.CenterVertically,
                 ) {
                     Button(
                         onClick = {
@@ -293,9 +296,14 @@ class ColorArrangementTest : VisionTest {
                             println(getScore(ans, "RELATIVE"))
                             onUpdate(ans)
                         }
-                    ) {
-                        Text("Dalej")
-                    }
+                    ) { Text("Dalej") }
+
+                    Button(
+                        onClick = {
+                            colorOffset += colors.size / 4
+                            onUpdate("REGENERATE")
+                        }
+                    ) { Text("Zmień kolory") }
                 }
             } else {
                 Row(

@@ -27,6 +27,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import me.proteus.myeye.io.ResultDataSaver
+import me.proteus.myeye.ui.components.BottomBar
+import me.proteus.myeye.ui.components.TopBar
+import me.proteus.myeye.ui.components.VisionTestIcon
 import me.proteus.myeye.ui.theme.MyEyeTheme
 
 class ResultBrowserActivity : ComponentActivity() {
@@ -35,9 +38,12 @@ class ResultBrowserActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             MyEyeTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
+                Scaffold(
+                    topBar = { TopBar() },
+                    bottomBar = { BottomBar(this) }
+                ) { innerPadding ->
 
-                    ResultColumn(this@ResultBrowserActivity, innerPadding)
+                    ResultColumn(this, innerPadding)
 
                 }
             }

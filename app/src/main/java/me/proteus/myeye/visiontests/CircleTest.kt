@@ -43,7 +43,7 @@ import kotlin.math.*
 
 class CircleTest : VisionTest {
 
-    override val testID: String = "TEST_CIRCLE"
+    override val testID: String = "TEST_SIGHT_CIRCLE"
     override val testIcon: ImageVector = Icons.Outlined.AccountCircle
     override val needsMicrophone: Boolean = true
 
@@ -101,7 +101,7 @@ class CircleTest : VisionTest {
             Column(
                 modifier = Modifier
                     .fillMaxHeight(),
-                verticalArrangement = Arrangement.Center,
+                verticalArrangement = Arrangement.SpaceEvenly,//Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 for (i in directions.indices) {
