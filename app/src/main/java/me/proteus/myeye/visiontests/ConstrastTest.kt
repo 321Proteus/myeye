@@ -31,10 +31,10 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.graphics.ColorUtils
+import androidx.navigation.NavController
 import me.proteus.myeye.SerializableStage
 import me.proteus.myeye.VisionTest
 import me.proteus.myeye.io.ResultDataCollector
-import me.proteus.myeye.ui.VisionTestLayoutActivity
 import java.util.Random
 
 class ConstrastTest : VisionTest {
@@ -51,7 +51,7 @@ class ConstrastTest : VisionTest {
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     override fun DisplayStage(
-        activity: VisionTestLayoutActivity,
+        controller: NavController,
         stage: SerializableStage,
         isResult: Boolean,
         onUpdate: (String) -> Unit
@@ -137,7 +137,7 @@ class ConstrastTest : VisionTest {
         val random = Random()
         var text = ""
 
-        for (i in 0..2) text += (if (random.nextBoolean() == true) "FF" else "00")
+        for (i in 0..2) text += (if (random.nextBoolean()) "FF" else "00")
 
         return if (text == "000000" || text == "FFFFFF") generateQuestion(stage)
         else "#FF$text"

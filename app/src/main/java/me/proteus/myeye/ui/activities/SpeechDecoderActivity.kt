@@ -1,4 +1,4 @@
-package me.proteus.myeye.ui
+package me.proteus.myeye.ui.activities
 
 import android.Manifest
 import android.app.Activity
@@ -24,7 +24,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.graphics.ColorUtils
 import androidx.lifecycle.LifecycleOwner
-import me.proteus.myeye.LanguageUtils
+import me.proteus.myeye.util.LanguageUtils
 import me.proteus.myeye.MyEyeApplication
 import me.proteus.myeye.io.ASRViewModel
 import me.proteus.myeye.R

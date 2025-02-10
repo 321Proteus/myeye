@@ -32,17 +32,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".MenuActivity" />
-        <activity android:name=".ui.SpeechDecoderActivity"/>
-        <activity android:name=".ui.VisionTestLayoutActivity" />
-        <activity android:name=".ui.TestResultActivity" />
-        <activity android:name=".ui.ResultBrowserActivity" />
-        <activity android:name=".ui.SimpleDistanceActivity" />
-        <activity android:name=".ui.SettingsActivity" />
-        <activity android:name=".ui.TestSelectorActivity" />
-
-        <activity android:name=".ui.MapActivity" />
-        <activity android:name=".ui.PlaceDetailsActivity" />
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"

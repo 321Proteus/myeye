@@ -1,4 +1,4 @@
-package me.proteus.myeye.ui
+package me.proteus.myeye.ui.activities
 
 import android.hardware.Sensor
 import android.hardware.SensorEvent

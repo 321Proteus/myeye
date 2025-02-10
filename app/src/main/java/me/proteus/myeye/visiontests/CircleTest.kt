@@ -1,6 +1,7 @@
 package me.proteus.myeye.visiontests
 
 import android.Manifest
+import android.app.Application
 import android.content.pm.PackageManager
 import android.content.res.Configuration
 import androidx.compose.foundation.layout.Arrangement
@@ -16,6 +17,7 @@ import androidx.compose.material.icons.outlined.AccountCircle
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
@@ -28,16 +30,17 @@ import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
 import me.proteus.myeye.GrammarType
 import me.proteus.myeye.R
-import me.proteus.myeye.ScreenScalingUtils.getScreenInfo
+import me.proteus.myeye.util.ScreenScalingUtils.getScreenInfo
 import me.proteus.myeye.SerializableStage
 import me.proteus.myeye.TestResult
 import me.proteus.myeye.VisionTest
 import me.proteus.myeye.io.ASRViewModel
 import me.proteus.myeye.io.ResultDataCollector
-import me.proteus.myeye.ui.VisionTestLayoutActivity
+import me.proteus.myeye.util.ASRViewModelFactory
 import java.util.Random
 import kotlin.math.*
 
@@ -53,7 +56,7 @@ class CircleTest : VisionTest {
 
     override var distance: Float = 0f
 
-    private lateinit var asr: ASRViewModel
+    private var asr: ASRViewModel? = null
 
     override val resultCollector: ResultDataCollector = ResultDataCollector()
 
@@ -144,7 +147,7 @@ class CircleTest : VisionTest {
 
     @Composable
     override fun DisplayStage(
-        activity: VisionTestLayoutActivity,
+        controller: NavController,
         stage: SerializableStage,
         isResult: Boolean,
         onUpdate: (String) -> Unit
@@ -152,15 +155,13 @@ class CircleTest : VisionTest {
 
         if (!isResult) {
             val context = LocalContext.current
-            val mapping = asr.grammarMapping
 
-            asr.wordBuffer.observe(context as LifecycleOwner) { data ->
+            asr!!.wordBuffer.observe(context as LifecycleOwner) { data ->
 
                 if (data.isEmpty()) return@observe
 
                 println("Data: ${data.joinToString(",") { it.word }}")
-
-                val mapped = data.map { mapping.entries.first { key -> key.value == it.word} }
+                val mapped = data.map { asr!!.grammarMapping!!.entries.first { key -> key.value == it.word } }
                 val directions = mapped.map {
                     when (it.key) {
                         "right" -> 0
@@ -173,7 +174,7 @@ class CircleTest : VisionTest {
 
                 if (mapped.size == 5) {
                     onUpdate(directions)
-                    asr.clearBuffer()
+                    asr!!.clearBuffer()
                 }
             }
 
@@ -246,27 +247,35 @@ class CircleTest : VisionTest {
 
     @Composable
     override fun BeginTest(
-        activity: VisionTestLayoutActivity,
+        controller: NavController,
         isResult: Boolean,
         result: TestResult?
     ) {
+        val context = LocalContext.current
+        val app = context.applicationContext as Application
 
         if (!isResult) {
-            asr = ViewModelProvider(
-                activity,
-                ViewModelProvider.AndroidViewModelFactory.getInstance(activity.application)
-            )[ASRViewModel::class]
-
-            if (activity.checkSelfPermission(Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED) {
-                asr.initialize(GrammarType.SIDES)
-            }
-
-        } else {
-            distance = result!!.distance
+            asr = viewModel(factory = ASRViewModelFactory(app))
         }
 
-        super.BeginTest(activity, isResult, result)
+        LaunchedEffect(Unit) {
 
+            println("Init launch")
+            if (!isResult) {
+
+                if (context.checkSelfPermission(Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED) {
+                    asr?.initialize(GrammarType.SIDES)
+                    println("Init model")
+                }
+
+            } else {
+                distance = result!!.distance
+            }
+        }
+
+        println("Done lauch")
+
+        super.BeginTest(controller, isResult, result)
     }
 
     override fun generateQuestion(stage: Int?): String {
@@ -313,10 +322,10 @@ class CircleTest : VisionTest {
 
     }
 
-    override fun endTest(activity: VisionTestLayoutActivity, isExit: Boolean) {
+    override fun endTest(controller: NavController, isExit: Boolean) {
 
-        super.endTest(activity, isExit)
-        if (::asr.isInitialized) asr.close()
+        super.endTest(controller, isExit)
+        asr?.close()
 
     }
 

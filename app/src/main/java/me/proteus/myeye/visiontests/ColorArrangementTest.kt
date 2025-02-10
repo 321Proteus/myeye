@@ -45,15 +45,16 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionInWindow
+import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
+import androidx.navigation.NavController
 import me.proteus.myeye.R
 import me.proteus.myeye.SerializableStage
 import me.proteus.myeye.TestResult
 import me.proteus.myeye.VisionTest
 import me.proteus.myeye.io.ResultDataCollector
-import me.proteus.myeye.ui.VisionTestLayoutActivity
 
 class ColorArrangementTest : VisionTest {
 
@@ -117,7 +118,7 @@ class ColorArrangementTest : VisionTest {
 
     @Composable
     override fun DisplayStage(
-        activity: VisionTestLayoutActivity,
+        controller: NavController,
         stage: SerializableStage,
         isResult: Boolean,
         onUpdate: (String) -> Unit
@@ -329,13 +330,13 @@ class ColorArrangementTest : VisionTest {
 
     @Composable
     override fun BeginTest(
-        activity: VisionTestLayoutActivity,
+        controller: NavController,
         isResult: Boolean,
         result: TestResult?
     ) {
-        colors = activity.resources.getStringArray(R.array.farnsworth_colors)
+        colors = stringArrayResource(R.array.farnsworth_colors)
 
-        BeginTestImpl(activity, isResult, result)
+        BeginTestImpl(controller, isResult, result)
 
             // zwieksz colorOffset gdy wynik jest bliski 100
 

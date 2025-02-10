@@ -1,4 +1,4 @@
-package me.proteus.myeye.io;
+package me.proteus.myeye.util;
 
 import androidx.camera.core.resolutionselector.ResolutionSelector;
 import androidx.camera.core.resolutionselector.ResolutionStrategy;

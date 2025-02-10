@@ -5,6 +5,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -18,6 +19,7 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -32,11 +34,29 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import me.proteus.myeye.visiontests.VisionTestUtils
 import me.proteus.myeye.R
+import me.proteus.myeye.ui.theme.MyEyeTheme
 
 @Composable
-fun ExpandableGrid(height: Dp, toggleExpand: Boolean) {
+fun TestSelector(controller: NavController) {
+    MyEyeTheme {
+        Scaffold(
+            topBar = { TopBar() },
+            bottomBar = { BottomBar(controller) }
+        ) { innerPadding ->
+            BoxWithConstraints(
+                modifier = Modifier.padding(innerPadding)
+            ) {
+                ExpandableGrid(this.maxHeight, true, controller)
+            }
+        }
+    }
+}
+
+@Composable
+fun ExpandableGrid(height: Dp, toggleExpand: Boolean, controller: NavController) {
     var expanded by remember { mutableStateOf(toggleExpand) }
     val list = VisionTestUtils().testList
 
@@ -84,7 +104,7 @@ fun ExpandableGrid(height: Dp, toggleExpand: Boolean) {
                                     testID = id.testID,
                                     size = 0.4f,
                                     clickable = true,
-                                    context = LocalContext.current
+                                    controller = controller
                                 )
                             }
                             Text(VisionTestUtils().getTestNameByID(id.testID), fontSize = 12.sp)
@@ -107,7 +127,7 @@ fun ExpandableGrid(height: Dp, toggleExpand: Boolean) {
                                     testID = id.testID,
                                     size = 0.4f,
                                     clickable = true,
-                                    context = LocalContext.current
+                                    controller = controller
                                 )
                             }
                             Text(VisionTestUtils().getTestNameByID(id.testID), fontSize = 12.sp)
