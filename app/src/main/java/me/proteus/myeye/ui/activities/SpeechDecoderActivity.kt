@@ -1,4 +1,4 @@
-package me.proteus.myeye.ui
+package me.proteus.myeye.ui.activities
 
 import android.Manifest
 import android.app.Activity

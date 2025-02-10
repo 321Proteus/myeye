@@ -1,4 +1,4 @@
-package me.proteus.myeye.ui
+package me.proteus.myeye.ui.screens
 
 import android.util.Log
 import androidx.compose.foundation.layout.Arrangement

@@ -1,4 +1,4 @@
-package me.proteus.myeye.ui
+package me.proteus.myeye.ui.screens
 
 import android.Manifest
 import android.content.Context
