@@ -70,7 +70,7 @@ class MainActivity : ComponentActivity() {
 
         NavHost(
             navController = controller,
-            startDestination = "main"
+            startDestination = "menu"
         ) {
             composable("menu") { MainMenu(controller) }
             composable("main") { MainScreen(controller) }
@@ -83,7 +83,7 @@ class MainActivity : ComponentActivity() {
                 )
             ) { backStackEntry ->
                 val sessionId = backStackEntry.arguments?.getInt("sessionId") ?: -1
-                val isAfter = backStackEntry.arguments?.getBoolean("isAfter") ?: false
+                val isAfter = backStackEntry.arguments?.getBoolean("isAfter") == true
                 TestResultScreen(controller, sessionId, isAfter)
             }
             composable(
@@ -98,7 +98,7 @@ class MainActivity : ComponentActivity() {
                 val distance = controller.previousBackStackEntry
                     ?.savedStateHandle?.get<Float>("distance") ?: 0f
                 val isResult = controller.previousBackStackEntry
-                    ?.savedStateHandle?.get<Boolean>("isResult") ?: false
+                    ?.savedStateHandle?.get<Boolean>("isResult") == true
                 val sessionId = controller.previousBackStackEntry
                     ?.savedStateHandle?.get<Int>("sessionId")
 
@@ -112,7 +112,7 @@ class MainActivity : ComponentActivity() {
                     navArgument("countdown") { type = NavType.BoolType }
                 )
             ) { backStackEntry ->
-                val countdown = backStackEntry.arguments?.getBoolean("countdown") ?: true
+                val countdown = backStackEntry.arguments?.getBoolean("countdown") != false
                 val testID = backStackEntry.arguments?.getString("testID") ?: "error"
                 DistanceMeasurement(controller, countdown, testID)
             }

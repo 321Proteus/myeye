@@ -52,7 +52,7 @@ fun PlaceDetailsScreen(controller: NavController, placeID: String) {
 
             LaunchedEffect(Unit) {
 
-                getPlace(placesClient, placeID) {
+                getPlace(placesClient, placeID, true) {
                     place = it
                     cameraPositionState.position = CameraPosition.fromLatLngZoom(it.location!!, 18f)
                 }
@@ -153,16 +153,20 @@ fun MapView(cps: CameraPositionState, marker: @Composable () -> Unit) {
 fun getPlace(
     client: PlacesClient,
     id: String,
+    extended: Boolean,
     callback: (Place) -> Unit
 ) {
 
-    val types = listOf(
+    val types = mutableListOf(
         Place.Field.DISPLAY_NAME,
-        Place.Field.LOCATION,
-        Place.Field.CURRENT_OPENING_HOURS,
-        Place.Field.INTERNATIONAL_PHONE_NUMBER,
-        Place.Field.FORMATTED_ADDRESS
+        Place.Field.LOCATION
     )
+
+    if (extended) {
+        types.add(Place.Field.CURRENT_OPENING_HOURS)
+        types.add(Place.Field.INTERNATIONAL_PHONE_NUMBER)
+        types.add(Place.Field.FORMATTED_ADDRESS)
+    }
 
     val request = FetchPlaceRequest.builder(id, types).build()
 
