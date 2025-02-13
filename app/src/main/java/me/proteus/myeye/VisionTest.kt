@@ -1,6 +1,5 @@
 package me.proteus.myeye
 
-import android.content.Intent
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.getValue
@@ -8,10 +7,9 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.navigation.NavController
 import me.proteus.myeye.io.ResultDataCollector
 import me.proteus.myeye.io.ResultDataSaver
-import me.proteus.myeye.ui.TestResultActivity
-import me.proteus.myeye.ui.VisionTestLayoutActivity
 import java.time.LocalDateTime
 import java.time.ZoneOffset
 
@@ -36,23 +34,23 @@ interface VisionTest {
 
     /**
      * Display the test stage as Composable in the target activity context
-     * @param activity The canvas activity to display the layout
+     * @param controller the Navigation Controller used to move to menu after the test ends
      */
     @Composable
     fun DisplayStage(
-        activity: VisionTestLayoutActivity,
+        controller: NavController,
         stage: SerializableStage,
         isResult: Boolean,
         onUpdate: (String) -> Unit
     )
 
     @Composable
-    fun BeginTest(activity: VisionTestLayoutActivity, isResult: Boolean, result: TestResult?) {
-        BeginTestImpl(activity, isResult, result)
+    fun BeginTest(controller: NavController, isResult: Boolean, result: TestResult?) {
+        BeginTestImpl(controller, isResult, result)
     }
 
     @Composable
-    fun BeginTestImpl(activity: VisionTestLayoutActivity, isResult: Boolean, result: TestResult?) {
+    fun BeginTestImpl(controller: NavController, isResult: Boolean, result: TestResult?) {
 
         if (isResult) {
             var i by remember { mutableIntStateOf(0) }
@@ -62,16 +60,17 @@ interface VisionTest {
 
             val currentResultStage = stageList[i]
 
-            DisplayStage(activity, currentResultStage, true) { answer ->
+            DisplayStage(controller, currentResultStage, true) { answer ->
 
                 if (answer == "PREV") {
                     if (i > 0) i--
                 } else if (answer == "NEXT") {
                     if (i < stageList.size - 1) i++
                     else {
-                        val exitIntent = Intent(activity, MenuActivity::class.java)
+//                        val exitIntent = Intent(controller, Menucontroller::class.java)
                         // TODO: Dodac podsumowanie testu
-                        activity.startActivity(exitIntent)
+                        controller.navigate("menu")
+//                        controller.startcontroller(exitIntent)
                     }
                 }
             }
@@ -84,7 +83,7 @@ interface VisionTest {
                 mutableStateOf(generateStage(currentDifficulty))
             }
 
-            DisplayStage(activity, currentStage, false) { answer ->
+            DisplayStage(controller, currentStage, false) { answer ->
 
                 if (answer == "REGENERATE") {
 
@@ -94,7 +93,7 @@ interface VisionTest {
                 } else if (currentDifficulty == stageCount) {
 
                     storeResult(currentStage.first, answer, currentDifficulty)
-                    endTest(activity, false)
+                    endTest(controller, false)
 
                 } else {
                     storeResult(currentStage.first, answer, currentDifficulty)
@@ -126,19 +125,21 @@ interface VisionTest {
         resultCollector.addResult(question, answer, difficulty)
     }
 
-     fun endTest(activity: VisionTestLayoutActivity, isExit: Boolean) {
+     fun endTest(controller: NavController, isExit: Boolean) {
 
          if (!isExit) {
-             val localSaver = ResultDataSaver(activity.applicationContext)
+             val localSaver = ResultDataSaver(controller.context)
 
              val timestamp = LocalDateTime.now().toEpochSecond(ZoneOffset.UTC)
              localSaver.insert(this.testID, this.resultCollector.stages, timestamp, this.distance)
 
-             val testLeavingIntent = Intent(activity, TestResultActivity::class.java)
-             testLeavingIntent.putExtra("IS_AFTER", true)
-             testLeavingIntent.putExtra("RESULT_PARCEL", localSaver.lastResult)
+             controller.navigate("result/${localSaver.lastID}/true")
 
-             activity.startActivity(testLeavingIntent)
+//             val testLeavingIntent = Intent(activity, TestResultActivity::class.java)
+//             testLeavingIntent.putExtra("IS_AFTER", true)
+//             testLeavingIntent.putExtra("RESULT_PARCEL", localSaver.lastResult)
+//
+//             activity.startActivity(testLeavingIntent)
          }
     }
 

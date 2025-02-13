@@ -5,6 +5,7 @@ import android.app.Application
 import android.content.Context
 import android.content.Intent
 import android.util.Log
+import me.proteus.myeye.util.LanguageUtils
 
 class MyEyeApplication : Application() {
 

@@ -18,10 +18,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import me.proteus.myeye.SerializableStage
 import me.proteus.myeye.VisionTest
 import me.proteus.myeye.io.ResultDataCollector
-import me.proteus.myeye.ui.VisionTestLayoutActivity
 import java.util.Random
 import kotlin.math.abs
 
@@ -39,7 +39,7 @@ class ExampleTest : VisionTest {
 
     @Composable
     override fun DisplayStage(
-        activity: VisionTestLayoutActivity,
+        controller: NavController,
         stage: SerializableStage,
         isResult: Boolean,
         onUpdate: (String) -> Unit
@@ -82,8 +82,6 @@ class ExampleTest : VisionTest {
                         )
                     }
                 }
-
-
 
             }
 
