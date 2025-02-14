@@ -1,60 +1,45 @@
 package me.proteus.myeye.ui.screens
 
-import android.Manifest
-import android.annotation.SuppressLint
-import android.content.Context
-import android.content.pm.PackageManager
-import android.location.Location
 import android.util.Log
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.LocationOn
-import androidx.compose.material.icons.filled.Search
-import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.ListItem
-import androidx.compose.material3.ListItemDefaults
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SearchBar
-import androidx.compose.material3.SearchBarDefaults
+import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableDoubleStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import androidx.core.content.ContextCompat
 import androidx.navigation.NavController
-import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.libraries.places.api.Places
 import com.google.android.libraries.places.api.model.*
 import com.google.android.libraries.places.api.net.*
-import com.google.android.libraries.places.compose.autocomplete.models.toPlaceDetails
 import com.google.maps.android.compose.*
 import me.proteus.myeye.BuildConfig
 import me.proteus.myeye.ui.theme.MyEyeTheme
@@ -63,6 +48,7 @@ import me.proteus.myeye.ui.components.BottomBar
 import me.proteus.myeye.ui.components.PlaceSearchBar
 import kotlin.math.*
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MapScreen(controller: NavController) {
 
@@ -72,13 +58,68 @@ fun MapScreen(controller: NavController) {
 
     val placesClient = Places.createClient(context)
     var currentPos by remember { mutableStateOf(LatLng(52.41, 16.93)) }
+    var distance by remember { mutableDoubleStateOf(1.0) }
+
+    var markerPos by remember { mutableStateOf(currentPos) }
+    var places by remember { mutableStateOf(emptyList<Place>()) }
 
     MyEyeTheme {
         Scaffold (
             topBar = {
-                PlaceSearchBar(placesClient, currentPos) { newPos ->
-                    currentPos = newPos
-                    println(currentPos)
+                Column {
+                    PlaceSearchBar(placesClient, currentPos) { newPos ->
+                        currentPos = newPos
+                        println(currentPos)
+                    }
+                    Row(
+                        modifier = Modifier
+                            .padding(horizontal = 16.dp)
+                            .clip(RoundedCornerShape(8.dp))
+                            .background(Color.LightGray),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+
+                        Text("Dystans")
+
+                        Slider(
+                            modifier = Modifier.fillMaxWidth(0.5f),
+                            value = distance.toFloat(),
+                            steps = 7,
+                            onValueChange = { distance = it.toDouble() },
+                            onValueChangeFinished = {
+                                search(placesClient, markerPos, distance) { foundPlaces ->
+                                    println(distance)
+                                    Log.e("Map", "Search over with ${foundPlaces.size} places")
+                                    places = foundPlaces.toList()
+                                }
+                            },
+                            valueRange = 0.5f..6f,
+                            thumb = {
+                                val colors = MaterialTheme.colorScheme
+                                Canvas(modifier = Modifier.size(24.dp)) {
+                                    drawCircle(
+                                        color = colors.primary,
+                                        radius = 12.dp.toPx()
+                                    )
+                                }
+                            },
+                            track = { slider ->
+                                val colors = MaterialTheme.colorScheme
+                                Canvas(modifier = Modifier.fillMaxWidth().height(4.dp)) {
+                                    drawRoundRect(
+                                        color = colors.surfaceVariant,
+                                        cornerRadius = CornerRadius(2.dp.toPx(), 2.dp.toPx())
+                                    )
+                                    val activeWidth = slider.value / slider.valueRange.endInclusive * size.width
+                                    drawRoundRect(
+                                        color = colors.primary,
+                                        cornerRadius = CornerRadius(2.dp.toPx(), 2.dp.toPx()),
+                                        size = androidx.compose.ui.geometry.Size(activeWidth, size.height)
+                                    )
+                                }
+                            }
+                        )
+                    }
                 }
             },
             bottomBar = { BottomBar(controller) }
@@ -88,9 +129,6 @@ fun MapScreen(controller: NavController) {
                 position = CameraPosition.fromLatLngZoom(currentPos, 15f)
             }
 
-            var markerPos by remember { mutableStateOf(currentPos) }
-            var places by remember { mutableStateOf(emptyList<Place>()) }
-
             LaunchedEffect(currentPos) {
                 markerPos = currentPos
                 val update = CameraUpdateFactory.newLatLng(currentPos)
@@ -98,15 +136,19 @@ fun MapScreen(controller: NavController) {
             }
 
             LaunchedEffect(markerPos) {
-                search(placesClient, markerPos) { foundPlaces ->
-                    Log.e("MapActivity", "onCreate: Search over")
-                    Log.e("MapActivity", foundPlaces.size.toString())
+                search(placesClient, markerPos, distance) { foundPlaces ->
+                    println(distance)
+                    Log.e("Map", "Search over with ${foundPlaces.size} places")
                     places = foundPlaces.toList()
                 }
+                val update = CameraUpdateFactory.newLatLng(markerPos)
+                cameraPositionState.animate(update, 250)
             }
 
             GoogleMap(
-                modifier = Modifier.fillMaxSize(),
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(bottom = innerPadding.calculateBottomPadding()),
                 cameraPositionState = cameraPositionState,
                 onMapClick = { markerPos = it }
             ) {
@@ -115,7 +157,7 @@ fun MapScreen(controller: NavController) {
                 )
 
                 places.forEach { place -> PlaceMarker(controller, place) }
-                RangeDisplay(markerPos)
+                RangeDisplay(markerPos, distance)
 
             }
         }
@@ -142,8 +184,8 @@ fun PlaceMarker(controller: NavController, place: Place) {
         ) {
             Box(
                 modifier = Modifier
-                    .clip(RoundedCornerShape(48.dp))
-                    .size(48.dp),
+                    .clip(RoundedCornerShape(36.dp))
+                    .size(36.dp),
                 contentAlignment = Alignment.Center
             ) {
                 Image(painterResource(R.drawable.myeye_logo_white_playstore), null)
@@ -154,8 +196,8 @@ fun PlaceMarker(controller: NavController, place: Place) {
 }
 
 @Composable
-private fun RangeDisplay(position: LatLng) {
-    val bounds = getRectangularBounds(position, 1.0)
+private fun RangeDisplay(position: LatLng, distance: Double) {
+    val bounds = getRectangularBounds(position, distance)
     val sw = bounds.southwest
     val ne = bounds.northeast
     val nw = LatLng(ne.latitude, sw.longitude)
@@ -170,50 +212,13 @@ private fun RangeDisplay(position: LatLng) {
     )
 }
 
-fun getAutocompletePlaces(
-    query: String,
-    client: PlacesClient,
-    center: LatLng,
-    callback: (List<AutocompletePrediction>) -> Unit
-) {
-    val autocompleteRequest = FindAutocompletePredictionsRequest.builder()
-        .setQuery(query)
-        .setCountries("PL")
-        .setRegionCode("PL")
-        .setTypesFilter(listOf("route"))
-        .setOrigin(center)
-        .setSessionToken(AutocompleteSessionToken.newInstance())
-        .build()
-
-    client.findAutocompletePredictions(autocompleteRequest)
-        .addOnSuccessListener { response ->
-            val predictions = response.autocompletePredictions
-            callback(predictions)
-        }
-        .addOnFailureListener { exception ->
-            Log.e("Map", "Error: ${exception.message}")
-        }
-
-}
-
-@SuppressLint("MissingPermission")
-fun getCurrentLocation(context: Context, update: (LatLng) -> Unit) {
-    val fusedLocationClient = LocationServices.getFusedLocationProviderClient(context)
-
-    fusedLocationClient.lastLocation.addOnSuccessListener { location: Location? ->
-        location?.let {
-            println(LatLng(it.latitude, it.longitude))
-            update(LatLng(it.latitude, it.longitude))
-        }
-    }
-}
-
 fun search(
     client: PlacesClient,
     center: LatLng,
+    distance: Double,
     callback: (List<Place>) -> Unit) {
 
-    val bounds = getRectangularBounds(center, 1.0)
+    val bounds = getRectangularBounds(center, distance)
 
     val placeFields: List<Place.Field> = listOf(Place.Field.ID, Place.Field.DISPLAY_NAME)
 

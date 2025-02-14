@@ -2,7 +2,9 @@ package me.proteus.myeye.ui.components
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.content.Context
 import android.content.pm.PackageManager
+import android.location.Location
 import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -34,12 +36,13 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
+import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.libraries.places.api.model.AutocompletePrediction
+import com.google.android.libraries.places.api.model.AutocompleteSessionToken
+import com.google.android.libraries.places.api.net.FindAutocompletePredictionsRequest
 import com.google.android.libraries.places.api.net.PlacesClient
 import com.google.android.libraries.places.compose.autocomplete.models.toPlaceDetails
-import me.proteus.myeye.ui.screens.getAutocompletePlaces
-import me.proteus.myeye.ui.screens.getCurrentLocation
 import me.proteus.myeye.ui.screens.getDistance
 import me.proteus.myeye.ui.screens.getPlace
 import kotlin.math.round
@@ -86,7 +89,7 @@ fun PlaceSearchBar(
         modifier = Modifier
             .then(
                 if (isExpanded) Modifier else Modifier
-                    .padding(horizontal = 16.dp, vertical = 8.dp)
+                    .padding(start = 16.dp, top = 8.dp, end = 16.dp, bottom = 2.dp)
 //                .height(48.dp)
             )
             .fillMaxWidth(),
@@ -156,7 +159,6 @@ fun PlaceSearchBar(
                                     pos = it.location ?: LatLng(0.0, 0.0),
                                     placeId = preds[i].placeId,
                                 )
-                                println(preds[i].types)
                                 placesCache.add(place)
                                 places[i] = place
                             }
@@ -172,35 +174,69 @@ fun PlaceSearchBar(
         }
 
         if (places.isNotEmpty()) {
+
+            val najblizsze = places
+                .filterNotNull()
+                .sortedBy { getDistance(it.pos, position) }
+
             LazyColumn {
-                val najblizsze = places
-                    .filterNotNull()
-                    .sortedBy { getDistance(it.pos, position) }
                 items(najblizsze) { place ->
-//                    println("lista ${places.filterNotNull().size}")
-//                    println("last ${preds.size}")
-//                    println("i ${preds[index].toPlaceDetails().primaryText}")
-//                distanceText = item.distanceMeters?.toString() + " m"
-//                    val primaryText = preds[index].getFullText(null).toString()
                     val distance = getDistance(place.pos, position)
                     ListItem(
                         headlineContent = { Text(place.title) },
                         supportingContent = { Text("${round(distance * 10) / 10} km") },
                         leadingContent = { Icon(Icons.Filled.Star, contentDescription = null) },
                         colors = ListItemDefaults.colors(containerColor = Color.Transparent),
-                        modifier =
-                        Modifier
+                        modifier = Modifier
+                            .fillMaxWidth()
                             .clickable {
                                 println("selected")
                                 currentText = place.name
                                 updatePosition(place.pos)
                                 isExpanded = false
                             }
-                            .fillMaxWidth()
-//                        .padding(horizontal = 16.dp, vertical = 4.dp)
                     )
                 }
             }
+        }
+    }
+}
+
+
+fun getAutocompletePlaces(
+    query: String,
+    client: PlacesClient,
+    center: LatLng,
+    callback: (List<AutocompletePrediction>) -> Unit
+) {
+    val autocompleteRequest = FindAutocompletePredictionsRequest.builder()
+        .setQuery(query)
+        .setCountries("PL")
+        .setRegionCode("PL")
+        .setTypesFilter(listOf("route"))
+        .setOrigin(center)
+        .setSessionToken(AutocompleteSessionToken.newInstance())
+        .build()
+
+    client.findAutocompletePredictions(autocompleteRequest)
+        .addOnSuccessListener { response ->
+            val predictions = response.autocompletePredictions
+            callback(predictions)
+        }
+        .addOnFailureListener { exception ->
+            Log.e("Map", "Error: ${exception.message}")
+        }
+
+}
+
+@SuppressLint("MissingPermission")
+fun getCurrentLocation(context: Context, update: (LatLng) -> Unit) {
+    val fusedLocationClient = LocationServices.getFusedLocationProviderClient(context)
+
+    fusedLocationClient.lastLocation.addOnSuccessListener { location: Location? ->
+        location?.let {
+            println(LatLng(it.latitude, it.longitude))
+            update(LatLng(it.latitude, it.longitude))
         }
     }
 }
