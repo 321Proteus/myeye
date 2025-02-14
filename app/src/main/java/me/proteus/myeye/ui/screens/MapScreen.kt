@@ -142,6 +142,13 @@ fun MapScreen(controller: NavController) {
 
 }
 
+data class PlaceField(
+    val name: String,
+    val title: String,
+    val placeId: String,
+    val pos: LatLng
+)
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PlaceSearchBar(
@@ -155,8 +162,9 @@ fun PlaceSearchBar(
 
     SearchBar(
         modifier = Modifier
-            .then(if (isExpanded) Modifier else Modifier
-                .padding(horizontal = 16.dp, vertical = 8.dp)
+            .then(
+                if (isExpanded) Modifier else Modifier
+                    .padding(horizontal = 16.dp, vertical = 8.dp)
 //                .height(48.dp)
             )
             .fillMaxWidth(),
@@ -183,49 +191,79 @@ fun PlaceSearchBar(
     ) {
 
         var preds by remember { mutableStateOf(emptyList<AutocompletePrediction>()) }
-        var lastPlaceIDs by remember { mutableStateOf(MutableList(5) { "" }) }
-        var places by remember { mutableStateOf(MutableList<Place?>(5) { null }) }
+        var places by remember { mutableStateOf(MutableList<PlaceField?>(5) { null }) }
+        var placesCache by remember { mutableStateOf(MutableList<PlaceField?>(1) { null }) }
 
         LaunchedEffect(currentText) {
             getAutocompletePlaces(currentText, placesClient, position) { predicted ->
                 preds = predicted.sortedBy { it.distanceMeters }
-            }
-            if (preds.isNotEmpty()) {
                 println("size ${preds.size}")
-                for (i in preds.indices) {
-                    if (preds[i].placeId != lastPlaceIDs[i]) {
-                        getPlace(placesClient, preds[i].placeId, false) {
-                                found -> places[i] = found
-                            println("requested for place at index $i")
-                            lastPlaceIDs[i] = preds[i].placeId
+                println("cache size ${placesCache.size}")
+
+                if (preds.isNotEmpty()) {
+                    for (i in preds.indices) {
+
+                        val j = placesCache.indexOfFirst { it?.placeId == preds[i].placeId }
+
+                        if (j == -1) {
+                            if (currentText.length < 2) return@getAutocompletePlaces
+
+                            lateinit var place: PlaceField
+                            Log.d("MapScreen", "requesting for id " +
+                                    preds[i].placeId.substring(0, 10) + "..."
+                            )
+
+                            getPlace(placesClient, preds[i].placeId, false) {
+                                place = PlaceField(
+                                    title = preds[i].getFullText(null).toString(),
+                                    name = preds[i].toPlaceDetails().primaryText.toString(),
+                                    pos = it.location ?: LatLng(0.0, 0.0),
+                                    placeId = preds[i].placeId,
+                                )
+                                println(preds[i].types)
+                                placesCache.add(place)
+                                places[i] = place
+                            }
+                        } else {
+                            places[i] = placesCache[j]
                         }
                     }
+                } else {
+                    println("empty preds")
                 }
             }
 
         }
 
-        LazyColumn {
-            itemsIndexed(places.filter { it != null }) { index, place ->
-                println(places.filter { it != null })
+        if (places.isNotEmpty()) {
+            LazyColumn {
+                val najblizsze = places
+                    .filterNotNull()
+                    .sortedBy { getDistance(it.pos, position) }
+                items(najblizsze) { place ->
+//                    println("lista ${places.filterNotNull().size}")
+//                    println("last ${preds.size}")
+//                    println("i ${preds[index].toPlaceDetails().primaryText}")
 //                distanceText = item.distanceMeters?.toString() + " m"
-                val primaryText = preds[index].getFullText(null).toString()
-                val distance = getDistance(place?.location!!, position)
-
-                ListItem(
-                    headlineContent = { Text(primaryText) },
-                    supportingContent = { Text("${round(distance * 10) / 10} km") },
-                    leadingContent = { Icon(Icons.Filled.Star, contentDescription = null) },
-                    colors = ListItemDefaults.colors(containerColor = Color.Transparent),
-                    modifier =
-                    Modifier.clickable {
-                        currentText = primaryText
-                        updatePosition(place.location!!)
-                        isExpanded = false
-                    }
-                        .fillMaxWidth()
+//                    val primaryText = preds[index].getFullText(null).toString()
+                    val distance = getDistance(place.pos, position)
+                    ListItem(
+                        headlineContent = { Text(place.title) },
+                        supportingContent = { Text("${round(distance * 10) / 10} km") },
+                        leadingContent = { Icon(Icons.Filled.Star, contentDescription = null) },
+                        colors = ListItemDefaults.colors(containerColor = Color.Transparent),
+                        modifier =
+                        Modifier
+                            .clickable {
+                                println("selected")
+                                currentText = place.name
+                                updatePosition(place.pos)
+                                isExpanded = false
+                            }
+                            .fillMaxWidth()
 //                        .padding(horizontal = 16.dp, vertical = 4.dp)
-                )
+                    )
+                }
             }
         }
     }
@@ -283,6 +321,7 @@ fun getAutocompletePlaces(
         .setQuery(query)
         .setCountries("PL")
         .setRegionCode("PL")
+        .setTypesFilter(listOf("route"))
         .setOrigin(center)
         .setSessionToken(AutocompleteSessionToken.newInstance())
         .build()
