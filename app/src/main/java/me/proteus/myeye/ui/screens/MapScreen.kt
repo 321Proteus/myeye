@@ -2,7 +2,6 @@ package me.proteus.myeye.ui.screens
 
 import android.util.Log
 import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -14,6 +13,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Slider
@@ -31,7 +31,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -79,7 +81,7 @@ fun MapScreen(controller: NavController) {
                         verticalAlignment = Alignment.CenterVertically
                     ) {
 
-                        Text("Dystans")
+                        Text(stringResource(R.string.map_distance))
 
                         Slider(
                             modifier = Modifier.fillMaxWidth(0.5f),
@@ -105,7 +107,9 @@ fun MapScreen(controller: NavController) {
                             },
                             track = { slider ->
                                 val colors = MaterialTheme.colorScheme
-                                Canvas(modifier = Modifier.fillMaxWidth().height(4.dp)) {
+                                Canvas(modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(4.dp)) {
                                     drawRoundRect(
                                         color = colors.surfaceVariant,
                                         cornerRadius = CornerRadius(2.dp.toPx(), 2.dp.toPx())
@@ -138,7 +142,7 @@ fun MapScreen(controller: NavController) {
             LaunchedEffect(markerPos) {
                 search(placesClient, markerPos, distance) { foundPlaces ->
                     println(distance)
-                    Log.e("Map", "Search over with ${foundPlaces.size} places")
+                    Log.d("Map", "Search over with ${foundPlaces.size} places")
                     places = foundPlaces.toList()
                 }
                 val update = CameraUpdateFactory.newLatLng(markerPos)
@@ -150,7 +154,10 @@ fun MapScreen(controller: NavController) {
                     .fillMaxSize()
                     .padding(bottom = innerPadding.calculateBottomPadding()),
                 cameraPositionState = cameraPositionState,
-                onMapClick = { markerPos = it }
+                onMapClick = { markerPos = it },
+                onPOIClick = { poi ->
+                    println("Clicked on ${poi.name}")
+                }
             ) {
                 Marker (
                     state = rememberUpdatedMarkerState(position = markerPos)
@@ -165,6 +172,7 @@ fun MapScreen(controller: NavController) {
 
     DisposableEffect(Unit) {
         onDispose {
+            Log.d("Map", "Disposed Places")
             Places.deinitialize()
         }
     }
@@ -185,10 +193,15 @@ fun PlaceMarker(controller: NavController, place: Place) {
             Box(
                 modifier = Modifier
                     .clip(RoundedCornerShape(36.dp))
-                    .size(36.dp),
+                    .size(36.dp)
+                    .background(Color.Red),
                 contentAlignment = Alignment.Center
             ) {
-                Image(painterResource(R.drawable.myeye_logo_white_playstore), null)
+//                Image(painterResource(R.drawable.myeye_logo_white_playstore), null)
+                Icon(
+                    imageVector = ImageVector.vectorResource(R.drawable.myeye_logo),
+                    contentDescription = null, tint = Color.White
+                )
             }
         }
 
