@@ -35,7 +35,7 @@ public class FileSaver {
         this.fileDirectory = new File(path);
     }
 
-    private static List<File> scanDirectory(File path, boolean filesOnly) {
+    public static List<File> scanDirectory(File path, boolean filesOnly) {
 
         return Arrays.stream(Objects.requireNonNull(path
                 .listFiles(File::exists)))
@@ -161,7 +161,7 @@ public class FileSaver {
 
     public static void unzip(File zip) {
 
-        String outputDirName = zip.getName().substring(0, zip.getName().length() - 4);
+//        String outputDirName = zip.getName().substring(0, zip.getName().length() - 4);
 
         String path = zip.getParent();
         System.out.println(path);

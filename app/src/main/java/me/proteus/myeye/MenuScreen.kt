@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Button
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -51,6 +52,10 @@ fun MenuScreen(controller: NavController) {
                     ),
                     textAlign = TextAlign.Center
                 )
+
+                Button(onClick = {
+                    controller.navigate("article_browser")
+                }) { "Artykuly" }
 
                 Spacer(Modifier.padding(16.dp))
 
