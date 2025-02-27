@@ -63,7 +63,7 @@ fun TestResultScreen(
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
 
-                        Text(text = resultData.fullTestName, fontSize = 24.sp)
+                        Text(text = getLocalizedFullTestName(resultData.testID), fontSize = 24.sp)
 
                         VisionTestIcon(
                             modifier = Modifier
@@ -148,6 +148,11 @@ fun TestResultScreen(
             }
         )
     }
+
+}
+
+@Composable
+fun Summary() {
 
 }
 

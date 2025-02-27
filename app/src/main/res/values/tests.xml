@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array translatable="false" name="test_ids">
+        <item> "TEST_SIGHT_LOGMAR" </item>
+        <item> "TEST_SIGHT_CIRCLE" </item>
+        <item> "TEST_SIGHT_GAP" </item>
+        <item> "TEST_COLOR_ARRANGE" </item>
+        <item> "TEST_COLOR_CONTRAST" </item>
+        <item> "TEST_COLOR_PLATE" </item>
+        <item> "TEST_MISC_REACTION" </item>
+        <item> "TEST_DEV_EXAMPLE" </item>
+        <item> "TEST_DEV_TODO" </item>
+    </string-array>
+
+    <string-array name="name">
+        <item> "LogMAR" </item>
+        <item> "Landolt C" </item>
+        <item> "Opacity Gap" </item>
+        <item> "Palette" </item>
+        <item> "Ishihara" </item>
+        <item> "Contrast" </item>
+        <item> "Reaction time" </item>
+        <item> "Example" </item>
+        <item> "TODO" </item>
+    </string-array>
+
+    <string-array name="categories">
+        <item> "Visual Acuity Test" </item>
+        <item> "Color Vision Test" </item>
+        <item> "Vision Test" </item>
+    </string-array>
+
+</resources>

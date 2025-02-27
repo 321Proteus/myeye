@@ -16,11 +16,14 @@
     <string name="bottom_bar_menu">Menu</string>
     <string name="bottom_bar_results">Wyniki</string>
     <string name="bottom_bar_tools">Narzędzia</string>
+    <string name="bottom_bar_articles">Wiedza</string>
 
     <string name="article_browser_local">Twoje artykuły</string>
     <string name="article_browser_remote">Artykuły do pobrania</string>
     <string name="article_author">Autor</string>
     <string name="article_read_time">min czytania</string>
+
+    <string name="result_browser_empty">Tutaj przechowywane są zapisane wyniki testów. Wykonaj jeden lub więcej, aby je tu znaleźć!</string>
 
     <string name="map_distance">Dystans</string>
 

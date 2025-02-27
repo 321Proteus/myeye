@@ -16,11 +16,14 @@
     <string name="bottom_bar_menu">Menu</string>
     <string name="bottom_bar_results">Results</string>
     <string name="bottom_bar_tools">Tools</string>
+    <string name="bottom_bar_articles">Articles</string>
 
     <string name="article_browser_local">Your articles</string>
     <string name="article_browser_remote">Articles to download</string>
     <string name="article_author">By</string>
     <string name="article_read_time">mins of reading</string>
+
+    <string name="result_browser_empty">Saved vision test results will appear here. Complete one of them, and they will appear!</string>
 
     <string name="map_distance">Distance</string>
 

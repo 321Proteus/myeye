@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="name">
+        <item> "LogMAR" </item>
+        <item> "Landolt C" </item>
+        <item> "Znajdź lukę" </item>
+        <item> "Układanie kolorów" </item>
+        <item> "Cyfry Ishihary" </item>
+        <item> "Kontrast" </item>
+        <item> "Czas reakcji" </item>
+        <item> "Example" </item>
+        <item> "TODO" </item>
+    </string-array>
+
+    <string-array name="categories">
+        <item> "Test ostrości wzroku" </item>
+        <item> "Test widzenia kolorów" </item>
+        <item> "Test wzroku" </item>
+    </string-array>
+
+</resources>

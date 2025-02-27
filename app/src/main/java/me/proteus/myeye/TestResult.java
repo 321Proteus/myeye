@@ -46,25 +46,25 @@ public class TestResult implements Parcelable {
         return date.format(fmt);
     }
 
-    public String getFullTestName() {
-
-        try {
-
-            VisionTestUtils vtu = new VisionTestUtils();
-
-            String testType = vtu.getTestTypeByID(this.testID);
-            String testName = vtu.getTestNameByID(this.testID);
-
-            return testType + " " + testName;
-
-        } catch (IllegalArgumentException e) {
-
-            Log.w(this.getClass().getSimpleName(), "Nieprawidlowe ID testu: " + this.testID + " na pozycji " + this.resultID);
-            return "Nieznany test";
-
-        }
-
-    }
+//    public String getFullTestName() {
+//
+//        try {
+//
+//            VisionTestUtils vtu = new VisionTestUtils();
+//
+//            String testType = vtu.getTestTypeByID(this.testID);
+//            String testName = vtu.getTestNameByID(this.testID);
+//
+//            return testType + " " + testName;
+//
+//        } catch (IllegalArgumentException e) {
+//
+//            Log.w(this.getClass().getSimpleName(), "Nieprawidlowe ID testu: " + this.testID + " na pozycji " + this.resultID);
+//            return "Nieznany test";
+//
+//        }
+//
+//    }
 
     @Override
     public int describeContents() {

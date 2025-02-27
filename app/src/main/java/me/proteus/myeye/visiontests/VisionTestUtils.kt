@@ -1,6 +1,9 @@
 package me.proteus.myeye.visiontests
 
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.res.stringArrayResource
 import me.proteus.myeye.VisionTest
+import me.proteus.myeye.R
 
 class VisionTestUtils {
 
@@ -32,30 +35,26 @@ class VisionTestUtils {
 
     }
 
+    @Composable
     fun getTestNameByID(testID: String?): String {
 
-        return when (testID) {
-            "TEST_SIGHT_LOGMAR" -> "LogMAR"
-            "TEST_SIGHT_CIRCLE" -> "Landolt C"
-            "TEST_TODO_BUILD" -> "TODO"
-            "TEST_SIGHT_INFO" -> "Przykładowy"
-            "TEST_COLOR_ARRANGE" -> "Farnsworth"
-            "TEST_MISC_REACTION" -> "Czas reakcji"
-            "TEST_COLOR_CONTRAST" -> "Kolory - konstrast"
-            "TEST_COLOR_PLATE" -> "Ishihary"
-            "TEST_SIGHT_GAP" -> "Znajdź lukę"
-            else -> throw IllegalArgumentException("Nie znaleziono testu o podanym ID")
-        }
+        val idMap = stringArrayResource(R.array.test_ids)
+        val resource = stringArrayResource(R.array.name)
+
+        val found = resource[idMap.indexOf(testID)]
+        return found
 
     }
 
+    @Composable
     fun getTestTypeByID(testID: String): String {
 
-        return when (testID.split('_')[1]) {
-            "SIGHT" -> "Test ostrości wzroku"
-            "COLOR" -> "Test widzenia kolorów"
-            else -> "Test"
+        val resource = stringArrayResource(R.array.categories)
 
+        return when (testID.split('_')[1]) {
+            "SIGHT" -> resource[0]
+            "COLOR" -> resource[1]
+            else -> resource[2]
         }
 
 
