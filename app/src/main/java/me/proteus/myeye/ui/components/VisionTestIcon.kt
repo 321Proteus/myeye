@@ -32,7 +32,7 @@ fun VisionTestIcon(
                 controller!!.currentBackStackEntry?.savedStateHandle?.apply {
                     set("isResult", false)
                 }
-                controller.navigate("visiontest/$testID")
+                controller.navigate("test_desc/$testID")
             }
             .background(MaterialTheme.colorScheme.primary),
         contentAlignment = Alignment.Center

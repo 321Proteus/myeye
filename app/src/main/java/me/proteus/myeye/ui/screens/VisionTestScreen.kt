@@ -5,21 +5,108 @@ import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.*
+import androidx.compose.material3.Button
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.compose.ui.util.fastRoundToInt
 import androidx.navigation.NavController
 import me.proteus.myeye.ui.theme.MyEyeTheme
 import me.proteus.myeye.visiontests.VisionTestUtils
 import me.proteus.myeye.io.ResultDataSaver
+import me.proteus.myeye.ui.components.TopBar
+import me.proteus.myeye.ui.components.VisionTestIcon
+
+@Composable
+fun VisionTestDescription(controller: NavController, testID: String) {
+
+    val vtu = VisionTestUtils()
+    val test = remember { vtu.getTestByID(testID) }
+    var expanded = remember { mutableStateListOf<Boolean>(false, false, false) }
+
+    MyEyeTheme {
+        Scaffold(
+            topBar = { TopBar() },
+            content = { innerPadding ->
+
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(innerPadding),
+                    verticalArrangement = Arrangement.SpaceEvenly,
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+
+                    Column(
+                        modifier = Modifier
+                            .fillMaxHeight(0.5f)
+                            .padding(top = 16.dp),
+                        verticalArrangement = Arrangement.SpaceEvenly,
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+
+                        Text(text = getLocalizedFullTestName(testID), fontSize = 24.sp)
+
+                        VisionTestIcon(
+                            modifier = Modifier
+                                .padding(start = 100.dp, end = 100.dp)
+                                .weight(0.65f),
+                            testID = testID,
+                            size = 0.4f
+                        )
+                    }
+
+                    Column(
+                        modifier = Modifier.weight(0.8f),
+                        verticalArrangement = Arrangement.SpaceEvenly,
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceEvenly
+                        ) {
+                            Button(onClick = {
+                                controller.navigate("visiontest/${testID}")
+                            }) {
+                                Text("Start", fontSize = 20.sp)
+                            }
+                        }
+
+                    }
+
+                }
+
+            }
+        )
+    }
+
+}
+
+@Composable
+fun getLocalizedFullTestName(testID: String): String {
+
+    val vtu = VisionTestUtils()
+    val lang = LocalConfiguration.current.locales[0].displayName
+    if (lang == "pl") {
+        return vtu.getTestTypeByID(testID) + " " + vtu.getTestNameByID(testID)
+    } else {
+        return vtu.getTestNameByID(testID) + " " + vtu.getTestTypeByID(testID)
+    }
+}
 
 @Composable
 fun VisionTestScreen(

@@ -29,6 +29,7 @@ import me.proteus.myeye.ui.screens.VisionTestScreen
 import me.proteus.myeye.ui.components.TestSelector
 import me.proteus.myeye.ui.screens.ArticleBrowserScreen
 import me.proteus.myeye.ui.screens.ArticleScreen
+import me.proteus.myeye.ui.screens.VisionTestDescription
 import me.proteus.myeye.ui.theme.MyEyeTheme
 import me.proteus.myeye.util.LanguageUtils
 
@@ -143,6 +144,15 @@ class MainActivity : ComponentActivity() {
             ) { backStackEntry ->
                 val articleId = backStackEntry.arguments?.getInt("id") ?: -1
                 ArticleScreen(controller, articleId)
+            }
+            composable(
+                route = "test_desc/{id}",
+                arguments = listOf(
+                    navArgument("id") { type = NavType.StringType }
+                )
+            ) { backStackEntry ->
+                val testId = backStackEntry.arguments?.getString("id") ?: "defaultTest"
+                VisionTestDescription(controller, testId)
             }
 
         }

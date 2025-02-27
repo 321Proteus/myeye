@@ -53,10 +53,6 @@ fun MenuScreen(controller: NavController) {
                     textAlign = TextAlign.Center
                 )
 
-                Button(onClick = {
-                    controller.navigate("article_browser")
-                }) { "Artykuly" }
-
                 Spacer(Modifier.padding(16.dp))
 
                 ExpandableGrid((LocalConfiguration.current.screenHeightDp / 2).dp, false, controller)
