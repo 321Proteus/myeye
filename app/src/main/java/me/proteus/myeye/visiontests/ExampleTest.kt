@@ -27,7 +27,7 @@ import kotlin.math.abs
 
 class ExampleTest : VisionTest {
 
-    override val testID: String = "TEST_SIGHT_INFO"
+    override val testID: String = "TEST_DEV_EXAMPLE"
     override val testIcon: ImageVector = Icons.Outlined.Info
     override val needsMicrophone: Boolean = false
     override val stageCount: Int = 10

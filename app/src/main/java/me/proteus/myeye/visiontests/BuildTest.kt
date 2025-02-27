@@ -12,7 +12,7 @@ import java.util.Random
 
 class BuildTest : VisionTest {
 
-    override val testID: String = "TEST_TODO_BUILD"
+    override val testID: String = "TEST_DEV_TODO"
     override val testIcon: ImageVector = Icons.Outlined.Build
     override val needsMicrophone: Boolean = false
     override val stageCount: Int = 5
