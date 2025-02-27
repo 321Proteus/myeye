@@ -52,13 +52,8 @@ import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
-import io.ktor.client.engine.HttpClientEngineFactory
-import io.ktor.client.engine.android.Android
-import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.request.get
-import io.ktor.serialization.kotlinx.json.json
 import kotlinx.coroutines.launch
-import kotlinx.serialization.json.Json
 import me.proteus.myeye.io.FileSaver
 import me.proteus.myeye.io.HTTPDownloaderDialog
 import me.proteus.myeye.io.HTTPRequestViewModel
@@ -68,21 +63,9 @@ import me.proteus.myeye.ui.components.TopBar
 import me.proteus.myeye.ui.theme.MyEyeTheme
 import java.io.File
 
-const val hostname = "https://tldrhostname.pl"
+const val hostname = "https://myeye-articles.up.railway.app"
 
-object HttpClientFactory {
-    fun create(): HttpClient {
-        return HttpClient(getEngine()) {
-            install(ContentNegotiation) {
-                json(Json { ignoreUnknownKeys = true })
-            }
-        }
-    }
-
-    private fun getEngine(): HttpClientEngineFactory<*> = Android
-}
-
-val httpClient = HttpClientFactory.create()
+val httpClient = HttpClient()
 
 @Composable
 fun ArticleBrowserScreen(controller: NavController) {
@@ -131,9 +114,13 @@ fun ArticleBrowserScreen(controller: NavController) {
                     .padding(innerPadding)
                     .verticalScroll(rememberScrollState())
             ) {
+
+                println("LOCAL ${local.joinToString(" ")}")
+                println("REMOTE ${downloadable.joinToString(" ")}")
                 Text(stringResource(R.string.article_browser_local))
                 Column {
                     local.forEach {
+                        println("it $it")
                         Article(controller, it, false) {
                             newId -> Log.d("ARB", "Skipping update of local $newId")
                         }
@@ -143,9 +130,10 @@ fun ArticleBrowserScreen(controller: NavController) {
                 Text(stringResource(R.string.article_browser_remote))
                 Column {
                     downloadable.forEach {
+                        println("it $it")
                         Article(controller, it, true) { newId ->
                             local.add(newId)
-                            downloadable.removeAt(downloadable.find { it == newId }!!)
+                            downloadable.remove(newId)
                         }
                     }
                 }
@@ -180,20 +168,21 @@ fun Article(
     val loading = stringResource(R.string.loading)
 
     val title = if (metadata.isEmpty()) loading else metadata[0]
+    println("$id $downloadable")
 
     Card(
         modifier = Modifier
             .padding(horizontal = 16.dp, vertical = 6.dp)
             .fillMaxSize()
-            .clickable { controller.navigate("article/$id") },
+            .clickable(enabled = !downloadable) { controller.navigate("article/$id") },
         shape = RoundedCornerShape(24.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 10.dp)
 //        contentAlignment = Alignment.CenterStart
     ) {
 
         Row(
-            Modifier
-                .height(IntrinsicSize.Max)
+            Modifier.height(150.dp)
+//                .height(IntrinsicSize.Max)
         ) {
             val url = "$hostname/header/$id"
             val painter = if (downloadable) {
@@ -327,7 +316,6 @@ fun getLocalizedDescription(metadata: List<String>, time: Int): String {
         if (obrazki.toInt() > 1) opis += 's'
     }
 
-    println(lang)
     return opis
 }
 
