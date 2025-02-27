@@ -19,6 +19,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
@@ -27,6 +28,7 @@ import me.proteus.myeye.ui.components.BottomBar
 import me.proteus.myeye.ui.components.TopBar
 import me.proteus.myeye.ui.components.VisionTestIcon
 import me.proteus.myeye.ui.theme.MyEyeTheme
+import me.proteus.myeye.R
 
 @Composable
 fun ResultBrowserScreen(controller: NavController) {
@@ -48,6 +50,16 @@ fun ResultBrowserScreen(controller: NavController) {
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.SpaceEvenly
             ) {
+
+                if (data.isEmpty()) item {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(stringResource(R.string.result_browser_empty))
+                    }
+                }
 
                 items(data) { result ->
 
@@ -76,7 +88,7 @@ fun ResultBrowserScreen(controller: NavController) {
                                     verticalArrangement = Arrangement.SpaceEvenly
                                 ) {
                                     Text(
-                                        text = result.fullTestName,
+                                        text = getLocalizedFullTestName(result.testID),
                                         fontSize = 18.sp
                                     )
                                     Text(
