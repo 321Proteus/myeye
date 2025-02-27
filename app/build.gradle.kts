@@ -87,7 +87,6 @@ dependencies {
     implementation(libs.async.http.client)
     implementation(libs.zip4j)
     implementation(libs.slf4j.simple)
-    implementation(libs.core)
     implementation(libs.face.detection)
     implementation(libs.androidx.camera.core)
     implementation(libs.androidx.camera.lifecycle)
