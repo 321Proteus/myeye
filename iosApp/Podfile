@@ -1,0 +1,10 @@
+platform :ios, '15.4'
+target 'iosApp' do
+  use_frameworks!
+ 
+  pod 'ComposeApp', :path => '../composeApp'
+#  pod 'GoogleMaps', '9.3.0'
+#   pod 'Google-Maps-iOS-Utils', '6.1.0'
+#   pod 'GooglePlaces', '9.3.0'
+  
+end
