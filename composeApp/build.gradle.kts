@@ -42,7 +42,6 @@ kotlin {
             val main by getting {
                 cinterops {
                     create("swiftSrc")
-//                    create("MapSwift")
                 }
             }
         }
@@ -120,29 +119,28 @@ kotlin {
             implementation(libs.places)
             implementation(libs.vosk)
             implementation(libs.ktor.client.okhttp)
+            implementation(libs.androidx.camera.core)
         }
 
         iosMain.dependencies {
             implementation(libs.ktor.client.darwin)
         }
 
-//        wasmJsMain.dependencies {
-////            implementation(libs.indexeddb.core)
-//        }
-
         val mobileMain by creating {
             dependsOn(commonMain.get())
             dependencies {
                 api(libs.biometry)
                 api(libs.biometry.compose)
+                implementation(libs.lifecycle.viewmodel)
+                implementation(libs.lifecycle.runtime.compose)
+                implementation(libs.navigation.compose)
                 implementation(libs.androidx.sqlite.bundled)
                 implementation(libs.androidx.sqlite)
-                implementation(libs.camerak)
                 implementation(libs.korio)
                 implementation(libs.korim)
-                implementation("dev.icerock.moko:permissions-microphone:0.19.1")
-                api("dev.icerock.moko:permissions:0.19.1")
-                api("dev.icerock.moko:permissions-compose:0.19.1")
+                implementation(libs.permissions.microphone)
+                api(libs.permissions)
+                api(libs.permissions.compose)
             }
         }
 
@@ -157,15 +155,11 @@ kotlin {
             implementation(compose.ui)
             implementation(compose.components.resources)
             implementation(compose.components.uiToolingPreview)
-            implementation(libs.androidx.lifecycle.viewmodel)
-            implementation(libs.androidx.lifecycle.runtime.compose)
-            implementation(libs.navigation.compose)
             implementation(libs.kotlinx.datetime)
             implementation(libs.kotlinx.serialization.json)
-            implementation(libs.ktor.client)
+            implementation(libs.ktor.client.core)
             implementation(libs.coil)
             implementation(libs.coil.network.ktor3)
-
         }
     }
 }
@@ -204,10 +198,4 @@ android {
         sourceCompatibility = JavaVersion.VERSION_21
         targetCompatibility = JavaVersion.VERSION_21
     }
-}
-dependencies {
-    implementation(libs.vision.common)
-    implementation(libs.play.services.mlkit.face.detection)
-    implementation(libs.places)
-    implementation(libs.androidx.lifecycle.livedata.core.ktx)
 }
