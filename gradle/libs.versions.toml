@@ -1,87 +1,66 @@
 [versions]
-agp = "8.8.0"
-kotlin = "2.0.0"
-coreKtx = "1.15.0"
-junit = "4.13.2"
-junitVersion = "1.2.1"
-espressoCore = "3.6.1"
-lifecycleRuntimeKtx = "2.8.7"
-activityCompose = "1.10.0"
-composeBom = "2025.01.00"
-sqlite = "2.4.0"
-sqliteFramework = "2.4.0"
-biometric = "1.2.0-alpha05"
-vosk = "0.3.47"
-appcompat = "1.7.0"
-gson = "2.11.0"
-asyncHttpClient = "3.0.0"
-zip4j = "2.11.5"
-slf4jSimple = "2.1.0-alpha1"
-core = "1.47.0"
-faceDetection = "16.1.7"
-cameraCore = "1.5.0-alpha05"
-cameraLifecycle = "1.5.0-alpha05"
-cameraView = "1.5.0-alpha05"
-cameraCamera2 = "1.5.0-alpha05"
-playServicesMaps = "19.0.0"
-maps = "3.1.0-beta"
-mapsCompose = "6.4.3"
-volley = "1.2.1"
-placesCompose = "0.1.2"
-places = "4.1.0"
-material = "1.13.0-alpha10"
-navigationCompose = "2.9.0-alpha05"
-coilCompose = "2.7.0"
-ktor = "2.3.7"
+agp = "8.8.2"
+kotlin = "2.1.10"
+activityCompose = "1.10.1"
+composeMultiplatform = "1.7.3"
+biometry = "0.4.0"
+sqlite = "2.5.0-rc01"
+korio = "4.0.10"
+korim = "4.0.10"
+permissionsMicrophone = "0.19.1"
+permissions = "0.19.1"
+permissionsCompose = "0.19.1"
+lifecycleViewmodel = "2.9.0-alpha11"
+lifecycleRuntimeCompose = "2.9.0-alpha11"
+kotlinxDatetime = "0.6.2"
+kotlinxSerializationJson = "1.8.0"
+coil = "3.1.0"
+coilNetworkKtor3 = "3.1.0"
+mapsComposeVersion = "6.5.0"
+volleyVersion = "1.2.1"
+playServicesMapsVersion = "19.1.0"
+placesComposeVersion = "0.1.2"
+placesVersion = "4.1.0"
+voskVersion = "0.3.45"
+ktor = "3.1.1"
+navigationCompose = "2.9.0-alpha14"
+lifecycle = "2.9.0-alpha04"
+ktorClientCore = "3.1.1"
 
 [libraries]
-androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
-junit = { group = "junit", name = "junit", version.ref = "junit" }
-androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
-androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
-androidx-lifecycle-runtime-ktx = { group = "androidx.lifecycle", name = "lifecycle-runtime-ktx", version.ref = "lifecycleRuntimeKtx" }
 androidx-activity-compose = { group = "androidx.activity", name = "activity-compose", version.ref = "activityCompose" }
-androidx-compose-bom = { group = "androidx.compose", name = "compose-bom", version.ref = "composeBom" }
-androidx-ui = { group = "androidx.compose.ui", name = "ui" }
-androidx-ui-graphics = { group = "androidx.compose.ui", name = "ui-graphics" }
-androidx-ui-tooling = { group = "androidx.compose.ui", name = "ui-tooling" }
-androidx-ui-tooling-preview = { group = "androidx.compose.ui", name = "ui-tooling-preview" }
-androidx-ui-test-manifest = { group = "androidx.compose.ui", name = "ui-test-manifest" }
-androidx-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4" }
-androidx-material3 = { group = "androidx.compose.material3", name = "material3" }
-sqlite = { group = "androidx.sqlite", name = "sqlite", version.ref = "sqlite" }
-sqlite-framework = { group = "androidx.sqlite", name = "sqlite-framework", version.ref = "sqliteFramework" }
-androidx-biometric = { group = "androidx.biometric", name = "biometric", version.ref = "biometric" }
-vosk = { group = "com.alphacephei", name = "vosk-android", version.ref = "vosk" }
-androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
-gson = { group = "com.google.code.gson", name = "gson", version.ref = "gson" }
-async-http-client = { group = "org.asynchttpclient", name = "async-http-client", version.ref = "asyncHttpClient" }
-zip4j = { group = "net.lingala.zip4j", name = "zip4j", version.ref = "zip4j" }
-slf4j-simple = { group = "org.slf4j", name = "slf4j-simple", version.ref = "slf4jSimple" }
-core = { group = "com.google.ar", name = "core", version.ref = "core" }
-face-detection = { group = "com.google.mlkit", name = "face-detection", version.ref = "faceDetection" }
-androidx-camera-core = { group = "androidx.camera", name = "camera-core", version.ref = "cameraCore" }
-androidx-camera-lifecycle = { group = "androidx.camera", name = "camera-lifecycle", version.ref = "cameraLifecycle" }
-androidx-camera-view = { group = "androidx.camera", name = "camera-view", version.ref = "cameraView" }
-androidx-camera-camera2 = { group = "androidx.camera", name = "camera-camera2", version.ref = "cameraCamera2" }
-play-services-maps = { group = "com.google.android.gms", name = "play-services-maps", version.ref = "playServicesMaps" }
-maps = { group = "com.google.android.libraries.maps", name = "maps", version.ref = "maps" }
-maps-compose = { group = "com.google.maps.android", name = "maps-compose", version.ref = "mapsCompose" }
-volley = { group = "com.android.volley", name = "volley", version.ref = "volley" }
-places-compose = { group = "com.google.maps.android", name = "places-compose", version.ref = "placesCompose" }
-places = { group = "com.google.android.libraries.places", name = "places", version.ref = "places" }
-material = { group = "com.google.android.material", name = "material", version.ref = "material" }
-androidx-navigation-compose = { group = "androidx.navigation", name = "navigation-compose", version.ref = "navigationCompose" }
-coil-compose = { group = "io.coil-kt", name = "coil-compose", version.ref = "coilCompose" }
-ktor-client-android = { module = "io.ktor:ktor-client-android", version.ref = "ktor" }
-ktor-client-content-negotiation = { module = "io.ktor:ktor-client-content-negotiation", version.ref = "ktor" }
-ktor-client-core = { module = "io.ktor:ktor-client-core", version.ref = "ktor" }
-ktor-client-darwin = { module = "io.ktor:ktor-client-darwin", version.ref = "ktor" }
-ktor-serialization-kotlinx-json = { module = "io.ktor:ktor-serialization-kotlinx-json", version.ref = "ktor" }
+androidx-sqlite = { group = "androidx.sqlite", name = "sqlite", version.ref = "sqlite" }
+androidx-sqlite-bundled = { group = "androidx.sqlite", name = "sqlite-bundled", version.ref = "sqlite" }
+biometry = { group = "dev.icerock.moko", name = "biometry", version.ref = "biometry" }
+biometry-compose = { group = "dev.icerock.moko", name = "biometry-compose", version.ref = "biometry" }
+korio = { group = "com.soywiz.korlibs.korio", name = "korio", version.ref = "korio" }
+korim = { group = "com.soywiz.korlibs.korim", name = "korim", version.ref = "korim" }
+permissions-microphone = { group = "dev.icerock.moko", name = "permissions-microphone", version.ref = "permissionsMicrophone" }
+permissions = { group = "dev.icerock.moko", name = "permissions", version.ref = "permissions" }
+permissions-compose = { group = "dev.icerock.moko", name = "permissions-compose", version.ref = "permissionsCompose" }
+kotlinx-datetime = { group = "org.jetbrains.kotlinx", name = "kotlinx-datetime", version.ref = "kotlinxDatetime" }
+kotlinx-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "kotlinxSerializationJson" }
+ktor-client = { group = "io.ktor", name = "ktor-client", version.ref = "ktor" }
+coil = { group = "io.coil-kt.coil3", name = "coil-compose", version.ref = "coil" }
+coil-network-ktor3 = { group = "io.coil-kt.coil3", name = "coil-network-ktor3", version.ref = "coilNetworkKtor3" }
+maps-compose = { group = "com.google.maps.android", name = "maps-compose", version.ref = "mapsComposeVersion" }
+volley = { group = "com.android.volley", name = "volley", version.ref = "volleyVersion" }
+play-services-maps = { group = "com.google.android.gms", name = "play-services-maps", version.ref = "playServicesMapsVersion" }
+places-compose = { group = "com.google.maps.android", name = "places-compose", version.ref = "placesComposeVersion" }
+places = { group = "com.google.android.libraries.places", name = "places", version.ref = "placesVersion" }
+vosk = { group = "com.alphacephei", name = "vosk", version.ref = "voskVersion" }
+ktor-client-okhttp = { group = "io.ktor", name = "ktor-client-okhttp", version.ref = "ktor" }
+ktor-client-darwin = { group = "io.ktor", name = "ktor-client-darwin", version.ref = "ktor" }
+navigation-compose = { group = "org.jetbrains.androidx.navigation", name = "navigation-compose", version.ref = "navigationCompose" }
+lifecycle-runtime-compose = { group = "org.jetbrains.androidx.lifecycle", name = "lifecycle-runtime-compose", version.ref = "lifecycle" }
+lifecycle-viewmodel = { group = "org.jetbrains.androidx.lifecycle", name = "lifecycle-viewmodel", version.ref = "lifecycle" }
+ktor-client-core = { group = "io.ktor", name = "ktor-client-core", version.ref = "ktorClientCore" }
 
 [plugins]
-android-application = { id = "com.android.application", version.ref = "agp" }
-kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
-kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
+androidApplication = { id = "com.android.application", version.ref = "agp" }
+kotlinCocoapods = { id = "org.jetbrains.kotlin.native.cocoapods", version.ref = "kotlin" }
+composeCompiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
+composeMultiplatform = { id = "org.jetbrains.compose", version.ref = "composeMultiplatform" }
+kotlinMultiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
 kotlinxSerialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 
