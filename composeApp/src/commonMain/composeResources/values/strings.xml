@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name" translatable="false">MyEye</string>
+
+    <string name="loading">Loading</string>
+    <string name="error">Error</string>
+
+    <string name="test">Speech Recognition</string>
+    <string name="start_talking">Speak now</string>
+    <string name="setting_desc_language">Select the language used by the user interface and Speech Recognition</string>
+    <string name="menu_description">Designed for quick self-assessment, MyEye offers an intuitive vision test interface - we have over 5 standardized eyesight, color and reaction tests. The app helps locate nearby eye clinics, provides insightful articles about eye health, and includes useful tools for people with myopia. Whether you want to check your eyesight or learn more about vision care, this app is a practical companion for maintaining eye health.</string>
+    <string name="menu_discover_tests">Discover our vision tests</string>
+    <string name="menu_tests_see_all">See all</string>
+
+    <string name="model_download">Downloading english speech recognition model...</string>
+
+    <string name="bottom_bar_map">Map</string>
+    <string name="bottom_bar_tests">Tests</string>
+    <string name="bottom_bar_menu">Menu</string>
+    <string name="bottom_bar_results">Results</string>
+    <string name="bottom_bar_tools">Tools</string>
+    <string name="bottom_bar_articles">Reading</string>
+
+    <string name="article_browser_local">Your articles</string>
+    <string name="article_browser_remote">Articles to download</string>
+    <string name="article_author">By</string>
+    <string name="article_read_time">mins of reading</string>
+
+    <string name="biometry_title">Authentication required</string>
+    <string name="biometry_reason">Use biometric auth to display the test result</string>
+    <string name="biometry_fail">Unable to authorize</string>
+
+    <string name="map_distance">Distance</string>
+
+    <string name="test_reaction_info">Click on the screen when it turns green</string>
+</resources>

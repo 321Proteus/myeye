@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="modelName">vosk-model-small-en-us-0.15</string>
+
+    <string-array name="phonetic">
+
+        <item>g:gong</item>
+
+    </string-array>
+
+</resources>

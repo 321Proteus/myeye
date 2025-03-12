@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="loading">Ładowanie</string>
+    <string name="error">Błąd</string>
+
+    <string name="test">Rozpoznawanie Mowy</string>
+    <string name="start_talking">Zacznij mówić</string>
+    <string name="setting_desc_language">Wybiera język interfejsu aplikacji i modelu rozpoznawania mowy</string>
+    <string name="menu_description">MyEye jest zaprojektowane pod kątem prostych samodzielnych badań wzroku - Mamy ponad 5 standaryzowanych testów ostrości wzroku, widzenia kolorów i czasu reakcji. Ponadto, aplikacja umożliwia lokalizację najbliższej kliniki okulistycznej, zawiera ciekawe artykuły na temat oka oraz zestaw narzędzi przydatnych osobom niedowidzącym. </string>
+    <string name="menu_discover_tests">Odkryj nasze testy wzroku</string>
+    <string name="menu_tests_see_all">Zobacz wszystkie</string>
+
+    <string name="model_download">Pobieranie modelu rozpoznawania mowy w języku polskim...</string>
+
+    <string name="bottom_bar_map">Mapa</string>
+    <string name="bottom_bar_tests">Testy</string>
+    <string name="bottom_bar_menu">Menu</string>
+    <string name="bottom_bar_results">Wyniki</string>
+    <string name="bottom_bar_tools">Narzędzia</string>
+    <string name="bottom_bar_articles">Wiedza</string>
+
+    <string name="article_browser_local">Twoje artykuły</string>
+    <string name="article_browser_remote">Artykuły do pobrania</string>
+    <string name="article_author">Autor</string>
+    <string name="article_read_time">min czytania</string>
+
+    <string name="biometry_title">Autoryzacja wymagana</string>
+    <string name="biometry_reason">Zweryfikuj swoją tożsamość, aby wyświetlić wynik testu</string>
+    <string name="biometry_fail">Weryfikacja nieudana</string>
+
+    <string name="map_distance">Dystans</string>
+
+    <string name="test_reaction_info">Naciśnij, kiedy ekran zabłyśnie na zielono</string>
+</resources>
