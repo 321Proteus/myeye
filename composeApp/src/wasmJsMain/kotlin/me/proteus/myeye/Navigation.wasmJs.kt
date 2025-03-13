@@ -8,6 +8,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import kotlinx.browser.document
 import kotlinx.browser.window
+import kotlinx.dom.isElement
 import me.proteus.myeye.ui.components.TestSelector
 import me.proteus.myeye.ui.screens.ArticleBrowserScreen
 import me.proteus.myeye.ui.screens.ArticleScreen
@@ -18,6 +19,8 @@ import me.proteus.myeye.ui.screens.ResultBrowserScreen
 import me.proteus.myeye.ui.screens.SimpleDistanceScreen
 import me.proteus.myeye.ui.screens.TestResultScreen
 import me.proteus.myeye.ui.screens.VisionTestScreen
+import org.w3c.dom.HTMLElement
+import org.w3c.dom.asList
 
 actual fun getCurrentRoute(): String {
     return window.location.hash.removePrefix("#/")
@@ -37,6 +40,12 @@ actual fun SetupNavigation() {
     }
     LaunchedEffect(Unit) {
         window.onhashchange = {
+            val otherElements = document.body!!.childNodes
+                .asList().filter { el ->
+                    el.isElement && (el as HTMLElement).id != "canvas"
+                }
+            otherElements.forEach { el -> document.body!!.removeChild(el) }
+
             println(it.oldURL)
             currentRoute = window.location.hash.removePrefix("#/")
             println(currentRoute)
