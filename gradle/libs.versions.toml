@@ -10,8 +10,6 @@ korim = "4.0.10"
 permissionsMicrophone = "0.19.1"
 permissions = "0.19.1"
 permissionsCompose = "0.19.1"
-lifecycleViewmodel = "2.9.0-alpha11"
-lifecycleRuntimeCompose = "2.9.0-alpha11"
 kotlinxDatetime = "0.6.2"
 kotlinxSerializationJson = "1.8.0"
 coil = "3.1.0"
@@ -27,10 +25,12 @@ navigationCompose = "2.9.0-alpha14"
 lifecycle = "2.9.0-alpha04"
 ktorClientCore = "3.1.1"
 androidCamera = "1.5.0-alpha06"
+faceDetection = "16.1.7"
 
 [libraries]
 androidx-activity-compose = { group = "androidx.activity", name = "activity-compose", version.ref = "activityCompose" }
 androidx-camera-core = { group = "androidx.camera", name = "camera-core", version.ref = "androidCamera" }
+androidx-camera-view = { group = "androidx.camera", name = "camera-view", version.ref = "androidCamera" }
 androidx-sqlite = { group = "androidx.sqlite", name = "sqlite", version.ref = "sqlite" }
 androidx-sqlite-bundled = { group = "androidx.sqlite", name = "sqlite-bundled", version.ref = "sqlite" }
 biometry = { group = "dev.icerock.moko", name = "biometry", version.ref = "biometry" }
@@ -42,8 +42,8 @@ permissions = { group = "dev.icerock.moko", name = "permissions", version.ref = 
 permissions-compose = { group = "dev.icerock.moko", name = "permissions-compose", version.ref = "permissionsCompose" }
 kotlinx-datetime = { group = "org.jetbrains.kotlinx", name = "kotlinx-datetime", version.ref = "kotlinxDatetime" }
 kotlinx-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "kotlinxSerializationJson" }
-ktor-client = { group = "io.ktor", name = "ktor-client", version.ref = "ktor" }
 coil = { group = "io.coil-kt.coil3", name = "coil-compose", version.ref = "coil" }
+mlkit-face = { group = "com.google.mlkit", name = "face-detection", version.ref = "faceDetection" }
 coil-network-ktor3 = { group = "io.coil-kt.coil3", name = "coil-network-ktor3", version.ref = "coilNetworkKtor3" }
 maps-compose = { group = "com.google.maps.android", name = "maps-compose", version.ref = "mapsComposeVersion" }
 volley = { group = "com.android.volley", name = "volley", version.ref = "volleyVersion" }
