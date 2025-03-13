@@ -120,6 +120,8 @@ kotlin {
             implementation(libs.vosk)
             implementation(libs.ktor.client.okhttp)
             implementation(libs.androidx.camera.core)
+            implementation(libs.androidx.camera.view)
+            implementation(libs.mlkit.face)
         }
 
         iosMain.dependencies {
