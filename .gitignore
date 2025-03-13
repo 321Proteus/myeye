@@ -4,8 +4,19 @@
 /secret.properties
 /.idea
 .DS_Store
-/build
 /captures
 .externalNativeBuild
 .cxx
 local.properties
+
+# Compose build files
+composeApp/build
+build
+.kotlin
+
+# iOS pods / build files
+iosApp/Pods
+iosApp/iosApp.xcworkspace
+iosApp/iosApp.xcodeproj
+iosApp/Podfile.lock
+composeApp/exportedSwiftSrc
