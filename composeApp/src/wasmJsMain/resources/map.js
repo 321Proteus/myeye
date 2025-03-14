@@ -74,26 +74,6 @@ async function initMap(top, bottom) {
 
 }
 
-function showPlace(id) {
-
-    const mapDiv = document.getElementById("map");
-    mapDiv.style.width = "50%";
-
-    var placeDiv = document.getElementById("place");
-
-    if (!placeDiv) {
-        placeDiv = document.createElement("div");
-        placeDiv.style.height = mapDiv.style.height;
-        placeDiv.style.top = mapDiv.style.top;
-
-        placeDiv.id = "place";
-        document.body.appendChild(placeDiv);
-    }
-
-    placeDiv.innerHTML = `<div>${id}</div>`
-
-}
-
 async function searchPlaces(pos) {
     const request = {
         textQuery: "okulistyczny",
