@@ -48,14 +48,16 @@ async function showPlace(id) {
 
     var placeDiv = document.getElementById("place");
 
-    if (!placeDiv) {
-        placeDiv = placeDocument.body.firstElementChild;
-        placeDiv.style.height = mapDiv.style.height;
-        placeDiv.style.top = mapDiv.style.top;
-
-        placeDiv.id = "place";
-        document.body.appendChild(placeDiv);
+    if (placeDiv) {
+        document.body.removeChild(placeDiv);
     }
+
+    placeDiv = placeDocument.body.firstElementChild;
+    placeDiv.style.height = mapDiv.style.height;
+    placeDiv.style.top = mapDiv.style.top;
+
+    placeDiv.id = "place";
+    document.body.appendChild(placeDiv);
 
 
     // placeDiv.innerHTML = `<div>${id}</div>`
