@@ -1,21 +1,26 @@
 <div>
-    <div id="place-name"></div>
-    <div id="place-address"></div>
-    <div id="place-hours"></div>
-    <div id="place-id"></div>
-    <div id="place-web-page"></div>
-    <div id="place-phone"></div>
+    <div class="place-data-field" id="place-name" style="font-size:larger;flex-grow:3;padding-top: 24px;"></div>
+    <div class="place-data-field" id="place-address"></div>
+    <div class="place-data-field" id="place-hours"></div>
+    <div class="place-data-field" id="place-id" style="display: none;"></div>
+    <div class="place-data-field" id="place-web-page"></div>
+    <div class="place-data-field" id="place-phone"></div>
 
-    <button
-        id="place-open-map"
-        onclick='window.open(`https:/\/google.com/maps/place/?q=place_id:${document.querySelector("#place-id").textContent}`)'
-    >
-        Zobacz w Mapach Google
-    </button>
-    <button
-        id="place-open-page"
-        onclick='const page=document.querySelector("#place-web-page").textContent;window.open(page.substring(page.indexOf("http")))'
-    >
-        Odwiedź stronę
-    </button>
+    <div id="buttons">
+        <button
+            class="place-button"
+            id="place-open-map"
+            onclick='window.open(`https:/\/google.com/maps/place/?q=place_id:${document.querySelector("#place-id").textContent}`)'
+        >
+            Zobacz w Mapach Google
+        </button>
+        <button
+            class="place-button"
+            id="place-open-page"
+            onclick='const page=document.querySelector("#place-web-page").textContent;window.open(page.substring(page.indexOf("http")))'
+        >
+            Odwiedź stronę
+        </button>
+    </div>
+
 </div>
