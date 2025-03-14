@@ -44,7 +44,7 @@ async function initMap(top, bottom) {
                 map: map,
                 content: new google.maps.marker.PinElement({
                     background: "red",
-                    glyph: oko,
+                    glyph: oko.cloneNode(true),
                     scale: 1.5
                 }).element
             })
