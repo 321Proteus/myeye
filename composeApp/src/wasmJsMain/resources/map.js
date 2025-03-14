@@ -2,15 +2,27 @@ async function initMap(top, bottom) {
 
     const oko = await initPin();
 
+    var displayPlace = false;
+
     var miejsce = { lat: 50, lng: 50 };
 
-    var mapDiv = document.getElementById("map");
+    const mapDiv = document.getElementById("map");
 
     mapDiv.style.top = top + "px";
     mapDiv.style.height = window.innerHeight - top - bottom + "px";
     mapDiv.style.width = "100%";
     mapDiv.style.position = "absolute";
     mapDiv.style.zIndex = "2";
+
+    document.body.onresize = () => {
+        mapDiv.style.top = top + "px";
+        mapDiv.style.height = window.innerHeight - top - bottom + "px";
+        if (displayPlace) {
+            const placeDiv = document.getElementById("place");
+            placeDiv.style.top = top + "px";
+            placeDiv.style.height = mapDiv.style.height;
+        }
+    }
 
     const map = new google.maps.Map(mapDiv, {
         zoom: 12,
@@ -22,8 +34,6 @@ async function initMap(top, bottom) {
         position: miejsce,
         map: map
     });
-
-    marker.addListener("gmp-click", e => console.log(marker));
 
     if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(pos => {
@@ -48,7 +58,12 @@ async function initMap(top, bottom) {
                     scale: 1.5
                 }).element
             })
-            placeMarker.addListener("gmp-click", () => console.log(place));
+            placeMarker.addListener("gmp-click", () => {
+                displayPlace = true;
+                map.panTo(place.Eg.location);
+                map.setZoom(15);
+                showPlace(place.id);
+            });
         });
 
         marker.position = new google.maps.LatLng(json.lat, json.lng);
@@ -56,6 +71,26 @@ async function initMap(top, bottom) {
         map.panTo(e.latLng);
 
     })
+
+}
+
+function showPlace(id) {
+
+    const mapDiv = document.getElementById("map");
+    mapDiv.style.width = "50%";
+
+    var placeDiv = document.getElementById("place");
+
+    if (!placeDiv) {
+        placeDiv = document.createElement("div");
+        placeDiv.style.height = mapDiv.style.height;
+        placeDiv.style.top = mapDiv.style.top;
+
+        placeDiv.id = "place";
+        document.body.appendChild(placeDiv);
+    }
+
+    placeDiv.innerHTML = `<div>${id}</div>`
 
 }
 

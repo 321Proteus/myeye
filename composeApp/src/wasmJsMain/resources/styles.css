@@ -5,3 +5,14 @@ html, body {
     padding: 0;
     overflow: hidden;
 }
+
+#place {
+    float: right;
+    width: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 2;
+    position: relative;
+    background-color: white;
+}
