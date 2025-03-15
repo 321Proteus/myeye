@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array translatable="false" name="test_ids">
+        <item>TEST_SIGHT_LOGMAR</item>
+        <item>TEST_SIGHT_CIRCLE</item>
+        <item>TEST_SIGHT_GAP</item>
+        <item>TEST_COLOR_ARRANGE</item>
+        <item>TEST_COLOR_CONTRAST</item>
+        <item>TEST_COLOR_PLATE</item>
+        <item>TEST_MISC_REACTION</item>
+        <item>TEST_MISC_EXAMPLE</item>
+    </string-array>
+
+    <string-array name="name">
+        <item>LogMAR</item>
+        <item>Landolt C</item>
+        <item>Opacity Gap</item>
+        <item>Palette</item>
+        <item>Ishihara</item>
+        <item>Contrast</item>
+        <item>Reaction time</item>
+        <item>Example</item>
+    </string-array>
+
+    <string-array name="categories">
+        <item>Visual Acuity Test</item>
+        <item>Color Vision Test</item>
+        <item>Vision Test</item>
+    </string-array>
+
+    <string-array name="descriptions">
+        <item>The LogMAR (Logarithm of the Minimum Angle of Resolution) vision test is a standardized method used to measure visual acuity through a chart of letters that gradually decrease in size. It provides a more precise evaluation of vision than traditional Snellen charts and is commonly used in clinical settings. To take the test, simply place your phone at the distance (for example 3 meters or 10 feet) from your eyes and read the letters on the screen, starting from the largest ones; try to identify as many letters as possible even if some appear blurry.</item>
+        <item>The Landolt C test is a standard method for assessing visual acuity. It provides a precise measurement of detail recognition ability and is commonly used in clinical examinations and optical diagnostics. The test uses a row of circles with a gap in different orientations instead of letters. To take the test, place your phone at the distance (for example 3 meters or 10 feet) and by saying "top", "bottom", "left" or "right" identify the direction of the gap in each circle displayed on the screen.</item>
+        <item>The gap detection test is a method of assessing the eyes' sensitivity to small differences in the details outlined on a device. A circle with a gap rotated at a certain angle is displayed on the screen, the color of which increasingly blends with the colors of the screen. To take the test, indicate from an outstretched arm's length (75 to 100 cm or 2.5 to 3.5 feet) on which side the hole in the circle is located.</item>
+        <item>The Farnsworth-Munsell color arrangement test is a tool for assessing color discrimination ability, commonly used in diagnosing color vision deficiencies. It involves arranging a series of colored elements in the correct order, transitioning smoothly from one shade to another. To take the test, drag the elements on the screen to create a continuous color gradient. The result can help identify color vision issues and determine sensitivity to subtle shade differences.</item>
+        <item>The Ishihara plate test is one of the most commonly used tools for detecting color blindness, particularly red-green color vision deficiencies. It consists of a series of colorful plates featuring numbers or patterns made up of dots in different colors and shades. To take the test, identify the numbers or shapes visible on the screen. Individuals with color vision deficiencies may see different patterns or fail to detect certain elements, allowing for an assessment of the type and severity of the condition.</item>
+        <item>The contrast matching test is a simple way of detecting color vision deficiencies by measuring the threshold of distinguishing color tones. To perform the test, pair the colors</item>
+        <item>The reaction time test is a simple and fun way to measure how quickly your eyes react to changes in your environment. To perform the test, you need to start a red screen. After a random interval, it will change color to green. The time between the screen changing color and the user reacting by pressing translates into their ability to react to stimuli.</item>
+        <item>This is an example test for contributing developers to showcase the working principles of the VisionTest interface. It features all the basic MyEye test mechanics such as question generation, answer validation, result data saving and variable (test/result) display modes. Not an actual visual acuity test.</item>
+    </string-array>
+
+</resources>

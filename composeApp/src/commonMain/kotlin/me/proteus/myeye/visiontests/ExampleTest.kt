@@ -31,7 +31,7 @@ import kotlin.random.Random
 
 class ExampleTest : VisionTest {
 
-    override val testID: String = "TEST_SIGHT_INFO"
+    override val testID: String = "TEST_MISC_EXAMPLE"
     override val testIcon: ImageVector = Icons.Outlined.Info
     override val needsMicrophone: Boolean = false
     override val stageCount: Int = 10
