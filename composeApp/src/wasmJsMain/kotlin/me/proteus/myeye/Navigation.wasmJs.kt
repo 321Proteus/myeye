@@ -18,6 +18,7 @@ import me.proteus.myeye.ui.screens.PlaceDetailsScreen
 import me.proteus.myeye.ui.screens.ResultBrowserScreen
 import me.proteus.myeye.ui.screens.SimpleDistanceScreen
 import me.proteus.myeye.ui.screens.TestResultScreen
+import me.proteus.myeye.ui.screens.VisionTestConfigScreen
 import me.proteus.myeye.ui.screens.VisionTestScreen
 import org.w3c.dom.HTMLElement
 import org.w3c.dom.asList
@@ -63,10 +64,14 @@ actual fun SetupNavigation() {
         }
         "visiontest" -> {
             val testID = parts.getOrNull(1).toString()
-            val isResult = parts.getOrNull(2).toBoolean()
+            val navMode = parts.getOrNull(2)?.toIntOrNull() ?: 0
             val sessionId = parts.getOrNull(3)?.toIntOrNull() ?: -1
             val distance = parts.getOrNull(4)?.toFloatOrNull() ?: 0f
-            VisionTestScreen(testID, isResult, sessionId, distance)
+            if (navMode == 0) {
+                VisionTestConfigScreen(testID)
+            } else {
+                VisionTestScreen(testID, navMode, sessionId, distance)
+            }
         }
         "distance" -> {
             val countdown = parts.getOrNull(1).toBoolean()

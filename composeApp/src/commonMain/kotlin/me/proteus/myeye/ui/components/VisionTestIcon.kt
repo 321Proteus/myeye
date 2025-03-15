@@ -29,7 +29,7 @@ fun VisionTestIcon(
             .aspectRatio(1.0f)
             .clip(shape = RoundedCornerShape(15.dp))
             .clickable(enabled = clickable) {
-                navigate("visiontest/$testID/false/0/0f")
+                navigate("visiontest/$testID/0/0/0f")
 //                controller!!.currentBackStackEntry?.savedStateHandle?.apply {
 //                    set("isResult", false)
 //                }

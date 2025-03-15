@@ -318,7 +318,7 @@ fun CameraView(
                             println(average)
 
                             println(testID)
-                            navigate("visiontest/$testID/false/0/$average")
+                            navigate("visiontest/$testID/1/0/$average")
 
                             return@detectFaces
 

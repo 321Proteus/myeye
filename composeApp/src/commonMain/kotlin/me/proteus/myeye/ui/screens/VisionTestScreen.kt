@@ -1,20 +1,122 @@
 package me.proteus.myeye.ui.screens
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.Button
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import me.proteus.myeye.ui.theme.MyEyeTheme
 import me.proteus.myeye.visiontests.VisionTestUtils
 import me.proteus.myeye.io.ResultDataSaver
+import me.proteus.myeye.navigate
+import me.proteus.myeye.ui.components.VisionTestIcon
+
+@Composable
+fun VisionTestConfigScreen(
+    testID: String
+) {
+    MyEyeTheme {
+
+        Scaffold(
+            content = { innerPadding ->
+
+                val vtu = VisionTestUtils()
+                val test = vtu.getTestByID(testID)
+                var distance by remember { mutableStateOf("0") }
+
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(innerPadding),
+                    verticalArrangement = Arrangement.SpaceEvenly,
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+
+                    Column(
+                        modifier = Modifier
+                            .fillMaxHeight(0.5f)
+                            .padding(top = 16.dp),
+                        verticalArrangement = Arrangement.SpaceEvenly,
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Text(text = vtu.getFullTestName(testID), fontSize = 24.sp)
+
+                        VisionTestIcon(
+                            modifier = Modifier
+                                .padding(start = 100.dp, end = 100.dp)
+                                .weight(0.65f),
+                            testID = testID,
+                            size = 0.4f
+                        )
+                    }
+
+                    Column(
+                        modifier = Modifier
+                            .weight(0.8f)
+                            .padding(horizontal = 16.dp),
+                        verticalArrangement = Arrangement.Top,
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+
+                        Box {
+                            Text(vtu.getTestDescriptionByID(testID))
+                        }
+
+                        if (test.distance != -1f) {
+                            Box {
+                                TextField(
+                                    value = distance,
+                                    onValueChange = { newValue ->
+                                        if (newValue.isEmpty() || newValue.toIntOrNull() != null) {
+                                            distance = newValue
+                                        }
+                                    },
+                                    label = { Text("Podaj odległość") },
+                                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                                    singleLine = true
+                                )
+                            }
+                        }
+                        Box(
+                            contentAlignment = Alignment.Center
+                        ) {
+
+
+                            Button(
+                                modifier = Modifier,
+                                onClick = {
+                                    navigate("visiontest/$testID/1/0/$distance")
+                                }
+                            ) {
+                                Text(text = "Rozpocznij test", fontSize = 20.sp)
+                            }
+                        }
+
+                    }
+
+                }
+
+            }
+        )
+    }
+}
 
 @Composable
 fun VisionTestScreen(
     testID: String,
-    isResult: Boolean,
+    navMode: Int,
     sessionID: Int?,
     distance: Float
 ) {
@@ -23,14 +125,17 @@ fun VisionTestScreen(
     val conn = ResultDataSaver.getConnection()
 
     val resultData = remember {
-        if (!isResult) null
+        if (navMode == 1) null
         else ResultDataSaver.select(conn, sessionID!!)[0]
     }
 
     val testObject = remember {
-        if (!isResult) vtu.getTestByID(testID)
+        if (navMode == 1) vtu.getTestByID(testID)
         else vtu.getTestByID(resultData!!.testID)
     }
+
+    println("dystans: $distance")
+
     // TODO: multiplatform camera/mic permissions
 //    val permissionList = mutableListOf<String>()
 //    if (testObject.needsMicrophone) permissionList.add(Manifest.permission.RECORD_AUDIO)
@@ -74,7 +179,7 @@ fun VisionTestScreen(
                 contentAlignment = Alignment.Center
             ) {
                 testObject.BeginTest(
-                    isResult = isResult,
+                    isResult = (navMode == 2),
                     result = resultData
                 )
             }

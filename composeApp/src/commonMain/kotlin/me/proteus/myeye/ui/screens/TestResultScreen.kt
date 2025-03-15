@@ -30,6 +30,7 @@ import me.proteus.myeye.ui.theme.MyEyeTheme
 import me.proteus.myeye.resources.Res
 import me.proteus.myeye.resources.*
 import me.proteus.myeye.util.biometryViewModelProvider
+import me.proteus.myeye.visiontests.VisionTestUtils
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
@@ -76,8 +77,8 @@ fun TestResultScreen(
                         verticalArrangement = Arrangement.SpaceEvenly,
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-
-                        Text(text = resultData.fullTestName, fontSize = 24.sp)
+                        val vtu = VisionTestUtils()
+                        Text(text = vtu.getFullTestName(resultData.testID), fontSize = 24.sp)
 
                         VisionTestIcon(
                             modifier = Modifier
@@ -161,6 +162,6 @@ fun TestResultScreen(
 
 fun openTest(test: TestResult) {
 
-    navigate("visiontest/${test.testID}/true/${test.resultID}/${test.distance}")
+    navigate("visiontest/${test.testID}/2/${test.resultID}/${test.distance}")
 
 }
