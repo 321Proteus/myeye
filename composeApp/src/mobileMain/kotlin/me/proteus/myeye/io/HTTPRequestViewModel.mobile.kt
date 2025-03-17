@@ -2,17 +2,19 @@ package me.proteus.myeye.io
 
 import androidx.lifecycle.ViewModel
 import io.ktor.client.HttpClient
-import io.ktor.client.request.get
-import io.ktor.client.request.headers
-import io.ktor.client.statement.bodyAsChannel
+import io.ktor.client.call.body
+import io.ktor.client.request.prepareGet
+import io.ktor.client.utils.DEFAULT_HTTP_BUFFER_SIZE
 import io.ktor.http.contentLength
-import io.ktor.utils.io.readAvailable
+import io.ktor.utils.io.ByteReadChannel
+import io.ktor.utils.io.readRemaining
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import kotlinx.io.readByteArray
 import me.proteus.myeye.getDriver
 import okio.Path
 import okio.buffer
@@ -64,39 +66,32 @@ actual class HTTPRequestViewModel : ViewModel() {
 
             try {
                 println("start at $url")
-                val res = client.get(url) {
-                    headers {
-                        append("Referer", "https://alphacephei.com/vosk/models")
-                    }
-                }
-                println("Res: $res")
-                val size = res.contentLength() ?: 0L
-                val data = res.bodyAsChannel()
-                println("running dl")
 
-                fs.sink(output, false).buffer().use { sink ->
+                client.prepareGet(url).execute { res ->
 
-                    var bytesRead = 0L
-                    val buffer = ByteArray(8192)
+                    println("Res: $res")
+                    val size = res.contentLength() ?: 0L
+                    println("running dl")
 
-                    while (!data.isClosedForRead) {
-                        val read = data.readAvailable(buffer)
-                        if (read == -1) break
+                    println(res)
+                    val channel: ByteReadChannel = res.body()
 
-                        sink.write(buffer, 0, read)
-                        bytesRead += read
-
-                        if (size > 0) {
-                            val progress = (bytesRead.toFloat() / size) * 100
-                            println(progress)
-                            _progressFlow.value = progress
+                    fs.sink(output, false).buffer().use { sink ->
+                        var bytesRead = 0L
+                        while (!channel.isClosedForRead) {
+                            val packet = channel.readRemaining(DEFAULT_HTTP_BUFFER_SIZE.toLong())
+                            while (!packet.exhausted()) {
+                                val bytes = packet.readByteArray()
+                                sink.write(bytes)
+                                bytesRead += bytes.size
+                                _progressFlow.value = bytesRead.toFloat() / size
+//                                println("Received $bytesRead bytes from $size")
+                            }
                         }
+                        sink.flush()
+                        _showDialog.value = false
+                        then()
                     }
-
-                    sink.flush()
-                    _showDialog.value = false
-                    then()
-
                 }
             } catch (e: Exception) {
                 println("Cause: " + e.message)
@@ -104,8 +99,6 @@ actual class HTTPRequestViewModel : ViewModel() {
 //                client.close()
 //            }
         }
-
-        println("sigma")
     }
 
     override fun onCleared() {

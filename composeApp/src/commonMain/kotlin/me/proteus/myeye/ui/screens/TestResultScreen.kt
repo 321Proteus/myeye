@@ -45,7 +45,7 @@ fun TestResultScreen(
     val desc = stringResource(Res.string.biometry_reason)
     val fail = stringResource(Res.string.biometry_fail)
 
-    var authModel = biometryViewModelProvider()
+    val authModel = biometryViewModelProvider()
 
     MyEyeTheme {
 
