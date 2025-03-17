@@ -6,7 +6,7 @@ import kotlinx.datetime.toLocalDateTime
 import kotlinx.serialization.Serializable
 
 @Serializable
-class TestResult (
+data class TestResult (
     var resultID: Int = 0,
     var testID: String = "",
     var timestamp: Long = 0L,
