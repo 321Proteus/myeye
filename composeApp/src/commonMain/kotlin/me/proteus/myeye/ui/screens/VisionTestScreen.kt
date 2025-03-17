@@ -17,6 +17,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import me.proteus.myeye.getPlatform
 import me.proteus.myeye.ui.theme.MyEyeTheme
 import me.proteus.myeye.visiontests.VisionTestUtils
 import me.proteus.myeye.io.ResultDataSaver
@@ -25,7 +26,8 @@ import me.proteus.myeye.ui.components.VisionTestIcon
 
 @Composable
 fun VisionTestConfigScreen(
-    testID: String
+    testID: String,
+    measured: Float? = null
 ) {
     MyEyeTheme {
 
@@ -34,7 +36,9 @@ fun VisionTestConfigScreen(
 
                 val vtu = VisionTestUtils()
                 val test = vtu.getTestByID(testID)
-                var distance by remember { mutableStateOf("0") }
+                var distance by remember {
+                    mutableStateOf(measured?.toString() ?: "0")
+                }
 
                 Column(
                     modifier = Modifier
@@ -46,7 +50,7 @@ fun VisionTestConfigScreen(
 
                     Column(
                         modifier = Modifier
-                            .fillMaxHeight(0.5f)
+                            .fillMaxHeight(0.4f)
                             .padding(top = 16.dp),
                         verticalArrangement = Arrangement.SpaceEvenly,
                         horizontalAlignment = Alignment.CenterHorizontally
@@ -55,7 +59,7 @@ fun VisionTestConfigScreen(
 
                         VisionTestIcon(
                             modifier = Modifier
-                                .padding(start = 100.dp, end = 100.dp)
+                                .padding(start = 120.dp, end = 120.dp)
                                 .weight(0.65f),
                             testID = testID,
                             size = 0.4f
@@ -75,19 +79,31 @@ fun VisionTestConfigScreen(
                         }
 
                         if (test.distance != -1f) {
-                            Box {
-                                TextField(
-                                    value = distance,
-                                    onValueChange = { newValue ->
-                                        if (newValue.isEmpty() || newValue.toIntOrNull() != null) {
-                                            distance = newValue
-                                        }
-                                    },
-                                    label = { Text("Podaj odległość") },
-                                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                                    singleLine = true
-                                )
+                            Column(
+                                horizontalAlignment = Alignment.CenterHorizontally
+                            ) {
+                                Box {
+                                    TextField(
+                                        value = distance,
+                                        onValueChange = { newValue ->
+                                            if (newValue.isEmpty() || newValue.toIntOrNull() != null) {
+                                                distance = newValue
+                                            }
+                                        },
+                                        label = { Text("Podaj odległość") },
+                                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                                        singleLine = true
+                                    )
+                                }
+                                if (getPlatform().type != "WEB") {
+                                    Button(onClick = {
+                                        navigate("distance/true/$testID")
+                                    }) {
+                                        Text("Zmierz odległość")
+                                    }
+                                }
                             }
+
                         }
                         Box(
                             contentAlignment = Alignment.Center

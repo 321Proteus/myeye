@@ -15,6 +15,8 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ExperimentalGetImage
 import androidx.camera.core.ImageAnalysis
+import androidx.camera.core.resolutionselector.ResolutionSelector
+import androidx.camera.core.resolutionselector.ResolutionStrategy
 import androidx.camera.view.LifecycleCameraController
 import androidx.camera.view.PreviewView
 import androidx.compose.foundation.layout.Arrangement
@@ -66,7 +68,6 @@ import java.util.concurrent.Executors
 import me.proteus.myeye.resources.Res
 import me.proteus.myeye.resources.optician_sans
 import me.proteus.myeye.ui.theme.MyEyeTheme
-import me.proteus.myeye.util.CameraUtils
 import org.jetbrains.compose.resources.Font
 
 const val sredniaSzerokoscTwarzy = 150f
@@ -129,7 +130,10 @@ fun StartView(
     val pairedSize = Size(imageSize.first.toInt(), imageSize.second.toInt())
 
     camera.imageAnalysisBackpressureStrategy = ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST
-    camera.imageAnalysisResolutionSelector = CameraUtils.createSelector(pairedSize)
+    camera.imageAnalysisResolutionSelector =
+        ResolutionSelector.Builder().setResolutionStrategy(
+            ResolutionStrategy(pairedSize, ResolutionStrategy.FALLBACK_RULE_CLOSEST_HIGHER_THEN_LOWER)
+        ).build()
 
     val introText = "Umieść urządzenie w odległości 2-6 metrów od siebie, na lub trochę poniżej linii wzroku, a następnie stań lub usiądź"
 
@@ -318,7 +322,7 @@ fun CameraView(
                             println(average)
 
                             println(testID)
-                            navigate("visiontest/$testID/1/0/$average")
+                            navigate("visiontest/$testID/0/0/$average")
 
                             return@detectFaces
 
