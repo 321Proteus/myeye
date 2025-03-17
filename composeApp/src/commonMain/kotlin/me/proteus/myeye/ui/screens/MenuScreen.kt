@@ -53,26 +53,6 @@ fun MenuScreen() {
     val conn = ResultDataSaver.getConnection()
     ResultDataSaver.createTable(conn)
 
-//    val model = remember { ASRViewModel() }
-//
-//    val factory = rememberPermissionsControllerFactory()
-//    val controller = remember(factory) { factory.createPermissionsController() }
-//
-//    var isRunning by remember { mutableStateOf(false) }
-//    BindEffect(controller)
-//
-//    LaunchedEffect(controller) {
-//        controller.providePermission(Permission.RECORD_AUDIO)
-//        isRunning = true
-//    }
-//
-//    if (isRunning) {
-//        println("Starting")
-//        model.start(GrammarType.LETTERS_LOGMAR)
-//    }
-//
-//    val buffer = model.wordBuffer.collectAsState()
-
     Scaffold(
         topBar = { TopBar() },
         bottomBar = { BottomBar() },
@@ -107,7 +87,7 @@ fun MenuScreen() {
 
                     Text(
                         fontSize = 12.sp,
-                        text = stringResource(Res.string.menu_description), // + buffer.value.joinToString(" "),
+                        text = stringResource(Res.string.menu_description),
                         textAlign = TextAlign.Center
                     )
 

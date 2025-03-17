@@ -19,7 +19,7 @@ volleyVersion = "1.2.1"
 playServicesMapsVersion = "19.1.0"
 placesComposeVersion = "0.1.2"
 placesVersion = "4.1.0"
-voskVersion = "0.3.45"
+vosk = "0.3.47"
 ktor = "3.1.1"
 navigationCompose = "2.9.0-alpha14"
 lifecycle = "2.9.0-alpha04"
@@ -50,7 +50,7 @@ volley = { group = "com.android.volley", name = "volley", version.ref = "volleyV
 play-services-maps = { group = "com.google.android.gms", name = "play-services-maps", version.ref = "playServicesMapsVersion" }
 places-compose = { group = "com.google.maps.android", name = "places-compose", version.ref = "placesComposeVersion" }
 places = { group = "com.google.android.libraries.places", name = "places", version.ref = "placesVersion" }
-vosk = { group = "com.alphacephei", name = "vosk", version.ref = "voskVersion" }
+vosk = { group = "com.alphacephei", name = "vosk-android", version.ref = "vosk" }
 ktor-client-okhttp = { group = "io.ktor", name = "ktor-client-okhttp", version.ref = "ktor" }
 ktor-client-darwin = { group = "io.ktor", name = "ktor-client-darwin", version.ref = "ktor" }
 navigation-compose = { group = "org.jetbrains.androidx.navigation", name = "navigation-compose", version.ref = "navigationCompose" }

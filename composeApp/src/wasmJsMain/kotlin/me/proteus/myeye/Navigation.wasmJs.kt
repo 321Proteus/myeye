@@ -92,3 +92,8 @@ actual fun SetupNavigation() {
     }
 
 }
+
+@Composable
+actual fun isLandscape(): Boolean {
+    return window.innerWidth > window.innerHeight
+}

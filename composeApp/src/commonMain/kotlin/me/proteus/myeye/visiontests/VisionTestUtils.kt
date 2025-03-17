@@ -9,8 +9,8 @@ import org.jetbrains.compose.resources.stringArrayResource
 class VisionTestUtils {
 
     val testList = listOf(
-//        SnellenChart(),
-//        CircleTest(),
+        SnellenChart(),
+        CircleTest(),
         ExampleTest(),
         ColorArrangementTest(),
         ReactionTest(),

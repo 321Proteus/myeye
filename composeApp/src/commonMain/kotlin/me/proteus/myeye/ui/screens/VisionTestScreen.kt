@@ -137,6 +137,10 @@ fun VisionTestScreen(
     println("dystans: $distance")
 
     // TODO: multiplatform camera/mic permissions
+
+    if (testObject.distance != -1f) {
+        testObject.distance = distance
+    }
 //    val permissionList = mutableListOf<String>()
 //    if (testObject.needsMicrophone) permissionList.add(Manifest.permission.RECORD_AUDIO)
 //    if (testObject.distance != -1f) permissionList.add(Manifest.permission.CAMERA)

@@ -10,3 +10,6 @@ expect fun navigate(route: String)
 expect fun SetupNavigation()
 
 expect fun goBack(route: String, inclusive: Boolean)
+
+@Composable
+expect fun isLandscape(): Boolean
