@@ -6,20 +6,20 @@ import java.net.URI
 
 val system: String = System.getProperty("os.name")
 val isMacos = system.contains("mac", true)
-println("Operating system: $system (${if (isMacos) "" else "not "}running ios builds)")
+
+if (!isMacos) {
+    logger.error("You are running Apple buildscript on a non-Apple device (${system}). " +
+            "To perform non-apple multiplatform build, replace this file with the default script")
+}
 
 plugins {
-
-    val isMacos = System.getProperty("os.name").contains("mac", true)
-
     alias(libs.plugins.kotlinMultiplatform)
     alias(libs.plugins.composeMultiplatform)
     alias(libs.plugins.composeCompiler)
     alias(libs.plugins.androidApplication)
-    if (isMacos) alias(libs.plugins.kotlinCocoapods)
+    alias(libs.plugins.kotlinCocoapods)
     alias(libs.plugins.kotlinxSerialization)
-//    id("io.github.ttypic.swiftklib") version "0.6.4"
-    if (isMacos) id("io.github.frankois944.spmForKmp") version "0.4.0"
+    id("io.github.frankois944.spmForKmp") version "0.4.0"
 }
 
 kotlin {
@@ -42,66 +42,64 @@ kotlin {
         }
         binaries.executable()
     }
-    if (isMacos) {
-        val iosTargets = listOf(iosSimulatorArm64(), /* iosX64(), iosArm64(),*/)
 
-        iosTargets.forEach { target ->
-            target.compilations {
-                val main by getting {
-                    cinterops {
-                        create("swiftSrc")
-                    }
+    val iosTargets = listOf(iosSimulatorArm64(), /* iosX64(), iosArm64(),*/)
+
+    iosTargets.forEach { target ->
+        target.compilations {
+            val main by getting {
+                cinterops {
+                    create("swiftSrc")
                 }
             }
         }
+    }
 
-        swiftPackageConfig {
-            create("swiftSrc") {
-                customPackageSourcePath = "../iosApp/"
-                minIos = "15.0"
-                dependency(
-                    SwiftDependency.Package.Remote.Version(
-                        url = URI("https://github.com/googlemaps/ios-maps-sdk"),
-                        products = {
-                            add("GoogleMaps")
-                        },
-                        version = "9.3.0",
-                    )
+    swiftPackageConfig {
+        create("swiftSrc") {
+            customPackageSourcePath = "../iosApp/"
+            minIos = "15.0"
+            dependency(
+                SwiftDependency.Package.Remote.Version(
+                    url = URI("https://github.com/googlemaps/ios-maps-sdk"),
+                    products = {
+                        add("GoogleMaps")
+                    },
+                    version = "9.3.0",
                 )
-                dependency(
-                    SwiftDependency.Package.Remote.Version(
-                        url = URI("https://github.com/googlemaps/ios-places-sdk"),
-                        products = {
-                            add("GooglePlaces")
-                        },
-                        version = "9.3.0",
-                    )
+            )
+            dependency(
+                SwiftDependency.Package.Remote.Version(
+                    url = URI("https://github.com/googlemaps/ios-places-sdk"),
+                    products = {
+                        add("GooglePlaces")
+                    },
+                    version = "9.3.0",
                 )
-                dependency(
-                    SwiftDependency.Binary.Local(
-                        path = "/Users/proteus/Desktop/libvosk.xcframework",
+            )
+            dependency(
+                SwiftDependency.Binary.Local(
+                    path = "/Users/proteus/Desktop/libvosk.xcframework",
 
-                        packageName = "vosk",
-                        linkerOpts = listOf("-lvosk", "-lc++", "-laccelerate")
+                    packageName = "vosk",
+                    linkerOpts = listOf("-lvosk", "-lc++", "-laccelerate")
 //                    exportToKotlin = true
-                    )
                 )
-            }
+            )
         }
+    }
 
-        cocoapods {
-            name = "ComposeApp"
-            summary = "Some description for the Shared Module"
-            homepage = "Link to the Shared Module homepage"
-            version = "1.0"
-            ios.deploymentTarget = "15.4"
-            podfile = project.file("../iosApp/Podfile")
-            framework {
-                baseName = "ComposeApp"
-                isStatic = true
-            }
+    cocoapods {
+        name = "ComposeApp"
+        summary = "Some description for the Shared Module"
+        homepage = "Link to the Shared Module homepage"
+        version = "1.0"
+        ios.deploymentTarget = "15.4"
+        podfile = project.file("../iosApp/Podfile")
+        framework {
+            baseName = "ComposeApp"
+            isStatic = true
         }
-
     }
 
     androidTarget {
@@ -129,7 +127,9 @@ kotlin {
             implementation(libs.vosk)
             implementation(libs.ktor.client.okhttp)
             implementation(libs.androidx.camera.core)
+            implementation(libs.androidx.camera.lifecycle)
             implementation(libs.androidx.camera.view)
+            implementation(libs.androidx.camera.camera2)
             implementation(libs.mlkit.face)
         }
 
@@ -150,6 +150,7 @@ kotlin {
                 implementation(libs.korio)
                 implementation(libs.korim)
                 implementation(libs.permissions.microphone)
+                implementation(libs.permissions.camera)
                 api(libs.permissions)
                 api(libs.permissions.compose)
             }

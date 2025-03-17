@@ -87,7 +87,9 @@ actual fun SetupNavigation() {
                 // navMode 0 - config, 1 - test, 2 - result
 
                 if (navMode == 0) {
-                    VisionTestConfigScreen(testID)
+                    println("running at $distance")
+                    if (distance == 0f) VisionTestConfigScreen(testID)
+                    else VisionTestConfigScreen(testID, distance)
                 } else {
                     VisionTestScreen(testID, navMode, sessionId, distance)
                 }
