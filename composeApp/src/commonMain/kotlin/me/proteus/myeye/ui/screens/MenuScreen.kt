@@ -27,10 +27,14 @@ import me.proteus.myeye.ui.components.TopBar
 import me.proteus.myeye.ui.theme.MyEyeTheme
 import me.proteus.myeye.resources.Res
 import me.proteus.myeye.resources.menu_description
+import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.stringResource
 
 val Int.fixedSp
     @Composable get() = (this / LocalDensity.current.fontScale).sp
+
+@Composable
+fun StringResource.res(): String = stringResource(this)
 
 @Composable
 fun MainMenu() {

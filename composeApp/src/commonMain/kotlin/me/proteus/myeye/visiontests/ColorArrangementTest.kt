@@ -55,6 +55,11 @@ import me.proteus.myeye.io.DBConnector
 import me.proteus.myeye.io.ResultDataCollector
 import me.proteus.myeye.io.SerializableStage
 import me.proteus.myeye.resources.farnsworth_colors
+import me.proteus.myeye.resources.next
+import me.proteus.myeye.resources.prev
+import me.proteus.myeye.resources.test_correct
+import me.proteus.myeye.resources.test_user
+import me.proteus.myeye.ui.screens.res
 import org.jetbrains.compose.resources.stringArrayResource
 
 class ColorArrangementTest : VisionTest {
@@ -175,7 +180,7 @@ class ColorArrangementTest : VisionTest {
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
 
-                    if (isResult) Text("Odpowiedź\nużytkownika")
+                    if (isResult) Text(Res.string.test_user.res())
 
                     LazyColumn(
                         horizontalAlignment = Alignment.CenterHorizontally,
@@ -275,7 +280,7 @@ class ColorArrangementTest : VisionTest {
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
 
-                        Text("Poprawna\nodpowiedź")
+                        Text(Res.string.test_correct.res())
 
                         LazyColumn(
                             horizontalAlignment = Alignment.CenterHorizontally,
@@ -306,14 +311,7 @@ class ColorArrangementTest : VisionTest {
                             println(getScore(ans, "RELATIVE"))
                             onUpdate(ans)
                         }
-                    ) { Text("Dalej") }
-
-                    Button(
-                        onClick = {
-                            colorOffset += colors.size / 4
-                            onUpdate("REGENERATE")
-                        }
-                    ) { Text("Zmień kolory") }
+                    ) { Text(Res.string.next.res()) }
                 }
             } else {
                 Row(
@@ -323,10 +321,10 @@ class ColorArrangementTest : VisionTest {
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Button(onClick = { onUpdate("PREV") }) {
-                        Text(text = "Poprzedni etap")
+                        Text(text = (Res.string.prev.res()))
                     }
                     Button(onClick = { onUpdate("NEXT") }) {
-                        Text(text = "Następny etap")
+                        Text(text = Res.string.next.res())
                     }
                 }
 

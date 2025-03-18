@@ -22,7 +22,11 @@ import me.proteus.myeye.ui.theme.MyEyeTheme
 import me.proteus.myeye.visiontests.VisionTestUtils
 import me.proteus.myeye.io.ResultDataSaver
 import me.proteus.myeye.navigate
+import me.proteus.myeye.resources.Res
+import me.proteus.myeye.resources.start_test
+import me.proteus.myeye.resources.test_enter_distance
 import me.proteus.myeye.ui.components.VisionTestIcon
+import org.jetbrains.compose.resources.stringResource
 
 @Composable
 fun VisionTestConfigScreen(
@@ -90,7 +94,7 @@ fun VisionTestConfigScreen(
                                                 distance = newValue
                                             }
                                         },
-                                        label = { Text("Podaj odległość") },
+                                        label = { Text(Res.string.test_enter_distance.res()) },
                                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                                         singleLine = true
                                     )
@@ -99,7 +103,7 @@ fun VisionTestConfigScreen(
                                     Button(onClick = {
                                         navigate("distance/true/$testID")
                                     }) {
-                                        Text("Zmierz odległość")
+                                        Text(Res.string.test_enter_distance.res())
                                     }
                                 }
                             }
@@ -116,7 +120,7 @@ fun VisionTestConfigScreen(
                                     navigate("visiontest/$testID/1/0/$distance")
                                 }
                             ) {
-                                Text(text = "Rozpocznij test", fontSize = 20.sp)
+                                Text(text = stringResource(Res.string.start_test), fontSize = 20.sp)
                             }
                         }
 

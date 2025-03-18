@@ -37,8 +37,11 @@ import me.proteus.myeye.io.DBConnector
 import me.proteus.myeye.io.ResultDataCollector
 import me.proteus.myeye.isLandscape
 import me.proteus.myeye.resources.Res
+import me.proteus.myeye.resources.next
 import me.proteus.myeye.resources.optician_sans
+import me.proteus.myeye.resources.prev
 import me.proteus.myeye.ui.components.OrientableGrid
+import me.proteus.myeye.ui.screens.res
 import org.jetbrains.compose.resources.Font
 import kotlin.math.*
 import kotlin.random.Random
@@ -214,10 +217,10 @@ class CircleTest : VisionTest {
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Button(onClick = { onUpdate("PREV") }) {
-                        Text(text = "Poprzedni etap")
+                        Text(Res.string.prev.res())
                     }
                     Button(onClick = { onUpdate("NEXT") }) {
-                        Text(text = "Następny etap")
+                        Text(Res.string.next.res())
                     }
                 }
             }

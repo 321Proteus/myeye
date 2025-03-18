@@ -36,6 +36,13 @@ import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.MapProperties
 import com.google.maps.android.compose.MapUiSettings
 import com.google.maps.android.compose.rememberCameraPositionState
+import me.proteus.myeye.resources.Res
+import me.proteus.myeye.resources.loading
+import me.proteus.myeye.resources.map_hours
+import me.proteus.myeye.resources.map_phone
+import me.proteus.myeye.resources.map_see_gmaps
+import me.proteus.myeye.resources.map_website
+import me.proteus.myeye.resources.nodata
 import me.proteus.myeye.ui.theme.MyEyeTheme
 
 @Composable
@@ -96,15 +103,15 @@ actual fun PlaceDetailsScreen(placeId: String) {
                         println(hours)
                         val lista = hours?.weekdayText?.joinToString("\n", "\n")
 
-                        val numer = place!!.internationalPhoneNumber ?: "Brak informacji"
+                        val numer = place!!.internationalPhoneNumber ?: Res.string.nodata.res()
 
                         Text(place!!.displayName!!, fontSize = 28.sp)
                         Text(place!!.formattedAddress!!, fontSize = 20.sp)
 
-                        Text("Godziny otwarcia: ${if (lista == null) "Brak informacji" else ""}", fontSize = 20.sp)
+                        Text(Res.string.map_hours.res() + ": ${if (lista == null) Res.string.nodata.res() else ""}", fontSize = 20.sp)
                         Text(lista ?: "", fontSize = 16.sp)
 
-                        Text("Telefon: $numer", fontSize = 20.sp)
+                        Text(Res.string.map_phone.res() + ": $numer", fontSize = 20.sp)
 
                         val handler = LocalUriHandler.current
                         val buttonModifier = Modifier.height(80.dp)
@@ -119,7 +126,7 @@ actual fun PlaceDetailsScreen(placeId: String) {
                                 onClick = {
                                 handler.openUri("https://google.com/maps/place/?q=$placeId")
                             }) {
-                                Text("Zobacz w Mapach Google")
+                                Text(Res.string.map_see_gmaps.res())
                             }
                             if (place!!.websiteUri != null) {
                                 Button(
@@ -127,14 +134,14 @@ actual fun PlaceDetailsScreen(placeId: String) {
                                     onClick = {
                                         handler.openUri("${place!!.websiteUri!!}")
                                     }) {
-                                    Text("Odwiedź stronę")
+                                    Text(Res.string.map_website.res())
                                 }
                             }
 
                         }
 
                     } else {
-                        Text("Ładowanie danych...")
+                        Text(Res.string.loading.res())
                     }
 
                 }

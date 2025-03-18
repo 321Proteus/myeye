@@ -28,6 +28,12 @@ import me.proteus.myeye.VisionTest
 import me.proteus.myeye.io.DBConnector
 import me.proteus.myeye.io.ResultDataCollector
 import me.proteus.myeye.io.SerializableStage
+import me.proteus.myeye.resources.Res
+import me.proteus.myeye.resources.next
+import me.proteus.myeye.resources.none
+import me.proteus.myeye.resources.prev
+import me.proteus.myeye.resources.test_plate
+import me.proteus.myeye.ui.screens.res
 
 class IshiharaTest : VisionTest {
 
@@ -79,7 +85,7 @@ class IshiharaTest : VisionTest {
         ) {
 
             Box(contentAlignment = Alignment.Center) {
-                Text("Jaki numer widać na ekranie?")
+                Text(Res.string.test_plate.res())
             }
             Box(
                 modifier = Modifier
@@ -113,10 +119,10 @@ class IshiharaTest : VisionTest {
             ) {
                 if (isResult) {
                     Button(onClick = { onUpdate("PREV") }) {
-                        Text("Poprzedni etap")
+                        Text(Res.string.next.res())
                     }
                     Button(onClick = { onUpdate("NEXT") }) {
-                        Text("Następny etap")
+                        Text(Res.string.prev.res())
                     }
                     Button(onClick = { showAnswer = !showAnswer }) {
                         Text(if (showAnswer) "Ukryj odpowiedź" else "Pokaż odpowiedź")
@@ -126,7 +132,7 @@ class IshiharaTest : VisionTest {
                         Button(onClick = {
                             onUpdate(el.toString())
                             currentID++
-                        }) { Text(if (el == -1) "Brak" else el.toString()) }
+                        }) { Text(if (el == -1) Res.string.none.res() else el.toString()) }
                     }
                 }
 

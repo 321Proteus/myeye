@@ -43,8 +43,11 @@ import com.google.android.libraries.places.api.model.AutocompleteSessionToken
 import com.google.android.libraries.places.api.net.FindAutocompletePredictionsRequest
 import com.google.android.libraries.places.api.net.PlacesClient
 import com.google.android.libraries.places.compose.autocomplete.models.toPlaceDetails
+import me.proteus.myeye.resources.Res
+import me.proteus.myeye.resources.map_search
 import me.proteus.myeye.ui.screens.getDistance
 import me.proteus.myeye.ui.screens.getPlace
+import me.proteus.myeye.ui.screens.res
 import kotlin.math.round
 
 data class PlaceField(
@@ -99,7 +102,7 @@ fun PlaceSearchBar(
                 onSearch = { isExpanded = false },
                 expanded = isExpanded,
                 onExpandedChange = { isExpanded = it },
-                placeholder = { Text("Wyszukaj ulicę lub miejsce") },
+                placeholder = { Text(Res.string.map_search.res()) },
                 leadingIcon = {
                     Icon(
                         if (isExpanded) Icons.Default.Close else Icons.Default.Search,

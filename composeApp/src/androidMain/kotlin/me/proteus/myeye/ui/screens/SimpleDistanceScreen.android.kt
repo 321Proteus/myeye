@@ -66,6 +66,7 @@ import kotlinx.coroutines.delay
 import me.proteus.myeye.navigate
 import java.util.concurrent.Executors
 import me.proteus.myeye.resources.Res
+import me.proteus.myeye.resources.camera_info
 import me.proteus.myeye.resources.optician_sans
 import me.proteus.myeye.ui.theme.MyEyeTheme
 import org.jetbrains.compose.resources.Font
@@ -135,7 +136,6 @@ fun StartView(
             ResolutionStrategy(pairedSize, ResolutionStrategy.FALLBACK_RULE_CLOSEST_HIGHER_THEN_LOWER)
         ).build()
 
-    val introText = "Umieść urządzenie w odległości 2-6 metrów od siebie, na lub trochę poniżej linii wzroku, a następnie stań lub usiądź"
 
     if (isStarted) {
         Counter(modifier, camera, isBeforeTest, imageSize, testID)
@@ -156,7 +156,7 @@ fun StartView(
                         .weight(3f)
                         .padding(24.dp),
                     fontSize = 24.sp,
-                    text = introText,
+                    text = Res.string.camera_info.res(),
                     textAlign = TextAlign.Center
                 )
                 Button(

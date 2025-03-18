@@ -96,12 +96,12 @@ fun TestResultScreen(
                     ) {
 
                         Box {
-                            Text("Data wykonania: " + resultData.formattedTimestamp)
+                            Text(stringResource(Res.string.result_date) + ": " + resultData.formattedTimestamp)
                         }
 
                         if (resultData.distance != -1f) {
                             Box {
-                                Text("Odległość: " + resultData.distance.fastRoundToInt() + " cm")
+                                Text(stringResource(Res.string.result_distance) + ": " + resultData.distance.fastRoundToInt() + " cm")
                             }
                         }
 
@@ -109,7 +109,7 @@ fun TestResultScreen(
                             Text(
                                 modifier = Modifier
                                     .padding(top = 32.dp, bottom = 16.dp),
-                                text = "Dziękujemy za wykonanie testu!",
+                                text = stringResource(Res.string.result_thankyou),
                                 fontWeight = FontWeight.Bold,
                                 fontSize = 24.sp
                             )
@@ -140,13 +140,13 @@ fun TestResultScreen(
 
                                     }
                                 ) {
-                                    Text(text = "Zobacz wyniki", fontSize = 20.sp)
+                                    Text(text = stringResource(Res.string.result_navigate), fontSize = 20.sp)
                                 }
                             }
                             Button(onClick = {
                                 goBack("menu", false)
                             }) {
-                                Text("Wyjdź", fontSize = 20.sp)
+                                Text(stringResource(Res.string.exit), fontSize = 20.sp)
                             }
                         }
 
