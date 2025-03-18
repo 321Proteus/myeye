@@ -2,14 +2,13 @@ import io.github.frankois944.spmForKmp.definition.SwiftDependency
 import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpackConfig
-import java.net.URI
 
 val system: String = System.getProperty("os.name")
 val isMacos = system.contains("mac", true)
 
 if (!isMacos) {
-    logger.error("You are running Apple buildscript on a non-Apple device (${system}). " +
-            "To perform non-apple multiplatform build, replace this file with the default script")
+    logger.warn("You are running non-Apple buildscript on an Apple device (${system}). " +
+            "To include iOS builds, replace this file with the build.gradle.mac.kts")
 }
 
 plugins {
@@ -17,9 +16,7 @@ plugins {
     alias(libs.plugins.composeMultiplatform)
     alias(libs.plugins.composeCompiler)
     alias(libs.plugins.androidApplication)
-    alias(libs.plugins.kotlinCocoapods)
     alias(libs.plugins.kotlinxSerialization)
-    id("io.github.frankois944.spmForKmp") version "0.4.0"
 }
 
 kotlin {
@@ -55,53 +52,6 @@ kotlin {
         }
     }
 
-    swiftPackageConfig {
-        create("swiftSrc") {
-            customPackageSourcePath = "../iosApp/"
-            minIos = "15.0"
-            dependency(
-                SwiftDependency.Package.Remote.Version(
-                    url = URI("https://github.com/googlemaps/ios-maps-sdk"),
-                    products = {
-                        add("GoogleMaps")
-                    },
-                    version = "9.3.0",
-                )
-            )
-            dependency(
-                SwiftDependency.Package.Remote.Version(
-                    url = URI("https://github.com/googlemaps/ios-places-sdk"),
-                    products = {
-                        add("GooglePlaces")
-                    },
-                    version = "9.3.0",
-                )
-            )
-            dependency(
-                SwiftDependency.Binary.Local(
-                    path = "/Users/proteus/Desktop/libvosk.xcframework",
-
-                    packageName = "vosk",
-                    linkerOpts = listOf("-lvosk", "-lc++", "-laccelerate")
-//                    exportToKotlin = true
-                )
-            )
-        }
-    }
-
-    cocoapods {
-        name = "ComposeApp"
-        summary = "Some description for the Shared Module"
-        homepage = "Link to the Shared Module homepage"
-        version = "1.0"
-        ios.deploymentTarget = "15.4"
-        podfile = project.file("../iosApp/Podfile")
-        framework {
-            baseName = "ComposeApp"
-            isStatic = true
-        }
-    }
-
     androidTarget {
         compilerOptions {
             println("JVM target set to " + jvmTarget.get().target)
@@ -133,10 +83,6 @@ kotlin {
             implementation(libs.mlkit.face)
         }
 
-        iosMain.dependencies {
-            implementation(libs.ktor.client.darwin)
-        }
-
         val mobileMain by creating {
             dependsOn(commonMain.get())
             dependencies {
@@ -157,7 +103,6 @@ kotlin {
         }
 
         androidMain.get().dependsOn(mobileMain)
-        iosMain.get().dependsOn(mobileMain)
 
         commonMain.dependencies {
             implementation(compose.runtime)
