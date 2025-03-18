@@ -44,7 +44,6 @@ actual class ASRViewModel : ViewModel() {
     private var recognizer: Recognizer? = null
     private var model: Model? = null
     private var audioRecord: AudioRecord? = null
-    private var isListening = false
     private var samplerate: Int? = null
     actual var grammarMapping: MutableMap<String, String>? = null
 
@@ -215,13 +214,12 @@ actual class ASRViewModel : ViewModel() {
         }
 
         audioRecord?.startRecording()
-        isListening = true
 
         viewModelScope.launch(Dispatchers.Default) {
 
             val buffer = ByteArray(4096)
 
-            while (isListening) {
+            while (audioRecord?.recordingState == AudioRecord.RECORDSTATE_RECORDING) {
                 val bytesRead = audioRecord?.read(buffer, 0, buffer.size) ?: 0
                 if (bytesRead > 0) {
                     if (recognizer?.acceptWaveForm(buffer, bytesRead) == true) {
@@ -258,9 +256,19 @@ actual class ASRViewModel : ViewModel() {
     }
 
     actual fun close() {
-        audioRecord?.release()
-        recognizer?.close()
-        model?.close()
+        viewModelScope.launch(Dispatchers.IO) {
+
+            if (audioRecord?.state == AudioRecord.STATE_INITIALIZED) {
+                audioRecord?.stop()
+                audioRecord?.release()
+            }
+
+            audioRecord = null
+            recognizer?.close()
+            recognizer = null
+            model?.close()
+            model = null
+        }
     }
 
 }
