@@ -3,6 +3,7 @@ package me.proteus.myeye.io
 import android.annotation.SuppressLint
 import android.media.AudioAttributes
 import android.media.AudioFormat
+import android.media.AudioManager
 import android.media.AudioRecord
 import android.media.AudioTrack
 import android.media.MediaRecorder
@@ -37,6 +38,7 @@ import me.proteus.myeye.ui.components.HTTPDownloaderDialog
 import okio.Path.Companion.toPath
 import org.jetbrains.compose.resources.stringArrayResource
 import org.jetbrains.compose.resources.stringResource
+import kotlin.math.PI
 import kotlin.math.sin
 
 actual class ASRViewModel : ViewModel() {
@@ -236,15 +238,48 @@ actual class ASRViewModel : ViewModel() {
 
     }
 
+    private fun playSineWave(frequency: Double, durationMs: Int, sampleRate: Int) {
+        val numSamples = (sampleRate * durationMs / 1000.0).toInt()
+        val generatedSound = ShortArray(numSamples)
+
+        for (i in generatedSound.indices) {
+            val angle = 2.0 * PI * i * frequency / sampleRate
+            generatedSound[i] = (sin(angle) * Short.MAX_VALUE).toInt().toShort()
+        }
+
+        val audioTrack = AudioTrack.Builder()
+            .setAudioAttributes(
+                AudioAttributes.Builder()
+                    .setUsage(AudioAttributes.USAGE_MEDIA)
+                    .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
+                    .build()
+            )
+            .setAudioFormat(
+                AudioFormat.Builder()
+                    .setEncoding(AudioFormat.ENCODING_PCM_16BIT)
+                    .setSampleRate(sampleRate)
+                    .setChannelMask(AudioFormat.CHANNEL_OUT_MONO)
+                    .build()
+            )
+            .setBufferSizeInBytes(generatedSound.size * 2)
+            .setTransferMode(AudioTrack.MODE_STATIC)
+            .build()
+
+        audioTrack.write(generatedSound, 0, generatedSound.size)
+        audioTrack.play()
+    }
+
     private fun processWords(words: List<SpeechDecoderResult>) {
         val doubtThreshold = 0.7
         if (words.isNotEmpty()) {
             for (el in words) {
                 println("${el.word} ${el.confidence}")
                 if (el.confidence < doubtThreshold) {
+                    playSineWave(2800.0, 400, samplerate!!)
                     return
                 }
             }
+            playSineWave(700.0, 400, samplerate!!)
             updateBuffer(words.map { it.word })
         }
         return
