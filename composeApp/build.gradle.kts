@@ -6,7 +6,7 @@ import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpackConfig
 val system: String = System.getProperty("os.name")
 val isMacos = system.contains("mac", true)
 
-if (!isMacos) {
+if (isMacos) {
     logger.warn("You are running non-Apple buildscript on an Apple device (${system}). " +
             "To include iOS builds, replace this file with the build.gradle.mac.kts")
 }
@@ -138,8 +138,8 @@ android {
         applicationId = "me.proteus.myeye"
         minSdk = 26
         targetSdk = 35
-        versionCode = 1
-        versionName = "1.0"
+        versionCode = 2
+        versionName = "1.0.1"
     }
     packaging {
         resources {

@@ -52,48 +52,49 @@ fun MainMenu() {
 @Composable
 fun MenuScreen() {
 
-    var screenSize by remember { mutableStateOf(Pair(0, 0)) }
+    MyEyeTheme {
+        var screenSize by remember { mutableStateOf(Pair(0, 0)) }
 
-    val conn = ResultDataSaver.getConnection()
-    ResultDataSaver.createTable(conn)
+        val conn = ResultDataSaver.getConnection()
+        ResultDataSaver.createTable(conn)
 
-    Scaffold(
-        topBar = { TopBar() },
-        bottomBar = { BottomBar() },
-        content = { innerPadding ->
-            Layout(
-                 measurePolicy = { measurables, constraints ->
-                    val width = constraints.maxWidth
-                    val height = constraints.maxHeight
+        Scaffold(
+            topBar = { TopBar() },
+            bottomBar = { BottomBar() },
+            content = { innerPadding ->
+                Layout(
+                    measurePolicy = { measurables, constraints ->
+                        val width = constraints.maxWidth
+                        val height = constraints.maxHeight
 
-                    screenSize = Pair(width, height)
-                    println("Width: $width, height: $height")
+                        screenSize = Pair(width, height)
+                        println("Width: $width, height: $height")
 
-                    val placeables = measurables.map { measurable ->
-                        measurable.measure(constraints)
-                    }
-
-                    layout(width, height) {
-                        var yPosition = 0
-                        placeables.forEach { placeable ->
-                            placeable.placeRelative(x = 0, y = yPosition)
-                            yPosition += placeable.height
+                        val placeables = measurables.map { measurable ->
+                            measurable.measure(constraints)
                         }
-                    }
-            }, content = {
-                Column(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(innerPadding)
-                        .verticalScroll(rememberScrollState()),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
 
-                    Text(
-                        fontSize = 12.sp,
-                        text = stringResource(Res.string.menu_description),
-                        textAlign = TextAlign.Center
-                    )
+                        layout(width, height) {
+                            var yPosition = 0
+                            placeables.forEach { placeable ->
+                                placeable.placeRelative(x = 0, y = yPosition)
+                                yPosition += placeable.height
+                            }
+                        }
+                    }, content = {
+                        Column(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(innerPadding)
+                                .verticalScroll(rememberScrollState()),
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+
+                            Text(
+                                fontSize = 12.sp,
+                                text = stringResource(Res.string.menu_description),
+                                textAlign = TextAlign.Center
+                            )
 
 //                val filePath = getPath("test.txt")
 //                val appRoot = getPath(null)
@@ -110,14 +111,15 @@ fun MenuScreen() {
 //                    Text(text)
 //                }
 
-                    Spacer(Modifier.padding(16.dp))
+                            Spacer(Modifier.padding(16.dp))
 
 //                val height = LocalWindowInfo.current.containerSize.height
 
-                    ExpandableGrid((screenSize.second / 2).dp, false)
+                            ExpandableGrid((screenSize.second / 2).dp, false)
 
-                }
-            })
-        }
-    )
+                        }
+                    })
+            }
+        )
+    }
 }
