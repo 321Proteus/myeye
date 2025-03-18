@@ -38,6 +38,7 @@ import me.proteus.myeye.io.SerializableStage
 import me.proteus.myeye.isLandscape
 import me.proteus.myeye.resources.Res
 import me.proteus.myeye.resources.optician_sans
+import me.proteus.myeye.ui.components.OrientableGrid
 import org.jetbrains.compose.resources.Font
 import kotlin.math.*
 import kotlin.random.Random
@@ -82,38 +83,23 @@ class SnellenChart : VisionTest {
         println("height $calculatedSize")
         val pixelSize = cmToSp(calculatedSize).sp
         println("pixelSize $pixelSize")
-        if (isLandscape()) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth(),
-                horizontalArrangement = Arrangement.Center
-            ) {
-                for (i in text.indices) {
-                    Text(
-                        text = text[i].toString(),
-                        color = (if (key != null) (if (text[i] == key[i]) Color.Green else Color.Red) else Color.Black),
-                        fontSize = pixelSize,
-                        fontFamily = FontFamily(Font(Res.font.optician_sans)),
-                        modifier = modifier.padding(8.dp)
-                    )
-                }
-            }
-        } else {
-            Column(
-                modifier = Modifier
-                    .fillMaxHeight(),
-                verticalArrangement = Arrangement.SpaceEvenly,//Arrangement.Center,
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                for (i in text.indices) {
-                    Text(
-                        text = text[i].toString(),
-                        color = (if (key != null) (if (text[i] == key[i]) Color.Green else Color.Red) else Color.Black),
-                        fontSize = pixelSize,
-                        fontFamily = FontFamily(Font(Res.font.optician_sans)),
-                        modifier = modifier.padding(8.dp)
-                    )
-                }
+
+        OrientableGrid(
+            qualifier = isLandscape(),
+            columnModifier = Modifier.fillMaxHeight(),
+            rowModifier = Modifier.fillMaxWidth(),
+            arrangement = Arrangement.SpaceEvenly,
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            for (i in text.indices) {
+                Text(
+                    text = text[i].toString(),
+                    color = (if (key != null) (if (text[i] == key[i]) Color.Green else Color.Red) else Color.Black),
+                    fontSize = pixelSize,
+                    fontFamily = FontFamily(Font(Res.font.optician_sans)),
+                    modifier = modifier.padding(8.dp)
+                )
             }
         }
 

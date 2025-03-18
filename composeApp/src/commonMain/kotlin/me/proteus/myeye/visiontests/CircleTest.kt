@@ -27,6 +27,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import me.proteus.myeye.GrammarType
 import me.proteus.myeye.io.SerializableStage
 import me.proteus.myeye.TestResult
@@ -37,6 +38,7 @@ import me.proteus.myeye.io.ResultDataCollector
 import me.proteus.myeye.isLandscape
 import me.proteus.myeye.resources.Res
 import me.proteus.myeye.resources.optician_sans
+import me.proteus.myeye.ui.components.OrientableGrid
 import org.jetbrains.compose.resources.Font
 import kotlin.math.*
 import kotlin.random.Random
@@ -62,58 +64,44 @@ class CircleTest : VisionTest {
         val marBase = ((PI/180) / 60) * 5  // 5 minut katowych
         val marCurrent = marBase * 10f.pow(-stage * 0.1f)
 
-        val height = distance * tan(marCurrent / 2)
-
+        val height = distance * tan(marCurrent / 2) * 2
         return height.toFloat()
 
     }
 
     @Composable
-    fun LetterContainer(currentStage: Int, directions: String, key: String?, modifier: Modifier = Modifier) {
+    private fun cmToSp(cm: Float): Float {
+        val density = LocalDensity.current
+        return with(density) {
+            val dpi = density.density * 160
+            val px = (cm / 2.54f) * dpi
+            (px / fontScale)
+        }
+    }
 
-        val opticianSansFamily = FontFamily(Font(Res.font.optician_sans))
+    @Composable
+    fun LetterContainer(stage: Int, directions: String, key: String?, modifier: Modifier = Modifier) {
+        val calculatedSize = stageToCentimeters(stage)
+        println("height $calculatedSize")
+        val pixelSize = cmToSp(calculatedSize).sp
+        println("pixelSize $pixelSize")
 
-        val screenDensity = LocalDensity.current.density / 2.54f
-        val calculatedSize = stageToCentimeters(currentStage)
-        println(calculatedSize)
-        val pixelSize = with(LocalDensity.current) { (screenDensity * calculatedSize).toSp() }
-
-        if (isLandscape()) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth(),
-                horizontalArrangement = Arrangement.Center,
-
-            ) {
-                for (i in directions.indices) {
-                    Text(
-                        text = "C",
-                        modifier = modifier
-                            .rotate(directions[i].digitToInt().toFloat() * 90f),
-                        color =(if (key != null) (if (directions[i] == key[i]) Color.Green else Color.Red) else Color.Black),
-                        fontSize = pixelSize * 15,
-                        fontFamily = opticianSansFamily,
-                    )
-                }
-            }
-        } else {
-            Column(
-                modifier = Modifier
-                    .fillMaxHeight(),
-                verticalArrangement = Arrangement.SpaceEvenly,//Arrangement.Center,
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                for (i in directions.indices) {
-                    Text(
-                        text = "C",
-                        modifier = modifier
-                            .rotate(directions[i].digitToInt().toFloat() * 90f),
-                        color =(if (key != null) (if (directions[i] == key[i]) Color.Green else Color.Red) else Color.Black),
-                        fontSize = pixelSize * 15,
-                        fontFamily = opticianSansFamily,
-
-                    )
-                }
+        OrientableGrid(
+            qualifier = isLandscape(),
+            columnModifier = Modifier.fillMaxHeight(),
+            rowModifier = Modifier.fillMaxWidth(),
+            arrangement = Arrangement.SpaceEvenly,
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            for (i in directions.indices) {
+                Text(
+                    text = "C",
+                    fontSize = pixelSize,
+                    fontFamily = FontFamily(Font(Res.font.optician_sans)),
+                    modifier = modifier.rotate(directions[i].digitToInt().toFloat() * 90f),
+                    color = (if (key != null) (if (directions[i] == key[i]) Color.Green else Color.Red) else Color.Black),
+                )
             }
         }
 
@@ -194,7 +182,7 @@ class CircleTest : VisionTest {
                     LetterContainer(
                         directions = stage.first,
                         key = null,
-                        currentStage = stage.difficulty,
+                        stage = stage.difficulty,
                         modifier = Modifier
                     )
 
@@ -202,7 +190,7 @@ class CircleTest : VisionTest {
                         LetterContainer(
                             directions = stage.second,
                             key = stage.first,
-                            currentStage = stage.difficulty,
+                            stage = stage.difficulty,
                             modifier = Modifier
                         )
                     }
@@ -247,7 +235,7 @@ class CircleTest : VisionTest {
         if (!isResult) {
             asr = remember { ASRViewModel() }
             if (trigger) {
-                asr?.start(GrammarType.LETTERS_LOGMAR)
+                asr?.start(GrammarType.SIDES)
                 trigger = false
             }
         } else {
@@ -299,8 +287,8 @@ class CircleTest : VisionTest {
 
     override fun endTest(isExit: Boolean) {
 
-        super.endTest(isExit)
         asr?.close()
+        super.endTest(isExit)
 
     }
 
