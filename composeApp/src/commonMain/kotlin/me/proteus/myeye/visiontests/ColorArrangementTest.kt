@@ -21,9 +21,11 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.List
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.material3.Button
+import androidx.compose.material3.Icon
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.remember
@@ -65,8 +67,7 @@ class ColorArrangementTest : VisionTest {
     override var distance: Float = -1f
     override var conn: DBConnector? = null
 
-    private val difficultyScale = listOf(7, 6, 5, 4, 3, 2, 1)
-    private var colorOffset = 0
+    private var colorOffset = -10
 
     private var colors: List<String> = listOf()
 
@@ -244,16 +245,25 @@ class ColorArrangementTest : VisionTest {
                             }
                     ) {
 
-                        Canvas(
-                            modifier = Modifier.fillMaxSize()
-                        ) {
-                            for (el in correctnessMap) {
-                                drawLine(
-                                    start = Offset(x = 0f, y = (startY + el.value * 60).dp.toPx()),
-                                    end = Offset(x = size.width, y = (startY + el.key * 60).dp.toPx()),
-                                    color = Color.Black,
-                                    strokeWidth = 4f
-                                )
+                        if (correctnessMap.isEmpty()) {
+                            Box(
+                                modifier = Modifier.fillMaxSize(),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Icon(Icons.Default.Check, null)
+                            }
+                        } else {
+                            Canvas(
+                                modifier = Modifier.fillMaxSize()
+                            ) {
+                                for (el in correctnessMap) {
+                                    drawLine(
+                                        start = Offset(x = 0f, y = (startY + el.value * 60).dp.toPx()),
+                                        end = Offset(x = size.width, y = (startY + el.key * 60).dp.toPx()),
+                                        color = Color.Black,
+                                        strokeWidth = 4f
+                                    )
+                                }
                             }
                         }
 
@@ -341,9 +351,10 @@ class ColorArrangementTest : VisionTest {
     }
 
     override fun generateQuestion(stage: Int?): String {
+        colorOffset += 10
         return prepareArray(
             old = colors.toList(),
-            freq = (if (stage != null) difficultyScale[stage] else 7),
+            freq = 1,
             count = 10,
             offset = colorOffset
         ).joinToString(" ").trim()

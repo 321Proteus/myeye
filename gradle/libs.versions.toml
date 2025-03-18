@@ -7,9 +7,7 @@ biometry = "0.4.0"
 sqlite = "2.5.0-rc01"
 korio = "4.0.10"
 korim = "4.0.10"
-permissionsMicrophone = "0.19.1"
 permissions = "0.19.1"
-permissionsCompose = "0.19.1"
 kotlinxDatetime = "0.6.2"
 kotlinxSerializationJson = "1.8.0"
 coil = "3.1.0"
@@ -31,15 +29,18 @@ faceDetection = "16.1.7"
 androidx-activity-compose = { group = "androidx.activity", name = "activity-compose", version.ref = "activityCompose" }
 androidx-camera-core = { group = "androidx.camera", name = "camera-core", version.ref = "androidCamera" }
 androidx-camera-view = { group = "androidx.camera", name = "camera-view", version.ref = "androidCamera" }
+androidx-camera-lifecycle = { group = "androidx.camera", name = "camera-lifecycle", version.ref = "androidCamera" }
+androidx-camera-camera2 = { group = "androidx.camera", name = "camera-camera2", version.ref = "androidCamera" }
 androidx-sqlite = { group = "androidx.sqlite", name = "sqlite", version.ref = "sqlite" }
 androidx-sqlite-bundled = { group = "androidx.sqlite", name = "sqlite-bundled", version.ref = "sqlite" }
 biometry = { group = "dev.icerock.moko", name = "biometry", version.ref = "biometry" }
 biometry-compose = { group = "dev.icerock.moko", name = "biometry-compose", version.ref = "biometry" }
 korio = { group = "com.soywiz.korlibs.korio", name = "korio", version.ref = "korio" }
 korim = { group = "com.soywiz.korlibs.korim", name = "korim", version.ref = "korim" }
-permissions-microphone = { group = "dev.icerock.moko", name = "permissions-microphone", version.ref = "permissionsMicrophone" }
+permissions-microphone = { group = "dev.icerock.moko", name = "permissions-microphone", version.ref = "permissions" }
+permissions-camera = { group = "dev.icerock.moko", name = "permissions-camera", version.ref = "permissions" }
 permissions = { group = "dev.icerock.moko", name = "permissions", version.ref = "permissions" }
-permissions-compose = { group = "dev.icerock.moko", name = "permissions-compose", version.ref = "permissionsCompose" }
+permissions-compose = { group = "dev.icerock.moko", name = "permissions-compose", version.ref = "permissions" }
 kotlinx-datetime = { group = "org.jetbrains.kotlinx", name = "kotlinx-datetime", version.ref = "kotlinxDatetime" }
 kotlinx-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "kotlinxSerializationJson" }
 coil = { group = "io.coil-kt.coil3", name = "coil-compose", version.ref = "coil" }
