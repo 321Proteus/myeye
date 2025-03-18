@@ -41,6 +41,7 @@ actual fun SetupNavigation() {
     }
     LaunchedEffect(Unit) {
         window.onhashchange = {
+            println("hash change")
             val otherElements = document.body!!.childNodes
                 .asList().filter { el ->
                     el.isElement && (el as HTMLElement).id != "canvas"
@@ -50,6 +51,12 @@ actual fun SetupNavigation() {
             println(it.oldURL)
             currentRoute = window.location.hash.removePrefix("#/")
             println(currentRoute)
+        }
+        window.onreset = {
+            println("reset")
+        }
+        window.onload = {
+            println("loaded")
         }
     }
 
