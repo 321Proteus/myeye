@@ -1,6 +1,7 @@
 package me.proteus.myeye.visiontests
 
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.text.intl.Locale
 import me.proteus.myeye.VisionTest
 import me.proteus.myeye.resources.Res
 import me.proteus.myeye.resources.*
@@ -65,7 +66,11 @@ class VisionTestUtils {
         val testType: String = vtu.getTestTypeByID(testId)
         val testName: String = vtu.getTestNameByID(testId)
 
-        return "$testType $testName"
+        if (Locale.current.language == "pl") {
+            return "$testType $testName"
+        } else {
+            return "$testName $testType"
+        }
     }
 
 }
