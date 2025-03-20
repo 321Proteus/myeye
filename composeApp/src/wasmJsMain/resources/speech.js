@@ -23,7 +23,7 @@ async function initSpeech(name, language, grammar) {
     if (!recognizer || !recognizer.ea.isDeleted()) {
 
         let module = await loadVosklet();
-        let model = await module.createModel("http://localhost:8000/" + name + ".tar.gz", language, name);
+        let model = await module.createModel("https://raw.githubusercontent.com/321proteus/myeye-articles/main/db/models/" + name + ".tar.gz", language, name);
         recognizer = await module.createRecognizer(model, ctx.sampleRate);
 
         recognizer.setWords(true);
