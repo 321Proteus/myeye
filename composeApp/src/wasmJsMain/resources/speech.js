@@ -21,10 +21,9 @@ async function initSpeech(name, language, grammar) {
     console.log(ctx);
 
     if (!recognizer || !recognizer.ea.isDeleted()) {
+
         let module = await loadVosklet();
-        console.log("module ", module)
         let model = await module.createModel("http://localhost:8000/" + name + ".tar.gz", language, name);
-        console.log("model ", model);
         recognizer = await module.createRecognizer(model, ctx.sampleRate);
 
         recognizer.setWords(true);
@@ -34,13 +33,8 @@ async function initSpeech(name, language, grammar) {
             recognizer.setGrm(grammar);
         }
 
-        console.log("recognizer ", recognizer);
-
-        console.log("starting micNode", micNode);
-
         recognizer.addEventListener("result", ev => {
             var a = JSON.parse(ev.detail);
-            console.log(a);
             if (a.text != "") document.getElementById("speech-result").innerText = JSON.stringify(a);
         });
 
@@ -53,7 +47,7 @@ async function initSpeech(name, language, grammar) {
 
         micNode.connect(transferer);
     } else {
-        console.warn("why is it here");
+        console.warn("This should never fire");
     }
 
 } catch(err) {
@@ -62,16 +56,13 @@ async function initSpeech(name, language, grammar) {
 }
 
 async function closeSpeech() {
-    console.log("attempting to close recognizer");
     await recognizer?.delete(true);
-    console.log("Recognizer", recognizer);
 }
 
 function initResultContainer() {
     try {
         if (!document.getElementById("speech-result")) {
             const resultDiv = document.createElement("div");
-            console.log(resultDiv);
             resultDiv.id = "speech-result";
             document.body.appendChild(resultDiv);
         }

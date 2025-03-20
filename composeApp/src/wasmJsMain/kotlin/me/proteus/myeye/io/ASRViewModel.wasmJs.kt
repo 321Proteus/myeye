@@ -83,10 +83,6 @@ actual class ASRViewModel: ComposeViewModel() {
 
             initSpeech(modelName, Locale.current.language, grammar)
 
-            val resultObservable = document.getElementById("speech-result")
-            println("ID " + resultObservable?.id)
-            println("Type: ${resultObservable?.isConnected} ${resultObservable?.isElement}")
-
             isActive = true
 
             var previousContent = ""
@@ -99,7 +95,6 @@ actual class ASRViewModel: ComposeViewModel() {
                 if (!content.isNullOrEmpty() && content != previousContent) {
                     val processed = deserialize(content)
                     _wordBuffer.value += processed.map { it.word }
-                    println(processed.size)
                     previousContent = content
                 }
             }
