@@ -71,7 +71,7 @@ fun findImage(path: String, name: String): String? {
     }[0].toString()
 }
 
-suspend fun unzip(zipPath: Path, delete: Boolean) {
+suspend fun unzip(zipPath: Path, delete: Boolean): Boolean {
     val fs = getFS()
 
     val zipFile: VfsFile = zipPath.toString().uniVfs
@@ -101,8 +101,7 @@ suspend fun unzip(zipPath: Path, delete: Boolean) {
     }
 
     println("Rozpakowano $count plikow z $outputName")
-
     println(zipPath.name)
-
     if (delete) fs.delete(zipPath)
+    return true
 }

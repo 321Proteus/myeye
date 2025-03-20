@@ -43,7 +43,7 @@ actual fun MapScreen() {
     val topHeight = AppBarsHeightHolder.topBarHeight / 2
     val bottomHeight = AppBarsHeightHolder.bottomBarHeight / 2
 
-    initMap(topHeight, bottomHeight)
+    initMap(64, 80)
 }
 
 

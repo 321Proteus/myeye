@@ -53,7 +53,8 @@ import me.proteus.myeye.ui.components.BottomBar
 import me.proteus.myeye.ui.components.PlaceSearchBar
 import me.proteus.myeye.ui.theme.MyEyeTheme
 import me.proteus.myeye.resources.Res
-import me.proteus.myeye.resources.map_distance
+import me.proteus.myeye.resources.map_prompt
+import me.proteus.myeye.resources.result_distance
 import me.proteus.myeye.resources.myeye_logo
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.resources.vectorResource
@@ -79,6 +80,8 @@ actual fun MapScreen() {
     var markerPos by remember { mutableStateOf(currentPos) }
     var places by remember { mutableStateOf(emptyList<Place>()) }
 
+    val localizedQuery = Res.string.map_prompt.res()
+
     MyEyeTheme {
         Scaffold (
             topBar = {
@@ -95,7 +98,7 @@ actual fun MapScreen() {
                         verticalAlignment = Alignment.CenterVertically
                     ) {
 
-                        Text(stringResource(Res.string.map_distance))
+                        Text(stringResource(Res.string.result_distance))
 
                         Slider(
                             modifier = Modifier.fillMaxWidth(0.5f),
@@ -103,7 +106,7 @@ actual fun MapScreen() {
                             steps = 7,
                             onValueChange = { distance = it.toDouble() },
                             onValueChangeFinished = {
-                                search(placesClient, markerPos, distance) { foundPlaces ->
+                                search(placesClient, markerPos, distance, localizedQuery) { foundPlaces ->
                                     println(distance)
                                     Log.e("Map", "Search over with ${foundPlaces.size} places")
                                     places = foundPlaces.toList()
@@ -154,7 +157,7 @@ actual fun MapScreen() {
             }
 
             LaunchedEffect(markerPos) {
-                search(placesClient, markerPos, distance) { foundPlaces ->
+                search(placesClient, markerPos, distance, localizedQuery) { foundPlaces ->
                     println(distance)
                     Log.d("Map", "Search over with ${foundPlaces.size} places")
                     places = foundPlaces.toList()
@@ -243,6 +246,7 @@ fun search(
     client: PlacesClient,
     center: LatLng,
     distance: Double,
+    prompt: String,
     callback: (List<Place>) -> Unit) {
 
     val bounds = getRectangularBounds(center, distance)
@@ -250,7 +254,7 @@ fun search(
     val placeFields: List<Place.Field> = listOf(Place.Field.ID, Place.Field.DISPLAY_NAME)
 
     val request =
-        SearchByTextRequest.builder("okulistyczny", placeFields)
+        SearchByTextRequest.builder(prompt, placeFields)
             .setMaxResultCount(10)
             .setLocationRestriction(bounds)
             .setPlaceFields(listOf(Place.Field.LOCATION, Place.Field.DISPLAY_NAME, Place.Field.ID))

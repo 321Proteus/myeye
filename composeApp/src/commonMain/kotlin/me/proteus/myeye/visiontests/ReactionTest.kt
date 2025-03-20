@@ -29,7 +29,13 @@ import me.proteus.myeye.VisionTest
 import me.proteus.myeye.io.DBConnector
 import me.proteus.myeye.io.ResultDataCollector
 import me.proteus.myeye.io.SerializableStage
+import me.proteus.myeye.resources.next
+import me.proteus.myeye.resources.prev
+import me.proteus.myeye.resources.stage
+import me.proteus.myeye.resources.test_reaction_elapsed
 import me.proteus.myeye.resources.test_reaction_info
+import me.proteus.myeye.resources.test_reaction_score
+import me.proteus.myeye.ui.screens.res
 import org.jetbrains.compose.resources.stringResource
 import kotlin.random.Random
 
@@ -102,10 +108,10 @@ class ReactionTest : VisionTest {
                         verticalArrangement = Arrangement.SpaceEvenly,
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        Text("Etap ${stage.difficulty + 1}", fontSize = 24.sp)
+                        Text(Res.string.stage.res() + " ${stage.difficulty + 1}", fontSize = 24.sp)
                         // TODO: Zaokraglanie
-                        Text("Czas oczekiwania: ${stage.first.toFloat()}s")
-                        Text("Czas reakcji użytkownika: ${stage.second.toFloat()}s")
+                        Text(Res.string.test_reaction_elapsed.res() + ": ${stage.first.toFloat()}s")
+                        Text(Res.string.test_reaction_score.res() + ": ${stage.second.toFloat()}s")
 
                     }
                 }
@@ -117,10 +123,10 @@ class ReactionTest : VisionTest {
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Button(onClick = { onUpdate("PREV") }) {
-                        Text(text = "Poprzedni etap")
+                        Text(text = Res.string.prev.res())
                     }
                     Button(onClick = { onUpdate("NEXT") }) {
-                        Text(text = "Następny etap")
+                        Text(text = Res.string.next.res())
                     }
                 }
             }

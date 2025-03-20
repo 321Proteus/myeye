@@ -83,8 +83,6 @@ fun ArticleScreen(id: Int) {
                     item {
                         val article = articleText.split('\n')
                         Text(article.subList(3, article.size).joinToString("\n"))
-//                        for (i in 0..100)
-//                            Text("Treść")
                     }
                 }
             }

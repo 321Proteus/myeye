@@ -4,9 +4,16 @@
 
     <string name="loading">Loading</string>
     <string name="error">Error</string>
+    <string name="exit">Exit</string>
+    <string name="next">Next stage</string>
+    <string name="prev">Previous stage</string>
+    <string name="nodata">Unknown</string>
+    <string name="none">None</string>
+    <string name="stage">Stage</string>
 
     <string name="test">Speech Recognition</string>
     <string name="start_talking">Speak now</string>
+    <string name="start_test">Start the test</string>
     <string name="setting_desc_language">Select the language used by the user interface and Speech Recognition</string>
     <string name="menu_description">Designed for quick self-assessment, MyEye offers an intuitive vision test interface - we have over 5 standardized eyesight, color and reaction tests. The app helps locate nearby eye clinics, provides insightful articles about eye health, and includes useful tools for people with myopia. Whether you want to check your eyesight or learn more about vision care, this app is a practical companion for maintaining eye health.</string>
     <string name="menu_discover_tests">Discover our vision tests</string>
@@ -30,7 +37,29 @@
     <string name="biometry_reason">Use biometric auth to display the test result</string>
     <string name="biometry_fail">Unable to authorize</string>
 
-    <string name="map_distance">Distance</string>
+    <string name="result_distance">Distance</string>
+    <string name="result_date">Date of the test</string>
+    <string name="result_thankyou">Thank you for taking the test!</string>
+    <string name="result_navigate">Open result view</string>
+
+    <string name="map_hours">Opening hours</string>
+    <string name="map_website">Visit the website</string>
+    <string name="map_phone">Phone</string>
+    <string name="map_see_gmaps">See on Google Maps</string>
+    <string name="map_prompt">optician</string>
+    <string name="map_search">Search a place or a street</string>
+
+    <string name="test_enter_distance">Enter distance</string>
+    <string name="test_correct">Correct answer</string>
+    <string name="test_user">Your answer</string>
 
     <string name="test_reaction_info">Click on the screen when it turns green</string>
+    <string name="test_reaction_elapsed">Elapsed time</string>
+    <string name="test_reaction_score">Reaction time</string>
+
+    <string name="test_contrast">Move the slider until the symbols are visible</string>
+    <string name="test_plate">Which number is visible on the screen?</string>
+    <string name="test_gap">Locate the gap in the circle</string>
+
+    <string name="camera_info">Place the device 2-6 meters away, at your line of sight, and then stand or sit down</string>
 </resources>

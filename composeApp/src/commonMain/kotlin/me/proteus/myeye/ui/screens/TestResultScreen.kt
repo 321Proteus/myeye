@@ -30,6 +30,7 @@ import me.proteus.myeye.ui.theme.MyEyeTheme
 import me.proteus.myeye.resources.Res
 import me.proteus.myeye.resources.*
 import me.proteus.myeye.util.biometryViewModelProvider
+import me.proteus.myeye.visiontests.VisionTestUtils
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
@@ -44,7 +45,7 @@ fun TestResultScreen(
     val desc = stringResource(Res.string.biometry_reason)
     val fail = stringResource(Res.string.biometry_fail)
 
-    var authModel = biometryViewModelProvider()
+    val authModel = biometryViewModelProvider()
 
     MyEyeTheme {
 
@@ -76,8 +77,8 @@ fun TestResultScreen(
                         verticalArrangement = Arrangement.SpaceEvenly,
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-
-                        Text(text = resultData.fullTestName, fontSize = 24.sp)
+                        val vtu = VisionTestUtils()
+                        Text(text = vtu.getFullTestName(resultData.testID), fontSize = 24.sp)
 
                         VisionTestIcon(
                             modifier = Modifier
@@ -95,12 +96,12 @@ fun TestResultScreen(
                     ) {
 
                         Box {
-                            Text("Data wykonania: " + resultData.formattedTimestamp)
+                            Text(stringResource(Res.string.result_date) + ": " + resultData.formattedTimestamp)
                         }
 
                         if (resultData.distance != -1f) {
                             Box {
-                                Text("Odległość: " + resultData.distance.fastRoundToInt() + " cm")
+                                Text(stringResource(Res.string.result_distance) + ": " + resultData.distance.fastRoundToInt() + " cm")
                             }
                         }
 
@@ -108,7 +109,7 @@ fun TestResultScreen(
                             Text(
                                 modifier = Modifier
                                     .padding(top = 32.dp, bottom = 16.dp),
-                                text = "Dziękujemy za wykonanie testu!",
+                                text = stringResource(Res.string.result_thankyou),
                                 fontWeight = FontWeight.Bold,
                                 fontSize = 24.sp
                             )
@@ -139,13 +140,13 @@ fun TestResultScreen(
 
                                     }
                                 ) {
-                                    Text(text = "Zobacz wyniki", fontSize = 20.sp)
+                                    Text(text = stringResource(Res.string.result_navigate), fontSize = 20.sp)
                                 }
                             }
                             Button(onClick = {
                                 goBack("menu", false)
                             }) {
-                                Text("Wyjdź", fontSize = 20.sp)
+                                Text(stringResource(Res.string.exit), fontSize = 20.sp)
                             }
                         }
 
@@ -161,6 +162,6 @@ fun TestResultScreen(
 
 fun openTest(test: TestResult) {
 
-    navigate("visiontest/${test.testID}/true/${test.resultID}/${test.distance}")
+    navigate("visiontest/${test.testID}/2/${test.resultID}/${test.distance}")
 
 }

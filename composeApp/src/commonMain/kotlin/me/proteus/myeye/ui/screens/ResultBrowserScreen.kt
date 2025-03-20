@@ -28,6 +28,7 @@ import me.proteus.myeye.ui.components.BottomBar
 import me.proteus.myeye.ui.components.TopBar
 import me.proteus.myeye.ui.components.VisionTestIcon
 import me.proteus.myeye.ui.theme.MyEyeTheme
+import me.proteus.myeye.visiontests.VisionTestUtils
 
 @Composable
 fun ResultBrowserScreen() {
@@ -81,7 +82,7 @@ fun ResultBrowserScreen() {
                                     verticalArrangement = Arrangement.SpaceEvenly
                                 ) {
                                     Text(
-                                        text = result.fullTestName,
+                                        text = VisionTestUtils().getFullTestName(result.testID),
                                         fontSize = 18.sp
                                     )
                                     Text(

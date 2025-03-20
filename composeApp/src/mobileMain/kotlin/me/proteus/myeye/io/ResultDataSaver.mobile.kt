@@ -23,7 +23,7 @@ class MobileDBConnector : DBConnector {
 //        createTable(driver)
     }
     override fun executeSet(query: TestResult) {
-        val insertionQuery = "INSERT OR IGNORE INTO Results" +
+        val insertionQuery = "INSERT INTO Results" +
                 "(TIMESTAMP, TEST, DISTANCE, RESULT)" +
                 "VALUES (?, ?, ?, ?)"
         assertDriver(arg = Unit, function = {
@@ -103,7 +103,7 @@ internal actual class ResultDataSaver {
         }
 
         actual fun getLastID(db: DBConnector): Int {
-            val list = db.executeGet("SELECT ID FROM Results ORDER BY TIMESTAMP DESC LIMIT 1")
+            val list = db.executeGet("SELECT * FROM Results ORDER BY TIMESTAMP DESC LIMIT 1")
             if (list.isEmpty()) return -1
             else return list[0].resultID
         }

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="name">
+        <item>LogMAR</item>
+        <item>Landolt C</item>
+        <item>Znajdź lukę</item>
+        <item>Układanie kolorów</item>
+        <item>Kontrast</item>
+        <item>Cyfry Ishihary</item>
+        <item>Czas reakcji</item>
+        <item>Example</item>
+    </string-array>
+
+    <string-array name="categories">
+        <item>Test ostrości wzroku</item>
+        <item>Test widzenia kolorów</item>
+        <item>Test wzroku</item>
+    </string-array>
+
+    <string-array name="descriptions">
+        <item>Test LogMAR (Logarithm of the Minimum Angle of Resolution) to standardowa metoda pomiaru ostrości wzroku za pomocą tablicy stopniowo zmniejszających się liter. Zapewnia dokładniejszą ocenę wzroku niż tradycyjne tablice Snellena i jest szeroko stosowany w gabinetach okulistycznych. Aby wykonać test, wystarczy ustawić telefon w pewnej odległości (np. 3 metry) od oczu i odczytywać litery z ekranu, zaczynając od największych; należy spróbować rozpoznać jak najwięcej liter, nawet jeśli niektóre wydają się rozmazane.</item>
+        <item>Test pierścieni Edmunda Landolta to standardowa metoda oceny ostrości wzroku, w której zamiast liter używane są okręgi z przerwami w różnych orientacjach. Pozwala na precyzyjny pomiar zdolności rozróżniania szczegółów i jest często stosowany w badaniach klinicznych oraz diagnostyce optycznej. Aby wykonać test, ustaw telefon w zalecanej odległości (np. 3 metry) i przy użyciu słów "góra", "dół", "lewo" i "prawo", określ z której strony każdego okręgu na ekranie znajdują się przerwy.</item>
+        <item>Test wykrywania luk jest metodą oceny wrażliwości oczu na drobne różnice w ostrości. Na ekranie jest wyświetlany okrąg z przerwą obrócony pod pewnym kątem, którego color coraz bardziej zlewa się z barwami ekranu. Zadaniem użytkownika jest wskazanie z odległości wyciągniętej ręki (75 do 100 cm) z której strony znajduje się dziura w okręgu.</item>
+        <item>Test układania kolorów Farnswortha-Munsella to narzędzie do oceny zdolności rozróżniania barw, wykorzystywane w diagnostyce zaburzeń widzenia kolorów. Polega na ułożeniu serii kolorowych elementów w prawidłowej kolejności, przechodząc od jednego odcienia do drugiego. Aby wykonać test, przeciągnij elementy na ekranie, tak aby stworzyć płynne przejście kolorów. Wynik może pomóc w identyfikacji problemów z widzeniem barw oraz określeniu wrażliwości na różnice w odcieniach.</item>
+        <item>Test tablic Ishihary to jedno z najczęściej stosowanych narzędzi do wykrywania daltonizmu, szczególnie zaburzeń rozróżniania barw czerwonej i zielonej. Składa się z serii kolorowych tablic z cyframi lub wzorami utworzonymi z kropek o różnych barwach i odcieniach. Aby wykonać test, należy odczytać liczby lub kształty widoczne na ekranie. Osoby z zaburzeniami widzenia barw mogą dostrzegać inne wzory lub nie widzieć niektórych elementów, co pozwala na ocenę rodzaju i stopnia zaburzenia.</item>
+        <item>Test dopasowywania kontrastu służy do wykrywania problemów z widzeniem kolorów poprzez pomiar progu rozróżniania odcieni kolorów. Aby wykonać test, połącz w parę kolory</item>
+        <item>Test czasu reakcji jest prostym i zabawnym sposobem na pomiar szybkości reakcji oczu na zmiany w otoczeniu. Aby wykonać test, należy uruchomić czerwony ekran. Po losowym odstępie czasu zmieni on kolor na zielony. Odstęp czasu pomiędzy zmianą koloru ekranu a reakcją użytkownika poprzez naciśnięcie przekłada się na jego możliwości w zakresie reakcji na bodźce.</item>
+        <item>Przykładowy test dla contributorów, który ma na celu zaprezentowanie zasad działania interfejsu VisionTest. Zawiera wszystkie podstawowe mechanizmy testów MyEye, takie jak generowanie pytań, walidacja odpowiedzi, zapisywanie wyników i zmienne tryby wyświetlania (test/rezultat). Nie jest to rzeczywisty test wzroku.</item>
+    </string-array>
+
+</resources>

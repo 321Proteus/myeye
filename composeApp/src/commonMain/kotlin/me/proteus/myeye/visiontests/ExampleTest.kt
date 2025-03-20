@@ -26,12 +26,16 @@ import me.proteus.myeye.io.SerializableStage
 import me.proteus.myeye.VisionTest
 import me.proteus.myeye.io.DBConnector
 import me.proteus.myeye.io.ResultDataCollector
+import me.proteus.myeye.resources.Res
+import me.proteus.myeye.resources.next
+import me.proteus.myeye.resources.prev
+import me.proteus.myeye.ui.screens.res
 import kotlin.math.abs
 import kotlin.random.Random
 
 class ExampleTest : VisionTest {
 
-    override val testID: String = "TEST_SIGHT_INFO"
+    override val testID: String = "TEST_MISC_EXAMPLE"
     override val testIcon: ImageVector = Icons.Outlined.Info
     override val needsMicrophone: Boolean = false
     override val stageCount: Int = 10
@@ -117,10 +121,10 @@ class ExampleTest : VisionTest {
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Button(onClick = { onUpdate("PREV") }) {
-                        Text(text = "Poprzedni etap")
+                        Text(text = Res.string.prev.res())
                     }
                     Button(onClick = { onUpdate("NEXT") }) {
-                        Text(text = "Następny etap")
+                        Text(text = Res.string.next.res())
                     }
                 }
             }

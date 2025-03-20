@@ -51,7 +51,7 @@ import okio.Path
 import okio.Path.Companion.toPath
 import org.jetbrains.compose.resources.stringResource
 
-const val hostname = "https://6976-37-30-55-4.ngrok-free.app"
+const val hostname = "https://api.myeye.dev"
 
 val httpClient = HttpClient(getDriver())
 
@@ -68,10 +68,7 @@ fun ArticleBrowserScreen() {
                 val hash = getLocalArticleHash(".".toPath()).toString()
                 val path = "$hostname/list/$hash"
 
-                println("running")
-
                 val res = httpClient.get(path).body<String>()
-
                 articles.addAll(res
                     .removeSuffix(" ")
                     .split(' ')

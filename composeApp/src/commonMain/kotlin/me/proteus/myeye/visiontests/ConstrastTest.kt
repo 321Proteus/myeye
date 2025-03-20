@@ -34,6 +34,11 @@ import me.proteus.myeye.VisionTest
 import me.proteus.myeye.io.DBConnector
 import me.proteus.myeye.io.ResultDataCollector
 import me.proteus.myeye.io.SerializableStage
+import me.proteus.myeye.resources.Res
+import me.proteus.myeye.resources.next
+import me.proteus.myeye.resources.prev
+import me.proteus.myeye.resources.test_contrast
+import me.proteus.myeye.ui.screens.res
 import me.proteus.myeye.visiontests.ColorArrangementTest.Companion.blendARGB
 import me.proteus.myeye.visiontests.ColorArrangementTest.Companion.parseColor
 import kotlin.random.Random
@@ -72,7 +77,7 @@ class ConstrastTest : VisionTest {
         ) {
 
             Box (contentAlignment = Alignment.Center) {
-                Text("Przesuwaj, aż symbole staną się widoczne")
+                Text(Res.string.test_contrast.res())
             }
             Box (
                 modifier = Modifier
@@ -121,10 +126,10 @@ class ConstrastTest : VisionTest {
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Button(onClick = { onUpdate("PREV") }) {
-                        Text(text = "Poprzedni etap")
+                        Text(text = Res.string.prev.res())
                     }
                     Button(onClick = { onUpdate("NEXT") }) {
-                        Text(text = "Następny etap")
+                        Text(text = Res.string.next.res())
                     }
                 }
             }

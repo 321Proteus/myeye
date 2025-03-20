@@ -18,6 +18,7 @@ import me.proteus.myeye.ui.screens.PlaceDetailsScreen
 import me.proteus.myeye.ui.screens.ResultBrowserScreen
 import me.proteus.myeye.ui.screens.SimpleDistanceScreen
 import me.proteus.myeye.ui.screens.TestResultScreen
+import me.proteus.myeye.ui.screens.VisionTestConfigScreen
 import me.proteus.myeye.ui.screens.VisionTestScreen
 
 object NavControllerHolder {
@@ -65,10 +66,10 @@ actual fun SetupNavigation() {
             }
         }
         composable(
-            route = "visiontest/{testID}/{isResult}/{sessionId}/{distance}",
+            route = "visiontest/{testID}/{navMode}/{sessionId}/{distance}",
             arguments = listOf(
                 navArgument("testID") { type = NavType.StringType },
-                navArgument("isResult") { type = NavType.BoolType },
+                navArgument("navMode") { type = NavType.IntType },
                 navArgument("sessionId") { type = NavType.IntType },
                 navArgument("distance") { type = NavType.FloatType }
             )
@@ -77,13 +78,22 @@ actual fun SetupNavigation() {
 
                 val testID = getString("testID")
                 val distance = getFloat("distance")
-                val isResult = getBoolean("isResult")
+                val navMode = getInt("navMode")
                 val sessionId = getInt("sessionId")
 
-                println("isResult: $isResult")
+                println("navMode: $navMode")
                 println("sessionId: $sessionId")
 
-                VisionTestScreen(testID, isResult, sessionId, distance)
+                // navMode 0 - config, 1 - test, 2 - result
+
+                if (navMode == 0) {
+                    println("running at $distance")
+                    if (distance == 0f) VisionTestConfigScreen(testID)
+                    else VisionTestConfigScreen(testID, distance)
+                } else {
+                    VisionTestScreen(testID, navMode, sessionId, distance)
+                }
+
             }
 
         }

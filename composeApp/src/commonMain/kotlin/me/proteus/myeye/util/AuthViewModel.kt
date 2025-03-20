@@ -23,11 +23,11 @@ class BiometryViewModel(
 
             if (isSuccess) {
                 _isAuthorized.value = true
-                println("walter white")
+                println("okay")
                 callback()
             }
         } catch (throwable: Throwable) {
-            println("oh no youre black")
+            println(throwable.message)
         }
     }
 }

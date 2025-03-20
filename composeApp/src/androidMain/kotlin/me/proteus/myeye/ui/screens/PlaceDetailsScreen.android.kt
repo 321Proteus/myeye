@@ -4,9 +4,12 @@ import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Button
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -16,8 +19,11 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalUriHandler
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
@@ -30,6 +36,13 @@ import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.MapProperties
 import com.google.maps.android.compose.MapUiSettings
 import com.google.maps.android.compose.rememberCameraPositionState
+import me.proteus.myeye.resources.Res
+import me.proteus.myeye.resources.loading
+import me.proteus.myeye.resources.map_hours
+import me.proteus.myeye.resources.map_phone
+import me.proteus.myeye.resources.map_see_gmaps
+import me.proteus.myeye.resources.map_website
+import me.proteus.myeye.resources.nodata
 import me.proteus.myeye.ui.theme.MyEyeTheme
 
 @Composable
@@ -63,6 +76,7 @@ actual fun PlaceDetailsScreen(placeId: String) {
                 modifier = Modifier
                     .padding(innerPadding)
                     .fillMaxSize(),
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Box(
                     modifier = Modifier
@@ -89,18 +103,45 @@ actual fun PlaceDetailsScreen(placeId: String) {
                         println(hours)
                         val lista = hours?.weekdayText?.joinToString("\n", "\n")
 
-                        val numer = place!!.internationalPhoneNumber ?: "Brak informacji"
+                        val numer = place!!.internationalPhoneNumber ?: Res.string.nodata.res()
 
                         Text(place!!.displayName!!, fontSize = 28.sp)
                         Text(place!!.formattedAddress!!, fontSize = 20.sp)
 
-                        Text("Godziny otwarcia: ${if (lista == null) "Brak informacji" else ""}", fontSize = 20.sp)
+                        Text(Res.string.map_hours.res() + ": ${if (lista == null) Res.string.nodata.res() else ""}", fontSize = 20.sp)
                         Text(lista ?: "", fontSize = 16.sp)
 
-                        Text("Telefon: $numer", fontSize = 20.sp)
+                        Text(Res.string.map_phone.res() + ": $numer", fontSize = 20.sp)
+
+                        val handler = LocalUriHandler.current
+                        val buttonModifier = Modifier.height(80.dp)
+
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.SpaceEvenly
+                        ) {
+                            Button(
+                                modifier = buttonModifier,
+                                onClick = {
+                                handler.openUri("https://google.com/maps/place/?q=$placeId")
+                            }) {
+                                Text(Res.string.map_see_gmaps.res())
+                            }
+                            if (place!!.websiteUri != null) {
+                                Button(
+                                    modifier = buttonModifier,
+                                    onClick = {
+                                        handler.openUri("${place!!.websiteUri!!}")
+                                    }) {
+                                    Text(Res.string.map_website.res())
+                                }
+                            }
+
+                        }
 
                     } else {
-                        Text("Ładowanie danych...")
+                        Text(Res.string.loading.res())
                     }
 
                 }
@@ -165,6 +206,7 @@ fun getPlace(
         types.add(Place.Field.CURRENT_OPENING_HOURS)
         types.add(Place.Field.INTERNATIONAL_PHONE_NUMBER)
         types.add(Place.Field.FORMATTED_ADDRESS)
+        types.add(Place.Field.WEBSITE_URI)
     }
 
     val request = FetchPlaceRequest.builder(id, types).build()

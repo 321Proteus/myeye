@@ -29,6 +29,8 @@ import me.proteus.myeye.io.DBConnector
 import me.proteus.myeye.io.ResultDataCollector
 import me.proteus.myeye.io.SerializableStage
 import me.proteus.myeye.resources.optician_sans
+import me.proteus.myeye.resources.test_gap
+import me.proteus.myeye.ui.screens.res
 import org.jetbrains.compose.resources.Font
 import kotlin.math.PI
 import kotlin.math.atan2
@@ -61,7 +63,7 @@ class OpacityTest : VisionTest {
         ) {
 
             Box(contentAlignment = Alignment.Center) {
-                Text("Gdzie jest luka w okręgu?")
+                Text(Res.string.test_gap.res())
             }
             Box(
                 modifier = Modifier

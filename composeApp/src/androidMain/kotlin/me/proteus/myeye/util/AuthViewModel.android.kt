@@ -3,6 +3,7 @@ package me.proteus.myeye.util
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import dev.icerock.moko.biometry.BiometryAuthenticator
+import dev.icerock.moko.biometry.compose.BindBiometryAuthenticatorEffect
 import dev.icerock.moko.biometry.compose.rememberBiometryAuthenticatorFactory
 import dev.icerock.moko.resources.desc.desc
 
@@ -26,5 +27,7 @@ actual fun biometryViewModelProvider(): BiometryViewModel {
     val biometryFactory = rememberBiometryAuthenticatorFactory()
     val authenticator = biometryFactory.createBiometryAuthenticator()
 
+    BindBiometryAuthenticatorEffect(authenticator)
     return remember { BiometryViewModel(AndroidBiometryAuth(authenticator)) }
+
 }

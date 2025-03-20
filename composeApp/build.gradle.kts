@@ -2,23 +2,21 @@ import io.github.frankois944.spmForKmp.definition.SwiftDependency
 import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpackConfig
-import java.net.URI
 
 val system: String = System.getProperty("os.name")
 val isMacos = system.contains("mac", true)
+
 if (isMacos) {
-    logger.warn("Warning: You are running non-Apple buildscript on an Apple device (${system}). " +
-                "To perform iOS build, replace this file with build.gradle.mac.kts.")
+    logger.warn("You are running non-Apple buildscript on an Apple device (${system}). " +
+            "To include iOS builds, replace this file with the build.gradle.mac.kts")
 }
 
 plugins {
-
     alias(libs.plugins.kotlinMultiplatform)
     alias(libs.plugins.composeMultiplatform)
     alias(libs.plugins.composeCompiler)
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.kotlinxSerialization)
-
 }
 
 kotlin {
@@ -40,6 +38,18 @@ kotlin {
             }
         }
         binaries.executable()
+    }
+
+    val iosTargets = listOf(iosSimulatorArm64(), /* iosX64(), iosArm64(),*/)
+
+    iosTargets.forEach { target ->
+        target.compilations {
+            val main by getting {
+                cinterops {
+                    create("swiftSrc")
+                }
+            }
+        }
     }
 
     androidTarget {
@@ -67,7 +77,9 @@ kotlin {
             implementation(libs.vosk)
             implementation(libs.ktor.client.okhttp)
             implementation(libs.androidx.camera.core)
+            implementation(libs.androidx.camera.lifecycle)
             implementation(libs.androidx.camera.view)
+            implementation(libs.androidx.camera.camera2)
             implementation(libs.mlkit.face)
         }
 
@@ -84,6 +96,7 @@ kotlin {
                 implementation(libs.korio)
                 implementation(libs.korim)
                 implementation(libs.permissions.microphone)
+                implementation(libs.permissions.camera)
                 api(libs.permissions)
                 api(libs.permissions.compose)
             }
@@ -125,8 +138,8 @@ android {
         applicationId = "me.proteus.myeye"
         minSdk = 26
         targetSdk = 35
-        versionCode = 1
-        versionName = "1.0"
+        versionCode = 2
+        versionName = "1.0.1"
     }
     packaging {
         resources {

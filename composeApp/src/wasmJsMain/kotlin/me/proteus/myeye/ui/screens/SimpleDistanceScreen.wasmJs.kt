@@ -9,6 +9,6 @@ actual fun SimpleDistanceScreen(
     testID: String
 ) {
     println(testID)
-    navigate("visiontest/$testID/false/0/0f")
+    navigate("visiontest/$testID/1/0/0f")
 }
 

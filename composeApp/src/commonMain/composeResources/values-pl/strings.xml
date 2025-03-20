@@ -3,9 +3,16 @@
 
     <string name="loading">Ładowanie</string>
     <string name="error">Błąd</string>
+    <string name="exit">Wyjdź</string>
+    <string name="next">Następny etap</string>
+    <string name="prev">Poprzedni etap</string>
+    <string name="nodata">Brak danych</string>
+    <string name="none">None</string>
+    <string name="stage">Etap</string>
 
     <string name="test">Rozpoznawanie Mowy</string>
     <string name="start_talking">Zacznij mówić</string>
+    <string name="start_test">Rozpocznij test</string>
     <string name="setting_desc_language">Wybiera język interfejsu aplikacji i modelu rozpoznawania mowy</string>
     <string name="menu_description">MyEye jest zaprojektowane pod kątem prostych samodzielnych badań wzroku - Mamy ponad 5 standaryzowanych testów ostrości wzroku, widzenia kolorów i czasu reakcji. Ponadto, aplikacja umożliwia lokalizację najbliższej kliniki okulistycznej, zawiera ciekawe artykuły na temat oka oraz zestaw narzędzi przydatnych osobom niedowidzącym. </string>
     <string name="menu_discover_tests">Odkryj nasze testy wzroku</string>
@@ -29,7 +36,29 @@
     <string name="biometry_reason">Zweryfikuj swoją tożsamość, aby wyświetlić wynik testu</string>
     <string name="biometry_fail">Weryfikacja nieudana</string>
 
-    <string name="map_distance">Dystans</string>
+    <string name="result_distance">Odległośść</string>
+    <string name="result_date">Data wykonania</string>
+    <string name="result_thankyou">Dziękujemy za wykonanie testu!</string>
+    <string name="result_navigate">Zobacz wyniki</string>
+
+    <string name="map_hours">Godziny otwarcia</string>
+    <string name="map_website">Odwiedź stronę</string>
+    <string name="map_phone">Telefon</string>
+    <string name="map_see_gmaps">Zobacz w Mapach Google</string>
+    <string name="map_prompt">okulistyczny</string>
+    <string name="map_search">Wyszukaj ulicę lub miejsce</string>
+
+    <string name="test_enter_distance">Podaj odległość</string>
+    <string name="test_correct">Poprawna odpowiedź</string>
+    <string name="test_user">Odpowiedź użytkownika</string>
 
     <string name="test_reaction_info">Naciśnij, kiedy ekran zabłyśnie na zielono</string>
+    <string name="test_reaction_elapsed">Czas oczekiwania</string>
+    <string name="test_reaction_score">Czas reakcji</string>
+
+    <string name="test_contrast">Przesuwaj, aż symbole staną się widoczne</string>
+    <string name="test_plate">Jaki numer widać na ekranie?</string>
+    <string name="test_gap">Z której strony znajduje się luka w okręgu?</string>
+
+    <string name="camera_info">Umieść urządzenie w odległości 2-6 metrów od siebie, na linii wzroku, a następnie stań lub usiądź</string>
 </resources>
