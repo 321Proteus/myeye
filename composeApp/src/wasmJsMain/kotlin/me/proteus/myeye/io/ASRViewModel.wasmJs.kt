@@ -16,6 +16,7 @@ import org.jetbrains.compose.resources.stringArrayResource
 import org.jetbrains.compose.resources.stringResource
 
 external fun initSpeech(name: String, language: String, grammar: String)
+external fun closeSpeech()
 
 external fun initResultContainer()
 
@@ -107,7 +108,10 @@ actual class ASRViewModel: ComposeViewModel() {
     }
 
     actual fun close() {
-        isActive = false
+        if (isActive) {
+            closeSpeech()
+            isActive = false
+        }
     }
 
     actual fun clearBuffer() {
