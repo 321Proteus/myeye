@@ -58,25 +58,40 @@ function displayPlaceData(el, data) {
 
 }
 
+function removePixels(str) {
+    return Number(str.substr(0, str.indexOf('p')));
+}
+
 async function showPlace(id) {
 
-    var placeDocument = await loadPlacePage()
-
-    const mapDiv = document.getElementById("map");
-    mapDiv.style.width = "60%";
-
+    var placeDocument = await loadPlacePage();
     const placeData = await fetchPlace(id);
     displayPlaceData(placeDocument, placeData);
 
     var placeDiv = document.getElementById("place");
+    const mapDiv = document.getElementById("map");
 
     if (placeDiv) {
         document.body.removeChild(placeDiv);
     }
 
     placeDiv = placeDocument.body.firstElementChild;
-    placeDiv.style.height = mapDiv.style.height;
-    placeDiv.style.top = mapDiv.style.top;
+
+    if (innerWidth < innerHeight) {
+        const mapTop = removePixels(mapDiv.style.top);
+        const mapHeight = removePixels(mapDiv.style.height);
+
+        mapDiv.style.height = mapHeight / 2 + "px";
+        placeDiv.style.height = mapHeight / 2;
+
+        var placeBarOffset = mapTop + mapHeight / 2;
+
+        placeDiv.style.top = placeBarOffset + "px";
+    } else {
+        mapDiv.style.width = "60%";
+        placeDiv.style.height = mapDiv.style.height;
+        placeDiv.style.top = mapDiv.style.top;
+    }
 
     placeDiv.id = "place";
     document.body.appendChild(placeDiv);

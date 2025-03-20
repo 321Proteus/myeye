@@ -8,8 +8,6 @@ html, body {
 
 #place {
     font-family: Arial;
-    float: right;
-    width: 40%;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -43,4 +41,9 @@ html, body {
 #btn {
     position: absolute;
     z-index: 3;
+}
+
+@media (min-aspect-ratio: 1/1) {
+    float: right;
+    width: 40%;
 }
