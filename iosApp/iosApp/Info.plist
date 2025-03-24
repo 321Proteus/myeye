@@ -52,5 +52,8 @@
 	<string>Potrzebujemy dostępu do rozpoznawania mowy</string>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>Potrzebujemy dostępu do mikrofonu</string>
+	<key>NSCameraUsageDescription</key>
+	<string>Do pomiaru odległości od urządzenia MyEye potrzebuje dostępu do kamery przedniej urządzenia</string>
+
 </dict>
 </plist>

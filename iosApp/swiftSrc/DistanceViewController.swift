@@ -10,15 +10,38 @@
 import UIKit
 import AVFoundation
 import Vision
+import ARKit
 
-@objc public class DistanceViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDelegate {
+@objc public class DistanceViewController:
+    UIViewController,
+    AVCaptureVideoDataOutputSampleBufferDelegate,
+    ARSCNViewDelegate
+
+{
+        
     var session: AVCaptureSession!
     var previewLayer: AVCaptureVideoPreviewLayer!
     var device: AVCaptureDevice!
+    var ogniskowa: CGFloat?
+    
+    var counts: Int = 0
+    var sum: Float = 0
+    
+    @objc public func getDistance() -> Float {
+        if (counts >= 25) {
+            let srednia = sum / Float(counts)
+            return srednia
+        } else {
+            return 0
+        }
+    }
     
     let distanceLabel: UILabel = {
+        
+        let distString = ResourceManager.shared.allResources["result_distance"]!
+        
         let label = UILabel()
-        label.text = "Odległość: -- cm"
+        label.text = distString + ": -- cm"
         label.textColor = .white
         label.font = UIFont.boldSystemFont(ofSize: 24)
         label.textAlignment = .center
@@ -38,10 +61,7 @@ import Vision
         session = AVCaptureSession()
         session.sessionPreset = .high
         
-        guard let camera = AVCaptureDevice.default(.builtInWideAngleCamera, for: .video, position: .front) else {
-            print("Brak dostępnej kamery")
-            return
-        }
+        guard let camera = AVCaptureDevice.default(.builtInWideAngleCamera, for: .video, position: .front) else { return }
         self.device = camera
         
         do {
@@ -59,7 +79,7 @@ import Vision
             
             session.startRunning()
         } catch {
-            print("Błąd konfiguracji kamery: \(error)")
+            print("Camera config error: \(error)")
         }
     }
     
@@ -83,10 +103,13 @@ import Vision
             guard let results = request.results as? [VNFaceObservation], let face = results.first else { return }
             
             DispatchQueue.main.async {
+//                print(face.boundingBox.width)
                 let faceWidth = face.boundingBox.width * self.view.frame.width  // Szerokość twarzy w pikselach
                 let distance = self.calculateDistance(faceWidth: faceWidth)
                 
-                self.distanceLabel.text = String(format: "Odległość: %.1f cm", distance)
+                let distString = ResourceManager.shared.allResources["result_distance"]!
+                
+                self.distanceLabel.text = String(format: distString + ": %.1f cm", distance)
             }
         }
         
@@ -95,11 +118,22 @@ import Vision
     }
     
     func calculateDistance(faceWidth: CGFloat) -> CGFloat {
-        let knownFaceWidth: CGFloat = 16.0 // cm (średnia szerokość twarzy)
-        let focalLength: CGFloat = 4.25 // mm (przykładowa wartość dla iPhone)
         
-        guard let sensorWidth = device?.activeFormat.formatDescription.dimensions.width else { return 0 }
+        if (ogniskowa == nil) {
+            let fov = device.activeFormat.videoFieldOfView
+            print("FOV \(fov)")
+            let width = UIScreen.main.nativeBounds.width
+            ogniskowa = width / 2 / tan(CGFloat(fov)/2)
+            print("Ogniskowa \(ogniskowa ?? -1.0)")
+        }
         
-        return (focalLength * knownFaceWidth * CGFloat(sensorWidth)) / faceWidth
+        let sredniaSzerokoscTwarzy: CGFloat = 15.0
+        
+//        guard let sensorWidth = device?.activeFormat.formatDescription.dimensions.width else { return 0 }
+        // TODO: magic value 2??
+        let calculated = ogniskowa! * sredniaSzerokoscTwarzy / faceWidth / 2
+        counts += 1
+        sum += Float(calculated)
+        return calculated
     }
 }
