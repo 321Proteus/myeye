@@ -14,9 +14,12 @@ protocol ViewUpdateDelegate: AnyObject {
 }
 
 @objc public class MapsViewController: UIViewController, ViewUpdateDelegate {
+
     private let googleMapView = GoogleMapsView()
     private var placeDetailsView: PlaceDetailsView?
     private var isDetail = false
+    
+    @objc public func getDetailStatus() -> Bool { return isDetail }
     
     public override func viewDidLoad() {
         super.viewDidLoad()
@@ -28,17 +31,19 @@ protocol ViewUpdateDelegate: AnyObject {
 
     }
 
-    @objc func updateView(place: GMSPlace) {
+    func updateView(place: GMSPlace) {
         print("updating from \(isDetail) with name \(place.name ?? "nil")")
         isDetail.toggle()
-        if isDetail {
-            googleMapView.removeFromSuperview()
-            self.dismiss(animated: false)
-//            placeDetailsView = PlaceDetailsView(frame: view.bounds, place: place)
-//            view.addSubview(placeDetailsView!)
-        } else {
-            placeDetailsView?.removeFromSuperview()
-            view.addSubview(googleMapView)
-        }
+        googleMapView.removeFromSuperview()
+//        self.dismiss(animated: false)
+        placeDetailsView = PlaceDetailsView(frame: view.bounds, place: place)
+        view.addSubview(placeDetailsView!)
+    }
+    
+    @objc public func updateView() {
+        isDetail.toggle()
+        placeDetailsView?.removeFromSuperview()
+        placeDetailsView = nil
+        view.addSubview(googleMapView)
     }
 }
