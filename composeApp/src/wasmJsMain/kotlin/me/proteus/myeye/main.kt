@@ -3,6 +3,7 @@ package me.proteus.myeye
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.window.ComposeViewport
 import kotlinx.browser.document
+import kotlinx.browser.window
 import me.proteus.myeye.resources.Res
 import me.proteus.myeye.resources.categories
 import me.proteus.myeye.resources.descriptions
