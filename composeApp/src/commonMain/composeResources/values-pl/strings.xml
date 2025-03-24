@@ -7,7 +7,7 @@
     <string name="next">Następny etap</string>
     <string name="prev">Poprzedni etap</string>
     <string name="nodata">Brak danych</string>
-    <string name="none">None</string>
+    <string name="none">Brak</string>
     <string name="stage">Etap</string>
 
     <string name="test">Rozpoznawanie Mowy</string>
