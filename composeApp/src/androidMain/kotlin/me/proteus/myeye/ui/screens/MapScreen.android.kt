@@ -32,6 +32,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -70,8 +71,10 @@ const val MAPS_API_KEY = "AIzaSyD33Ph-HlL8gtc08VZ4d07LH6dPlp71v3M"
 @Composable
 actual fun MapScreen() {
     val context = LocalContext.current
+    val locale = LocalConfiguration.current.locales[0]
 
-    Places.initializeWithNewPlacesApiEnabled(context, MAPS_API_KEY)
+    Places.initializeWithNewPlacesApiEnabled(context, MAPS_API_KEY, locale)
+    Places.initialize(context, MAPS_API_KEY, locale)
 
     val placesClient = Places.createClient(context)
     var currentPos by remember { mutableStateOf(LatLng(52.41, 16.93)) }
