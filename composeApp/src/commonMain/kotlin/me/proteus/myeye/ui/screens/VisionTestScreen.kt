@@ -1,5 +1,6 @@
 package me.proteus.myeye.ui.screens
 
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
@@ -14,6 +15,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -38,6 +41,8 @@ fun VisionTestConfigScreen(
         Scaffold(
             content = { innerPadding ->
 
+                val focusManager = LocalFocusManager.current
+
                 val vtu = VisionTestUtils()
                 val test = vtu.getTestByID(testID)
                 var distance by remember {
@@ -47,36 +52,32 @@ fun VisionTestConfigScreen(
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
-                        .padding(innerPadding),
+                        .padding(innerPadding)
+                        .pointerInput(Unit) {
+                            detectTapGestures(onTap = { focusManager.clearFocus() })
+                        },
                     verticalArrangement = Arrangement.SpaceEvenly,
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
 
                     Column(
                         modifier = Modifier
-                            .fillMaxHeight(0.4f)
+                            .fillMaxSize()
                             .padding(top = 16.dp),
-                        verticalArrangement = Arrangement.SpaceEvenly,
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        Text(text = vtu.getFullTestName(testID), fontSize = 24.sp)
-
-                        VisionTestIcon(
-                            modifier = Modifier
-                                .padding(start = 120.dp, end = 120.dp)
-                                .weight(0.65f),
-                            testID = testID,
-                            size = 0.4f
-                        )
-                    }
-
-                    Column(
-                        modifier = Modifier
-                            .weight(0.8f)
-                            .padding(horizontal = 16.dp),
                         verticalArrangement = Arrangement.Top,
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
+                        Text(
+                            text = vtu.getFullTestName(testID),
+                            fontSize = 24.sp
+                        )
+
+                        VisionTestIcon(
+                            modifier = Modifier
+                                .padding(start = 120.dp, end = 120.dp, top = 16.dp),
+                            testID = testID,
+                            size = 0.4f
+                        )
 
                         Box {
                             Text(vtu.getTestDescriptionByID(testID))
