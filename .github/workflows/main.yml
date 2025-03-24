@@ -38,17 +38,15 @@ jobs:
       - name: "Build WasmJS App"
         run: gradle :composeApp:wasmJsBrowserDistribution
 
-      # 5. Set up GitHub Pages
-      - name: "Configure GitHub Pages"
-        uses: actions/configure-pages@v5
+      # Install Vercel CLI
+      - name: "Install Vercel CLI"
+        run: npm install -g vercel
 
-      # 6. Upload the built artifact to Pages
-      - name: "Upload GitHub Pages artifact"
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: ./composeApp/build/dist/wasmJs/productionExecutable
+      # Vercel Login
+      - name: "Vercel Login"
+        run: vercel login ${{ secrets.VERCEL_TOKEN }}
 
-      # 7. Deploy to GitHub Pages
-      - name: "Deploy to GitHub Pages"
-        id: deployment
-        uses: actions/deploy-pages@v4
+      # Deploy to Vercel
+      - name: "Deploy to Vercel"
+        run: vercel --prod --token ${{ secrets.VERCEL_TOKEN }}
+        working-directory: ./composeApp/build/dist/wasmJs/productionExecutable

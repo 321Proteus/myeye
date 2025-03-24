@@ -29,7 +29,6 @@ class VisionTestUtils {
         val found = testList.find {
             it.testID == testID
         }
-        println("$testID $found")
         if (found == null) throw IllegalArgumentException("Nie znaleziono testu o podanym ID")
         else return found
     }
@@ -38,6 +37,8 @@ class VisionTestUtils {
     fun getTestNameByID(testID: String): String {
         val idMap = stringArrayResource(Res.array.test_ids)
         val resource = stringArrayResource(Res.array.name)
+
+        if (idMap.isEmpty() || resource.isEmpty()) return ""
         return resource[idMap.indexOf(testID)]
     }
 

@@ -11,7 +11,4 @@ actual fun isLandscape(): Boolean {
     val o = UIDevice.currentDevice.orientation
     return o == UID.UIDeviceOrientationLandscapeLeft ||
             o == UIDeviceOrientation.UIDeviceOrientationLandscapeRight
-
-//    return UIDevice.currentDevice.orientation == UID.LandscapeLeft ||
-//            UIDevice.currentDevice.orientation == UIDeviceOrientation.LandscapeRight
 }

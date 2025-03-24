@@ -96,6 +96,9 @@ actual fun SetupNavigation() {
             val id = parts.getOrNull(1)?.toIntOrNull() ?: 0
             ArticleScreen(id)
         }
+        else -> {
+            println("Hash: " + window.location.hash)
+        }
     }
 
 }

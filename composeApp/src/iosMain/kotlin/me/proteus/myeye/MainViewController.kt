@@ -1,11 +1,17 @@
 package me.proteus.myeye
 
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.window.ComposeUIViewController
 import kotlinx.cinterop.ExperimentalForeignApi
+import me.proteus.myeye.resources.Res
+import me.proteus.myeye.resources.allStringResources
+import org.jetbrains.compose.resources.ExperimentalResourceApi
+import org.jetbrains.compose.resources.stringResource
 import platform.UIKit.UIViewController
 import platform.UIKit.addChildViewController
 import platform.UIKit.didMoveToParentViewController
 import platform.UIKit.willMoveToParentViewController
+import swiftSrc.ResourceManager
 
 class UIViewControllerWrapper(
     private val controller: UIViewController, // compose view controller
@@ -47,9 +53,19 @@ class UIViewControllerWrapper(
 
 }
 
-@OptIn(ExperimentalForeignApi::class)
+@OptIn(ExperimentalResourceApi::class, ExperimentalForeignApi::class)
+@Composable
+fun setupResources() {
+
+    for (el in Res.allStringResources) {
+        val res = stringResource(el.value)
+        ResourceManager.shared().addResourceWithKey(el.key, res)
+    }
+}
+
 fun MainViewController() = UIViewControllerWrapper(
     controller = ComposeUIViewController {
+        setupResources()
         App()
     },
     onDisappear = { println("again") }

@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Home
@@ -35,7 +36,13 @@ import androidx.compose.ui.text.font.FontFamily
 import me.proteus.myeye.getCurrentRoute
 import me.proteus.myeye.navigate
 import me.proteus.myeye.resources.Res
-import me.proteus.myeye.resources.*
+import me.proteus.myeye.resources.app_name
+import me.proteus.myeye.resources.bottom_bar_articles
+import me.proteus.myeye.resources.bottom_bar_map
+import me.proteus.myeye.resources.bottom_bar_menu
+import me.proteus.myeye.resources.bottom_bar_results
+import me.proteus.myeye.resources.bottom_bar_tests
+import me.proteus.myeye.resources.optician_sans
 import org.jetbrains.compose.resources.Font
 import org.jetbrains.compose.resources.stringResource
 
@@ -46,7 +53,7 @@ object AppBarsHeightHolder {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TopBar() {
+fun TopBar(isReturning: Boolean = false, returnAction: (() -> Unit)? = null) {
 
     CenterAlignedTopAppBar(
         modifier = Modifier
@@ -62,8 +69,10 @@ fun TopBar() {
             )
         },
         navigationIcon = {
-            IconButton(onClick = { }) {
-                Icon(Icons.Filled.Menu, null)
+            IconButton(onClick = {
+                returnAction?.invoke()
+            }) {
+                Icon(if (isReturning) Icons.AutoMirrored.Filled.ArrowBack else Icons.Filled.Menu, null)
 //                Icon(Icons.Filled.Menu, null)
             }
         },

@@ -20,6 +20,7 @@ typealias iOSLatLng = CLLocationCoordinate2D
     private var locationManager = CLLocationManager()
     private var locationMarker: GMSMarker?
     private var range: GMSPolygon?
+    private var distance: CGFloat = 2.0
     weak var delegate: ViewUpdateDelegate?
 
     override init(frame: CGRect) {
@@ -83,6 +84,7 @@ typealias iOSLatLng = CLLocationCoordinate2D
                 GMSPlaceProperty.name.rawValue,
                 GMSPlaceProperty.coordinate.rawValue,
                 GMSPlaceProperty.phoneNumber.rawValue,
+                GMSPlaceProperty.website.rawValue,
                 GMSPlaceProperty.currentOpeningHours.rawValue,
                 GMSPlaceProperty.formattedAddress.rawValue
             ],
@@ -111,12 +113,12 @@ typealias iOSLatLng = CLLocationCoordinate2D
         let newCamera = GMSCameraPosition.camera(
            withLatitude: coordinate.latitude,
            longitude: coordinate.longitude,
-           zoom: 13.0
+           zoom: mapView.camera.zoom
         )
         mapView.animate(to: newCamera)
         search(center: coordinate)
         
-        drawRange(mapView: mapView, center: coordinate, distance: 1.0)
+        drawRange(mapView: mapView, center: coordinate)
         
     }
     
@@ -132,11 +134,11 @@ typealias iOSLatLng = CLLocationCoordinate2D
 
     }
     
-    func drawRange(mapView: GMSMapView, center: iOSLatLng, distance: Double) {
+    func drawRange(mapView: GMSMapView, center: iOSLatLng) {
         
         range?.map = nil
         
-        let bounds = getRectangularBounds(center: center, distance: distance)
+        let bounds = getRectangularBounds(center: center)
         let sw = bounds.0
         let ne = bounds.1
         let nw = iOSLatLng(latitude: ne.latitude, longitude: sw.longitude)
@@ -157,7 +159,7 @@ typealias iOSLatLng = CLLocationCoordinate2D
     
     func search(center: iOSLatLng) {
         
-        let bounds = getRectangularBounds(center: center, distance: 1.0)
+        let bounds = getRectangularBounds(center: center)
         let req = GMSPlaceSearchByTextRequest(
             textQuery: "okulistyczny",
             placeProperties: [
@@ -218,7 +220,7 @@ typealias iOSLatLng = CLLocationCoordinate2D
         }
     }
     
-    func getRectangularBounds(center: iOSLatLng, distance: Double) -> (iOSLatLng, iOSLatLng) {
+    func getRectangularBounds(center: iOSLatLng) -> (iOSLatLng, iOSLatLng) {
         let earthRadius = 6371.0
         let lat = center.latitude
         let lon = center.longitude
