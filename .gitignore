@@ -21,3 +21,4 @@ iosApp/iosApp.xcworkspace
 iosApp/iosApp.xcodeproj
 iosApp/Podfile.lock
 composeApp/exportedSwiftSrc
+.vercel

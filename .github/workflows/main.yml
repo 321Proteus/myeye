@@ -42,7 +42,8 @@ jobs:
       - name: "Install Vercel CLI"
         run: npm install -g vercel
 
+
       # Deploy to Vercel
       - name: "Deploy to Vercel"
-        run: vercel --prod --token ${{ secrets.VERCEL_TOKEN }}
+        run: vercel --prod --token ${{ secrets.VERCEL_TOKEN }} --cwd ./composeApp/build/dist/wasmJs/productionExecutable
         working-directory: ./composeApp/build/dist/wasmJs/productionExecutable

@@ -21,6 +21,7 @@ import me.proteus.myeye.ui.screens.TestResultScreen
 import me.proteus.myeye.ui.screens.VisionTestConfigScreen
 import me.proteus.myeye.ui.screens.VisionTestScreen
 import org.w3c.dom.HTMLElement
+import org.w3c.dom.HashChangeEvent
 import org.w3c.dom.asList
 
 actual fun getCurrentRoute(): String {
@@ -40,7 +41,7 @@ actual fun SetupNavigation() {
         mutableStateOf(getCurrentRoute())
     }
     LaunchedEffect(Unit) {
-        window.onhashchange = {
+        window.addEventListener("hashchange") {
             println("hash change")
             val otherElements = document.body!!.childNodes
                 .asList().filter { el ->
@@ -48,7 +49,7 @@ actual fun SetupNavigation() {
                 }
             otherElements.forEach { el -> document.body!!.removeChild(el) }
 
-            println(it.oldURL)
+//            println((it as HashChangeEvent).oldURL)
             currentRoute = window.location.hash.removePrefix("#/")
             println(currentRoute)
         }

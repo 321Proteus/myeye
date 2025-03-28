@@ -21,6 +21,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.unit.dp
@@ -49,8 +50,10 @@ import me.proteus.myeye.ui.theme.MyEyeTheme
 actual fun PlaceDetailsScreen(placeId: String) {
 
     val context = LocalContext.current
+    val locale = LocalConfiguration.current.locales[0]
 
     Places.initializeWithNewPlacesApiEnabled(context, MAPS_API_KEY)
+    Places.initialize(context, MAPS_API_KEY, locale)
     val placesClient = Places.createClient(context)
 
     MyEyeTheme {

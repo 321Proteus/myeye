@@ -11,6 +11,7 @@
 
         gtag('config', 'G-PYJRZTDJL8');
     </script>
+    <script defer src="js/content/scroll.js"></script>
 
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -20,7 +21,33 @@
 
 </head>
 <body>
-    <a href="./app.html#/menu">Uruchom</a>
-    <!-- <div id="btn" style="background-color: aqua;">Click to start</div> -->
+    
+    <div id="container">
+        <div id="color-top">
+            <div id="litery"></div>
+            <div id="gora">
+                <div id="teksty-gora">
+                    <div>
+                        <div id="tytul">MyEye</div>
+                        <div id="podtytul">Jak się patrzy?</div>
+                        <button class="app-button" id="btn-demo" onclick="window.location.href='./app.html#/menu'">URUCHOM DEMO</button>
+                        <button class="app-button" id="btn-info">O NAS</button>
+                        <button class="app-button" id="btn-call">KONTAKT</button>
+                    </div>
+                </div>
+                <div id="logo-big">
+                    <img src="./myeye.png">
+                </div>
+                <div id="arrow-container">
+                    <svg id="arrow-button" width="100" height="40" viewBox="0 0 100 40" xmlns="http://www.w3.org/2000/svg">
+                        <polyline points="5,15 50,25 95,15" fill="none" stroke="white" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
+                      </svg>
+                </div>
+            </div>
+        </div>
+        <div id="color-bottom"></div>
+        <div id="color-mid"></div>
+        <div id="color-mid"></div>
+    </div>
 </body>
 </html>

@@ -13,7 +13,10 @@ import me.proteus.myeye.resources.phonetic
 import me.proteus.myeye.resources.test_ids
 import org.jetbrains.compose.resources.stringArrayResource
 import org.w3c.dom.HTMLElement
+import org.w3c.dom.events.MouseEvent
 import org.w3c.dom.get
+
+external fun sendCanvasClick()
 
 @OptIn(ExperimentalComposeUiApi::class)
 fun main() {
@@ -31,5 +34,9 @@ fun main() {
     composeCanvas.id = "canvas"
     composeCanvas.style.position = "fixed"
     composeCanvas.style.top = "0px"
+
+    composeCanvas.addEventListener("click") {
+        sendCanvasClick()
+    }
 
 }

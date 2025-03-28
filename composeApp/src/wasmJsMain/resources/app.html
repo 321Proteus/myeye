@@ -10,6 +10,40 @@
         gtag('js', new Date());
 
         gtag('config', 'G-PYJRZTDJL8');
+
+        let timer = null;
+        const interval = 10000;
+
+        const checkHash = () => window.location.hash.includes("visiontest");
+
+        function startTrack() {
+          if (timer === null) {
+            timer = setInterval(() => {
+              if (checkHash()) {
+                gtag("event", "user_engagement", {
+                  engagement_time_msec: interval,
+                });
+              } else stopTrack();
+            }, interval);
+          }
+        }
+
+        function stopTrack() {
+          if (timer !== null) {
+            clearInterval(timer);
+            timer = null;
+          }
+        }
+
+        window.addEventListener("hashchange", () => {
+          if (checkHash()) startTrack();
+          else stopTrack();
+        });
+
+        if (checkHash()) {
+          console.log("Starting from test")
+          startTrack();
+        }
     </script>
 
     <meta charset="UTF-8">
@@ -17,18 +51,24 @@
     <!-- <link rel="icon" type="image/x-icon" href="favicon.ico"> -->
     <title>MyEye</title>
     <link type="text/css" rel="stylesheet" href="styles.css">
+    <link type="text/css" rel="stylesheet" href="map.css">
 
     <script type="application/javascript" src="composeApp.js"></script>
     <script src="https://cdn.jsdelivr.net/gh/msqr1/Vosklet@1.2.1/Examples/Vosklet.js" crossorigin defer></script>
-     <script src="https://cdn.jsdelivr.net/gh/msqr1/Vosklet@1.2.1/AddCOI.js" async></script>
-    <!-- <script src="./Vosklet.js"></script> -->
-    <!-- <script src="./AddCOI.js"></script> -->
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD33Ph-HlL8gtc08VZ4d07LH6dPlp71v3M&v=weekly&libraries=places,marker" async defer></script>
 
-    <script src="map.js" defer></script>
-    <script src="navigation.js"></script>
-    <script src="place.js"></script>
-    <script src="speech.js" defer></script>
+    <script src="js/content/map.js" defer></script>
+    <script src="js/functions/navigation.js"></script>
+    <script src="js/content/place.js"></script>
+    <script src="js/functions/speech.js" defer></script>
+    <script>
+      function sendCanvasClick() {
+        console.log("sending");
+        gtag("event", "user_engagement", {
+            engagement_time_msec: 1000,
+        });
+      }
+    </script>
 
 </head>
 <body>
